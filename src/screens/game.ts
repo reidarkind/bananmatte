@@ -1,3 +1,4 @@
+import { ROTTEN_LIMIT } from "../game/rules";
 import { modeLabel, t } from "../i18n";
 import type { Locale, ModeId } from "../types";
 import { html, onClick } from "./dom";
@@ -25,12 +26,13 @@ export function renderGameShell(
       </div>
       <div class="hud-row">
         <span data-lives></span>
-        <span data-rotten></span>
+        <span class="rotten-meter" data-rotten></span>
         <span data-progress></span>
         <span data-score>0</span>
       </div>
     </div>
   `);
+  paintRotten(hud, 0, locale);
   onClick(hud, "[data-quit]", onQuit);
   return {
     canvas: root.querySelector("#stage") as HTMLCanvasElement,
@@ -54,13 +56,23 @@ export function updateHud(
 ): void {
   const locale = info.locale ?? "nb";
   const lives = "🍌".repeat(info.lives) + "✕".repeat(Math.max(0, 2 - info.lives));
-  const rotten = "🟤".repeat(info.rottenCaught ?? 0);
   setText(hud, "[data-mode]", modeLabel(locale, info.mode));
   setText(hud, "[data-level]", t(locale, "level", { n: info.level }));
   setText(hud, "[data-lives]", lives);
-  setText(hud, "[data-rotten]", rotten);
+  paintRotten(hud, info.rottenCaught ?? 0, locale);
   setText(hud, "[data-progress]", `${info.collected} / ${info.target}`);
   setText(hud, "[data-score]", String(info.score));
+}
+
+function paintRotten(hud: HTMLElement, caught: number, locale: Locale): void {
+  const meter = hud.querySelector("[data-rotten]");
+  if (!meter) return;
+  const filled = Math.min(ROTTEN_LIMIT, Math.max(0, caught));
+  const slots = Array.from({ length: ROTTEN_LIMIT }, (_, i) =>
+    `<i class="rotten-slot${i < filled ? " on" : ""}" aria-hidden="true"></i>`,
+  ).join("");
+  meter.setAttribute("aria-label", t(locale, "game.rottenCount", { n: filled, max: ROTTEN_LIMIT }));
+  meter.innerHTML = `<span class="rotten-label">${t(locale, "game.rotten")}</span><span class="rotten-slots">${slots}</span>`;
 }
 
 function setText(root: ParentNode, selector: string, value: string): void {

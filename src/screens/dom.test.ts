@@ -57,4 +57,28 @@ describe("game HUD", () => {
     expect(hud.querySelector("[data-progress]")?.textContent).toBe("1 / 5");
     root.remove();
   });
+
+  it("shows a rotten-banana meter with three slots at the top", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    const { hud } = renderGameShell(root, "addisjon", () => {});
+    const meter = hud.querySelector("[data-rotten]");
+    expect(meter).not.toBeNull();
+    expect(meter?.textContent).toContain("Råtten");
+    expect(hud.querySelectorAll(".rotten-slot")).toHaveLength(3);
+    expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(0);
+
+    updateHud(hud, {
+      mode: "addisjon",
+      level: 2,
+      lives: 2,
+      collected: 0,
+      target: 6,
+      score: 20,
+      rottenCaught: 2,
+    });
+    expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(2);
+    expect(meter?.getAttribute("aria-label")).toContain("2");
+    root.remove();
+  });
 });
