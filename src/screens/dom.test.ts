@@ -66,7 +66,9 @@ describe("game HUD", () => {
     expect(meter).not.toBeNull();
     expect(meter?.textContent).toContain("Råtten");
     expect(hud.querySelectorAll(".rotten-slot")).toHaveLength(3);
+    expect(hud.querySelectorAll(".rotten-icon")).toHaveLength(3);
     expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(0);
+    expect(hud.querySelectorAll(".rotten-slot .cross")).toHaveLength(3);
 
     updateHud(hud, {
       mode: "addisjon",
@@ -77,7 +79,9 @@ describe("game HUD", () => {
       score: 20,
       rottenCaught: 2,
     });
+    expect(hud.querySelectorAll(".rotten-icon")).toHaveLength(3);
     expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(2);
+    expect(hud.querySelectorAll(".rotten-slot.on .cross")).toHaveLength(2);
     expect(meter?.getAttribute("aria-label")).toContain("2");
     root.remove();
   });

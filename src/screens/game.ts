@@ -64,12 +64,22 @@ export function updateHud(
   setText(hud, "[data-score]", String(info.score));
 }
 
+function rottenBananaSvg(): string {
+  return `<svg class="rotten-icon" viewBox="-24 -28 50 52" aria-hidden="true">
+    <path class="peel" d="M-16-10C-4-22 18-8 16 14C8 8-8 2-16-10Z"/>
+    <path class="stem" d="M-18-11c-1.2-4.2 1.6-7.6 3.6-6.2 1.4 1.4.2 5.2-1.8 6.2z"/>
+    <ellipse class="spot" cx="2" cy="1" rx="3.1" ry="2.2" transform="rotate(23 2 1)"/>
+    <ellipse class="spot" cx="9" cy="8" rx="2.3" ry="1.7" transform="rotate(-17 9 8)"/>
+    <path class="cross" d="M-12-18 12 16M12-18-12 16"/>
+  </svg>`;
+}
+
 function paintRotten(hud: HTMLElement, caught: number, locale: Locale): void {
   const meter = hud.querySelector("[data-rotten]");
   if (!meter) return;
   const filled = Math.min(ROTTEN_LIMIT, Math.max(0, caught));
   const slots = Array.from({ length: ROTTEN_LIMIT }, (_, i) =>
-    `<i class="rotten-slot${i < filled ? " on" : ""}" aria-hidden="true"></i>`,
+    `<i class="rotten-slot${i < filled ? " on" : ""}" aria-hidden="true">${rottenBananaSvg()}</i>`,
   ).join("");
   meter.setAttribute("aria-label", t(locale, "game.rottenCount", { n: filled, max: ROTTEN_LIMIT }));
   meter.innerHTML = `<span class="rotten-label">${t(locale, "game.rotten")}</span><span class="rotten-slots">${slots}</span>`;
