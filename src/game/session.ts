@@ -11,11 +11,12 @@ import {
 } from "./attack";
 import { createDecor, type Decor } from "./backgrounds";
 import { intersects } from "./collision";
-import { drawApe, drawAttackGrove, drawAttackLeaves, drawBackground, drawBanana, drawCanopy, drawDecor, drawGorilla, drawTreeLine } from "./draw";
+import { bananaKindForThrower, createDefendWorld, maybeSpawnThrower, stepThrowers, type DefendWorld } from "./defend";
+import { drawApe, drawApeGang, drawAttackGrove, drawAttackLeaves, drawBackground, drawBanana, drawDecor, drawGorilla } from "./draw";
 import { attachKeys, attachPointer, attachTap } from "./input";
-import { bananaInBasketPose, basketRect, gorillaRect, spawnFalling, type FallingItem } from "./entities";
+import { bananaInBasketPose, basketRect, gorillaRect, spawnFalling, spawnFallingAt, type FallingItem } from "./entities";
 import { attackHitEvent, attackLeaveEvent, attackMissEvent, defendEscapeEvent, defendHitEvent } from "./play-map";
-import { ATTACK_THROWER_KIND, apeCountForValue, defendSpawnInterval, resolvePlayStyle, type PlayStyle } from "./play-style";
+import { ATTACK_THROWER_KIND, peekPop, resolvePlayStyle, type PlayStyle } from "./play-style";
 import { applyCatchEvent, createPlayState, fallSpeed, spawnRotten, type FallingKind, type PlayState } from "./rules";
 
 export interface HudSnapshot {
@@ -64,6 +65,7 @@ export function createPlaySession(opts: {
   let style: PlayStyle = "sank";
   let previousStyle: PlayStyle | undefined;
   let attack: AttackWorld = createAttackWorld();
+  let defend: DefendWorld = createDefendWorld();
   let throwerFacing = 1;
 
   const resize = () => {
@@ -100,11 +102,13 @@ export function createPlaySession(opts: {
       paused = true;
       items = [];
       attack = createAttackWorld();
+      defend = createDefendWorld();
       opts.onGameOver(state);
     } else if (state.roundComplete) {
       paused = true;
       items = [];
       attack = createAttackWorld();
+      defend = createDefendWorld();
       opts.onRoundComplete(state);
     }
   };
@@ -114,7 +118,7 @@ export function createPlaySession(opts: {
     apply(applyCatchEvent(state, event), sound);
   };
 
-  const tickSankOrDefend = (dt: number, defend: boolean) => {
+  const tickSankOrDefend = (dt: number, isDefend: boolean) => {
     gorillaX += keyDir * 280 * dt;
     gorillaX = Math.max(36, Math.min(width - 36, gorillaX));
     const body = gorillaRect(gorillaX, height - 58);
@@ -122,26 +126,26 @@ export function createPlaySession(opts: {
     const speed = fallSpeed(level);
 
     spawnAcc += dt;
-    const interval = defend ? defendSpawnInterval(level) : Math.max(0.55, 1.35 - level * 0.06);
-    if (spawnAcc >= interval && items.length < 5) {
+    const interval = Math.max(0.55, 1.35 - level * 0.06);
+    if (isDefend) {
+      maybeSpawnThrower(defend, width, Math.max(1, state.target - state.collected), opts.settings.maxN, level, dt, opts.rng, height);
+      const { throws } = stepThrowers(defend, dt);
+      for (const tossed of throws) {
+        items.push(spawnFallingAt(tossed.kind, tossed.value, tossed.x, tossed.y, speed, opts.rng));
+      }
+    } else if (spawnAcc >= interval && items.length < 5) {
       spawnAcc = 0;
       const remaining = Math.max(1, state.target - state.collected);
-      if (defend) {
-        const ripe = spawnRotten(level, opts.rng);
-        const value = nextBananaValue(opts.settings.maxN, remaining, opts.rng);
-        items.push(spawnFalling(ripe ? "banana" : "rotten", value, width, speed, opts.rng));
-      } else {
-        const rotten = spawnRotten(level, opts.rng);
-        items.push(
-          spawnFalling(
-            rotten ? "rotten" : "banana",
-            rotten ? 1 : nextBananaValue(opts.settings.maxN, remaining, opts.rng),
-            width,
-            speed,
-            opts.rng,
-          ),
-        );
-      }
+      const rotten = spawnRotten(level, opts.rng);
+      items.push(
+        spawnFalling(
+          rotten ? "rotten" : "banana",
+          rotten ? 1 : nextBananaValue(opts.settings.maxN, remaining, opts.rng),
+          width,
+          speed,
+          opts.rng,
+        ),
+      );
     }
 
     const kept: FallingItem[] = [];
@@ -149,9 +153,9 @@ export function createPlaySession(opts: {
       item.y += item.vy * dt;
       item.rot += item.spin * dt;
       const box = { x: item.x, y: item.y, w: item.w, h: item.h };
-      if (intersects(box, defend ? body : basket)) {
-        if (!defend) inBasket.push({ kind: item.kind, value: item.value, rot: item.rot, age: 0 });
-        if (defend) {
+      if (intersects(box, isDefend ? body : basket)) {
+        if (!isDefend) inBasket.push({ kind: item.kind, value: item.value, rot: item.rot, age: 0 });
+        if (isDefend) {
           const event = defendHitEvent(item.kind, item.value);
           apply(
             applyCatchEvent(state, event),
@@ -167,7 +171,7 @@ export function createPlaySession(opts: {
         continue;
       }
       if (item.y > height) {
-        if (defend) {
+        if (isDefend) {
           const event = defendEscapeEvent(item.kind, item.value);
           apply(
             applyCatchEvent(state, event),
@@ -206,11 +210,8 @@ export function createPlaySession(opts: {
     if (style === "angrep") {
       drawAttackGrove(ctx, width, height);
       for (const target of attack.targets) {
-        const count = target.kind === "gorilla" ? 1 : apeCountForValue(target.value);
-        const scale = target.kind === "gorilla" ? 0.72 : 0.58;
-        for (let i = 0; i < count; i += 1) {
-          drawApe(ctx, target.x + target.w / 2 + (i - (count - 1) / 2) * 20, target.y + target.h * 0.7, 1, target.kind, scale);
-        }
+        const popY = (1 - peekPop(target.age, target.life)) * 42;
+        drawApeGang(ctx, target.x + target.w / 2, target.y + target.h * 0.7 + popY, target.kind, target.value);
       }
       drawAttackLeaves(ctx, width, height);
       for (const shot of attack.shots) {
@@ -232,11 +233,20 @@ export function createPlaySession(opts: {
     }
 
     if (style === "forsvar") {
-      drawTreeLine(ctx, width, 78);
-      drawApe(ctx, width * 0.22, 58, 1, "orangutan", 0.55);
-      drawApe(ctx, width * 0.5, 48, -1, "orangutan", 0.58);
-      drawApe(ctx, width * 0.78, 62, 1, "orangutan", 0.52);
-      drawCanopy(ctx, width, height);
+      drawAttackGrove(ctx, width, height);
+      for (const target of defend.targets) {
+        const popY = (1 - peekPop(target.age, target.life)) * 42;
+        drawApe(
+          ctx,
+          target.x + target.w / 2,
+          target.y + target.h * 0.7 + popY,
+          1,
+          target.kind,
+          target.kind === "gorilla" ? 0.72 : 0.62,
+          target.thrown ? undefined : bananaKindForThrower(target.kind),
+        );
+      }
+      drawAttackLeaves(ctx, width, height);
       drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "back");
       for (const item of items) drawBanana(ctx, item);
       drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "front");
@@ -329,6 +339,7 @@ export function createPlaySession(opts: {
       inBasket = [];
       spawnAcc = 0.4;
       attack = createAttackWorld();
+      defend = createDefendWorld();
       gorillaX = width / 2;
       decor = createDecor(level, width, height, opts.rng);
       paused = false;

@@ -1,5 +1,6 @@
 import { backgroundFor, type Decor } from "./backgrounds";
 import { GORILLA, type FallingItem } from "./entities";
+import { apeCountForValue, gangOffsets, shouldShowApeValue } from "./play-style";
 
 export function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, level: number): void {
   const bg = backgroundFor(level);
@@ -202,6 +203,15 @@ export const APE_FUR = {
 
 export const APE_BODY = { cx: 0, cy: 26, rx: 22, ry: 18 };
 
+export const APE_ORANGUTAN = {
+  flangeRx: 20,
+  flangeRy: 16.5,
+  faceRx: 6.4,
+  faceRy: 10.2,
+};
+
+export const PAN_HELMET = { cyOffset: -18, rimRx: 17, bowlRy: 10 };
+
 export function apeFaceFill(kind: "gorilla" | "orangutan"): string {
   return kind === "orangutan" ? "#241610" : "#f0c4a0";
 }
@@ -385,6 +395,46 @@ function drawGorillaBody(ctx: CanvasRenderingContext2D, fur: string = FUR, furLi
   drawGorillaHead(ctx, fur);
 }
 
+function drawPanHelmet(ctx: CanvasRenderingContext2D): void {
+  const { cx, cy } = GORILLA.head;
+  const rimY = cy + PAN_HELMET.cyOffset + 2;
+  const { rimRx, bowlRy } = PAN_HELMET;
+  ctx.fillStyle = "#6b7280";
+  ctx.beginPath();
+  ctx.ellipse(cx, rimY - 1, rimRx - 3, bowlRy, 0, Math.PI, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#4b5563";
+  ctx.beginPath();
+  ctx.ellipse(cx, rimY - 5, rimRx - 5, bowlRy - 3, 0, Math.PI, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#d1d5db";
+  ctx.beginPath();
+  ctx.ellipse(cx, rimY, rimRx, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#374151";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(cx, rimY, rimRx - 2.2, 3.8, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = "#9ca3af";
+  ctx.lineWidth = 3.6;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(cx + rimRx - 1, rimY);
+  ctx.quadraticCurveTo(cx + 28, rimY + 1, cx + 30, rimY + 8);
+  ctx.stroke();
+  ctx.fillStyle = "#e5e7eb";
+  ctx.beginPath();
+  ctx.ellipse(cx + 30, rimY + 8, 3.2, 2.2, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#6b7280";
+  ctx.lineWidth = 2.4;
+  ctx.beginPath();
+  ctx.moveTo(cx - rimRx + 1, rimY);
+  ctx.lineTo(cx - rimRx - 5, rimY + 1);
+  ctx.stroke();
+}
+
 export function drawGorilla(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -397,6 +447,7 @@ export function drawGorilla(
   ctx.scale(facing < 0 ? -1 : 1, 1);
   if (layer === "back") {
     drawGorillaBody(ctx);
+    drawPanHelmet(ctx);
     drawBasketBack(ctx);
   } else {
     drawBasketFront(ctx);
@@ -425,99 +476,141 @@ function drawApeHands(ctx: CanvasRenderingContext2D, fur: string, long = false):
 function drawOrangutanTorso(ctx: CanvasRenderingContext2D): void {
   const fur = APE_FUR.orangutan;
   const dark = APE_FUR.orangutanDark;
+  const light = APE_FUR.orangutanLight;
+  ctx.fillStyle = dark;
+  ctx.beginPath();
+  ctx.ellipse(-11, 50, 9, 5.5, 0, 0, Math.PI * 2);
+  ctx.ellipse(11, 50, 9, 5.5, 0, 0, Math.PI * 2);
+  ctx.fill();
   ctx.fillStyle = fur;
   ctx.beginPath();
-  ctx.ellipse(-12, 48, 8, 5, 0, 0, Math.PI * 2);
-  ctx.ellipse(12, 48, 8, 5, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 30, 17, 21, 0, 0, Math.PI * 2);
   ctx.fill();
+  ctx.fillStyle = light;
   ctx.beginPath();
-  ctx.ellipse(0, 28, 18, 20, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 32, 8, 12, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = APE_FUR.orangutanLight;
-  ctx.beginPath();
-  ctx.ellipse(0, 30, 9, 12, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = dark;
-  ctx.lineWidth = 7;
+  ctx.strokeStyle = fur;
+  ctx.lineWidth = 8;
   ctx.lineCap = "round";
   ctx.beginPath();
-  ctx.moveTo(-12, 16);
-  ctx.quadraticCurveTo(-30, 8, -30, 24);
-  ctx.moveTo(12, 16);
-  ctx.quadraticCurveTo(30, 8, 30, 24);
+  ctx.moveTo(-10, 16);
+  ctx.quadraticCurveTo(-32, 10, -32, 28);
+  ctx.moveTo(10, 16);
+  ctx.quadraticCurveTo(32, 10, 32, 28);
   ctx.stroke();
-  ctx.fillStyle = fur;
+  ctx.strokeStyle = light;
+  ctx.lineWidth = 3.2;
   ctx.beginPath();
-  ctx.ellipse(-18, 18, 10, 14, -0.5, 0, Math.PI * 2);
-  ctx.ellipse(18, 18, 10, 14, 0.5, 0, Math.PI * 2);
-  ctx.ellipse(0, 12, 12, 10, 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.moveTo(-12, 20);
+  ctx.quadraticCurveTo(-30, 16, -30, 26);
+  ctx.moveTo(12, 20);
+  ctx.quadraticCurveTo(30, 16, 30, 26);
+  ctx.stroke();
 }
 
 function drawOrangutanHead(ctx: CanvasRenderingContext2D): void {
   const { cx, cy } = GORILLA.head;
   const fur = APE_FUR.orangutan;
   const dark = APE_FUR.orangutanDark;
+  const light = APE_FUR.orangutanLight;
+  const { flangeRx, flangeRy, faceRx, faceRy } = APE_ORANGUTAN;
   const face = apeFaceFill("orangutan");
-
-  ctx.fillStyle = fur;
-  ctx.beginPath();
-  ctx.ellipse(cx - 18, cy + 10, 12, 20, -0.45, 0, Math.PI * 2);
-  ctx.ellipse(cx + 18, cy + 10, 12, 20, 0.45, 0, Math.PI * 2);
-  ctx.ellipse(cx, cy - 16, 16, 14, 0, 0, Math.PI * 2);
-  ctx.ellipse(cx - 10, cy - 12, 10, 12, -0.6, 0, Math.PI * 2);
-  ctx.ellipse(cx + 10, cy - 12, 10, 12, 0.6, 0, Math.PI * 2);
-  ctx.fill();
 
   ctx.fillStyle = dark;
   ctx.beginPath();
-  ctx.ellipse(cx - 16, cy + 8, 10, 14, -0.08, 0, Math.PI * 2);
-  ctx.ellipse(cx + 16, cy + 8, 10, 14, 0.08, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy + 10, 16, 20, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#5a3218";
+  ctx.fillStyle = fur;
   ctx.beginPath();
-  ctx.ellipse(cx - 15, cy + 8, 6.5, 10, -0.08, 0, Math.PI * 2);
-  ctx.ellipse(cx + 15, cy + 8, 6.5, 10, 0.08, 0, Math.PI * 2);
+  ctx.ellipse(cx - 22, cy + 16, 11, 22, 0.35, 0, Math.PI * 2);
+  ctx.ellipse(cx + 22, cy + 16, 11, 22, -0.35, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy + 22, 12, 12, 0, 0, Math.PI * 2);
   ctx.fill();
+  ctx.fillStyle = light;
+  ctx.beginPath();
+  ctx.ellipse(cx - 26, cy + 20, 6, 16, 0.45, 0, Math.PI * 2);
+  ctx.ellipse(cx + 26, cy + 20, 6, 16, -0.45, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#5a3016";
+  ctx.beginPath();
+  ctx.ellipse(cx - 17, cy + 3, flangeRx, flangeRy, -0.06, 0, Math.PI * 2);
+  ctx.ellipse(cx + 17, cy + 3, flangeRx, flangeRy, 0.06, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#7a4320";
+  ctx.beginPath();
+  ctx.ellipse(cx - 16, cy + 2, flangeRx - 6, flangeRy - 5, -0.06, 0, Math.PI * 2);
+  ctx.ellipse(cx + 16, cy + 2, flangeRx - 6, flangeRy - 5, 0.06, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#3d1e0c";
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.ellipse(cx - 17, cy + 3, flangeRx - 3, flangeRy - 3, -0.06, 0.2, Math.PI - 0.2);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(cx + 17, cy + 3, flangeRx - 3, flangeRy - 3, 0.06, 0.2, Math.PI - 0.2);
+  ctx.stroke();
 
   ctx.fillStyle = fur;
   ctx.beginPath();
-  ctx.ellipse(cx, cy - 2, 16, 17, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy - 10, 12, 11, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = light;
+  ctx.beginPath();
+  ctx.ellipse(cx - 5, cy - 12, 5, 6, -0.4, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.fillStyle = face;
   ctx.beginPath();
-  ctx.ellipse(cx, cy + 1, 8.2, 7.6, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy + 3, faceRx, faceRy, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#3a2418";
+  ctx.fillStyle = "#2c1a10";
   ctx.beginPath();
-  ctx.ellipse(cx, cy + 12, 9.4, 8.4, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy + 9, faceRx + 1.2, faceRy - 3.4, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#4a3420";
+  ctx.fillStyle = "#1a1008";
   ctx.beginPath();
-  ctx.ellipse(cx - 3.2, cy - 1.5, 2.4, 2.8, 0, 0, Math.PI * 2);
-  ctx.ellipse(cx + 3.2, cy - 1.5, 2.4, 2.8, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy - 4, 6.4, 3.2, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#140c08";
+  ctx.fillStyle = "#6b4528";
   ctx.beginPath();
-  ctx.arc(cx - 3.1, cy - 1.3, 1.35, 0, Math.PI * 2);
-  ctx.arc(cx + 3.1, cy - 1.3, 1.35, 0, Math.PI * 2);
+  ctx.ellipse(cx - 2.3, cy - 0.6, 1.7, 2, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 2.3, cy - 0.6, 1.7, 2, 0, 0, Math.PI * 2);
   ctx.fill();
-
-  ctx.fillStyle = "#140c08";
+  ctx.fillStyle = "#100804";
   ctx.beginPath();
-  ctx.ellipse(cx - 2.4, cy + 9.2, 1.8, 1.4, 0, 0, Math.PI * 2);
-  ctx.ellipse(cx + 2.4, cy + 9.2, 1.8, 1.4, 0, 0, Math.PI * 2);
+  ctx.arc(cx - 2.2, cy - 0.4, 1.05, 0, Math.PI * 2);
+  ctx.arc(cx + 2.2, cy - 0.4, 1.05, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = "#140c08";
+  ctx.fillStyle = "#100804";
+  ctx.beginPath();
+  ctx.ellipse(cx - 1.7, cy + 8.6, 1.3, 1.1, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 1.7, cy + 8.6, 1.3, 1.1, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#100804";
   ctx.lineWidth = 1.5;
   ctx.lineCap = "round";
   ctx.beginPath();
-  ctx.moveTo(cx - 4.4, cy + 15);
-  ctx.quadraticCurveTo(cx, cy + 17.6, cx + 4.4, cy + 15);
+  ctx.moveTo(cx - 3.6, cy + 13.8);
+  ctx.quadraticCurveTo(cx, cy + 16.4, cx + 3.6, cy + 13.8);
   ctx.stroke();
+
+  ctx.fillStyle = fur;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 18, 7, 6, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawHeldBanana(ctx: CanvasRenderingContext2D, rotten: boolean): void {
+  ctx.save();
+  ctx.translate(28, 22);
+  ctx.rotate(0.85);
+  ctx.scale(0.42, 0.42);
+  drawOneBanana(ctx, rotten);
+  ctx.restore();
 }
 
 export function drawApe(
@@ -527,6 +620,7 @@ export function drawApe(
   facing: number,
   kind: "gorilla" | "orangutan",
   scale = 1,
+  held?: "banana" | "rotten",
 ): void {
   const fur = kind === "orangutan" ? APE_FUR.orangutanDark : APE_FUR.gorilla;
   const light = kind === "orangutan" ? APE_FUR.orangutanLight : APE_FUR.gorillaLight;
@@ -542,7 +636,42 @@ export function drawApe(
     drawGorillaHead(ctx, fur);
     drawApeHands(ctx, fur);
   }
+  if (held) drawHeldBanana(ctx, held === "rotten");
   ctx.restore();
+}
+
+export function drawValueBadge(ctx: CanvasRenderingContext2D, x: number, y: number, value: number): void {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = "#f4d35e";
+  ctx.beginPath();
+  ctx.arc(0, 0, 13, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#1b4332";
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.fillStyle = "#1b4332";
+  ctx.font = "bold 14px Nunito, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(String(value), 0, 1);
+  ctx.restore();
+}
+
+export function drawApeGang(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  kind: "gorilla" | "orangutan",
+  value: number,
+  facing = 1,
+): void {
+  const count = kind === "gorilla" ? 1 : apeCountForValue(value);
+  const base = kind === "gorilla" ? 0.72 : 0.62;
+  for (const off of gangOffsets(count)) {
+    drawApe(ctx, x + off.x, y + off.y, facing * off.facing, kind, base * off.scale);
+  }
+  if (shouldShowApeValue(kind, value)) drawValueBadge(ctx, x, y - 46, value);
 }
 
 export function drawAttackGrove(ctx: CanvasRenderingContext2D, width: number, height: number): void {

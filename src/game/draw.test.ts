@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { APE_BODY, APE_FUR, apeFaceFill, bananaCurves, pointOnCubic } from "./draw";
+import { APE_BODY, APE_FUR, APE_ORANGUTAN, PAN_HELMET, apeFaceFill, bananaCurves, pointOnCubic } from "./draw";
 import { GORILLA, bananaInBasketPose, basketRect } from "./entities";
 
 function distToChord(
@@ -57,6 +57,17 @@ describe("ape colors", () => {
     expect(apeFaceFill("orangutan")).not.toBe(apeFaceFill("gorilla"));
     expect(apeFaceFill("gorilla")).toMatch(/^#f/i);
     expect(apeFaceFill("orangutan")).toMatch(/^#[0-6]/i);
+  });
+
+  it("gives orangutans wide cheek flanges and a long dark muzzle", () => {
+    expect(APE_ORANGUTAN.flangeRx).toBeGreaterThan(APE_ORANGUTAN.faceRx * 2);
+    expect(APE_ORANGUTAN.faceRy).toBeGreaterThan(APE_ORANGUTAN.faceRx);
+  });
+
+  it("sits a saucepan helmet on the catcher gorilla", () => {
+    expect(PAN_HELMET.cyOffset).toBeLessThan(0);
+    expect(PAN_HELMET.rimRx).toBeGreaterThan(12);
+    expect(PAN_HELMET.bowlRy).toBeGreaterThan(7);
   });
 });
 

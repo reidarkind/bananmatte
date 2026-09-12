@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createRng } from "../math/rng";
-import { ATTACK_THROWER_KIND, apeCountForValue, peekTime, resolvePlayStyle } from "./play-style";
+import { ATTACK_THROWER_KIND, apeCountForValue, gangOffsets, peekPop, peekTime, resolvePlayStyle, shouldShowApeValue } from "./play-style";
 
 describe("resolvePlayStyle", () => {
   it("keeps a fixed style", () => {
@@ -30,5 +30,26 @@ describe("level helpers", () => {
     expect(apeCountForValue(1)).toBe(1);
     expect(apeCountForValue(5)).toBe(2);
     expect(apeCountForValue(10)).toBe(3);
+  });
+
+  it("shows the gang number and fans the apes out", () => {
+    expect(shouldShowApeValue("orangutan", 5)).toBe(true);
+    expect(shouldShowApeValue("orangutan", 4)).toBe(true);
+    expect(shouldShowApeValue("orangutan", 1)).toBe(false);
+    expect(shouldShowApeValue("gorilla", 8)).toBe(false);
+    const huddle = gangOffsets(3);
+    expect(huddle).toHaveLength(3);
+    expect(huddle[2]!.y).toBeGreaterThan(huddle[0]!.y);
+    expect(Math.abs(huddle[0]!.x - huddle[1]!.x)).toBeGreaterThan(60);
+    expect(huddle[0]!.facing).not.toBe(huddle[1]!.facing);
+  });
+
+  it("lets peeking apes rise in and sink away", () => {
+    expect(peekPop(0, 4)).toBe(0);
+    expect(peekPop(0.4, 4)).toBeCloseTo(1);
+    expect(peekPop(2, 4)).toBeCloseTo(1);
+    expect(peekPop(4, 4)).toBe(0);
+    expect(peekPop(0.18, 4)).toBeGreaterThan(0.2);
+    expect(peekPop(0.18, 4)).toBeLessThan(0.9);
   });
 });

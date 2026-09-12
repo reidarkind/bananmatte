@@ -46,3 +46,31 @@ export function apeCountForValue(value: number): number {
   if (value >= 5) return 2;
   return 1;
 }
+
+export function shouldShowApeValue(kind: "orangutan" | "gorilla", value: number): boolean {
+  return kind === "orangutan" && value > 1;
+}
+
+export function peekPop(age: number, life: number): number {
+  const up = 0.4;
+  const down = 0.35;
+  const enter = age <= 0 ? 0 : Math.min(1, age / up);
+  const leave = age >= life ? 0 : age > life - down ? Math.max(0, (life - age) / down) : 1;
+  const raw = Math.min(enter, leave);
+  return raw * raw * (3 - 2 * raw);
+}
+
+export function gangOffsets(count: number): { x: number; y: number; scale: number; facing: number }[] {
+  if (count <= 1) return [{ x: 0, y: 0, scale: 1, facing: 1 }];
+  if (count === 2) {
+    return [
+      { x: -34, y: -6, scale: 0.9, facing: -1 },
+      { x: 32, y: 8, scale: 1, facing: 1 },
+    ];
+  }
+  return [
+    { x: -38, y: -8, scale: 0.86, facing: -1 },
+    { x: 36, y: -6, scale: 0.86, facing: 1 },
+    { x: 0, y: 16, scale: 1.08, facing: 1 },
+  ];
+}

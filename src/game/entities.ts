@@ -15,6 +15,20 @@ export interface FallingItem {
 
 let nextId = 1;
 
+export function spawnFallingAt(
+  kind: FallingKind,
+  value: number,
+  x: number,
+  y: number,
+  speed: number,
+  rng: () => number,
+): FallingItem {
+  const item = spawnFalling(kind, value, Math.max(x + 40, 80), speed, rng);
+  item.x = x - item.w / 2;
+  item.y = y;
+  return item;
+}
+
 export function spawnFalling(
   kind: FallingKind,
   value: number,

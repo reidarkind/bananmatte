@@ -69,11 +69,12 @@ export function targetRect(target: AttackTarget): Rect {
 }
 
 export function visualTargetRect(target: AttackTarget): Rect {
+  const count = target.kind === "gorilla" ? 1 : apeCountForValue(target.value);
   const scale = target.kind === "gorilla" ? 0.72 : 0.58;
   const cx = target.x + target.w / 2;
   const cy = target.y + target.h * 0.7;
-  const w = 46 * scale;
-  const h = 70 * scale;
+  const w = (48 + (count - 1) * 36) * scale;
+  const h = (72 + (count > 1 ? 18 : 0)) * scale;
   return { x: cx - w / 2, y: cy - h * 0.58, w, h };
 }
 
@@ -126,7 +127,7 @@ export function spawnAttackTarget(
   const gorilla = spawnRotten(level, rng);
   const value = gorilla ? 1 : nextBananaValue(maxN, remaining, rng);
   const count = gorilla ? 1 : apeCountForValue(value);
-  const w = 52 + (count - 1) * 22;
+  const w = 56 + (count - 1) * 36;
   const h = 64;
   const band = attackPeekBand(height);
   const span = Math.max(8, band.maxY - band.minY - h);
@@ -160,8 +161,10 @@ export function maybeSpawnTarget(
   world.targets.push(spawnAttackTarget(width, remaining, maxN, level, rng, height));
 }
 
+export const ATTACK_MAX_SHOTS = 4;
+
 export function throwAt(world: AttackWorld, fromX: number, fromY: number, toX: number, toY: number, level: number): void {
-  if (world.shots.length > 0) return;
+  if (world.shots.length >= ATTACK_MAX_SHOTS) return;
   const aimed = apeAtPoint(world.targets, toX, toY);
   const aimX = aimed ? aimed.x + aimed.w / 2 : toX;
   const aimY = aimed ? aimed.y + aimed.h * 0.7 : toY;

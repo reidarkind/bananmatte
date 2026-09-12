@@ -24,10 +24,15 @@ describe("availableModes", () => {
     expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 10 }).join(" ")).not.toMatch(/ned-sma/);
   });
 
-  it("keeps rounding modes only when maxN is over 10", () => {
+  it("keeps rounding to ten when maxN is over 10, and to a hundred only at 1000", () => {
     expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 10 })).not.toContain("avrunding-tier");
     expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 50 })).toContain("avrunding-tier");
-    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 50 })).toContain("avrunding-hundre");
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 50 })).not.toContain("avrunding-hundre");
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 100 })).not.toContain("avrunding-hundre-opp");
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 100 })).not.toContain("avrunding-hundre-ned");
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 1000 })).toContain("avrunding-hundre");
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 1000 })).toContain("avrunding-hundre-opp");
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 1000 })).toContain("avrunding-hundre-ned");
   });
 });
 
@@ -35,6 +40,20 @@ describe("sanitizeSettings", () => {
   it("keeps at least one selected mode", () => {
     const next = sanitizeSettings({ ...DEFAULT_SETTINGS, selectedModes: [] });
     expect(next.selectedModes.length).toBeGreaterThan(0);
+  });
+
+  it("drops hundred-rounding modes when maxN is not 1000", () => {
+    const next = sanitizeSettings({
+      ...DEFAULT_SETTINGS,
+      maxN: 100,
+      playSelection: "avrunding-hundre",
+      selectedModes: ["avrunding-hundre", "avrunding-hundre-opp", "avrunding-hundre-ned", "addisjon"],
+    });
+    expect(next.playSelection).toBe("mix");
+    expect(next.selectedModes).not.toContain("avrunding-hundre");
+    expect(next.selectedModes).not.toContain("avrunding-hundre-opp");
+    expect(next.selectedModes).not.toContain("avrunding-hundre-ned");
+    expect(next.selectedModes).toContain("addisjon");
   });
 
   it("drops friend modes from the selection when maxN is 50", () => {

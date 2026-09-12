@@ -7,6 +7,7 @@ export function isHundrevennAvailable(settings: Pick<Settings, "maxN" | "hundrev
 export function isModeAvailable(mode: ModeId, settings: Pick<Settings, "maxN" | "hundrevennEnabled">): boolean {
   if (mode === "hundrevenn") return isHundrevennAvailable(settings);
   if (FRIEND_BASE[mode]) return settings.maxN === 10;
+  if (mode.startsWith("avrunding-hundre")) return settings.maxN === 1000;
   if (mode.startsWith("avrunding-")) return settings.maxN > 10;
   return true;
 }

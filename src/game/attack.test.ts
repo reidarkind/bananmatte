@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  ATTACK_MAX_SHOTS,
   attackPeekBand,
   aimShot,
   createAttackWorld,
@@ -43,11 +44,36 @@ describe("attack throw", () => {
     expect(world.targets.length).toBeGreaterThan(0);
   });
 
-  it("only keeps one banana in the air", () => {
+  it("lets you throw another banana before the first hits", () => {
     const world = createAttackWorld();
     throwAt(world, 100, 400, 80, 60, 1);
     throwAt(world, 100, 400, 140, 60, 1);
-    expect(world.shots).toHaveLength(1);
+    expect(world.shots).toHaveLength(2);
+  });
+
+  it("stops adding bananas after a few are already flying", () => {
+    const world = createAttackWorld();
+    for (let i = 0; i < ATTACK_MAX_SHOTS + 2; i += 1) {
+      throwAt(world, 100, 400, 80 + i * 10, 60, 1);
+    }
+    expect(world.shots).toHaveLength(ATTACK_MAX_SHOTS);
+  });
+
+  it("can hit two apes with bananas in the air at once", () => {
+    const world = createAttackWorld();
+    const left = ape({ id: 1, kind: "orangutan", x: 70, y: 140 });
+    const right = ape({ id: 2, kind: "orangutan", x: 220, y: 150 });
+    world.targets = [left, right];
+    throwAt(world, 166, 520, left.x + left.w / 2, left.y + left.h * 0.7, 1);
+    throwAt(world, 166, 520, right.x + right.w / 2, right.y + right.h * 0.7, 1);
+    expect(world.shots).toHaveLength(2);
+
+    const hitIds: number[] = [];
+    while (world.shots.length > 0) {
+      const { hits } = stepShots(world, 0.016, 360, 640);
+      hitIds.push(...hits.map((hit) => hit.target.id));
+    }
+    expect(hitIds.sort()).toEqual([1, 2]);
   });
 
   it("flies past a lower gorilla when the tap was on a higher orangutan", () => {
