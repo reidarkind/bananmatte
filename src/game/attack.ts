@@ -34,8 +34,14 @@ export interface AttackWorld {
 
 let nextTargetId = 1;
 
+export function attackPeekBand(height: number): { minY: number; maxY: number } {
+  const minY = Math.max(128, height * 0.22);
+  const maxY = Math.max(minY + 100, height * 0.5);
+  return { minY, maxY };
+}
+
 export function createAttackWorld(): AttackWorld {
-  return { targets: [], shots: [], spawnAcc: 0.3 };
+  return { targets: [], shots: [], spawnAcc: 99 };
 }
 
 export function aimShot(fromX: number, fromY: number, toX: number, toY: number, speed: number): AttackShot {
@@ -67,18 +73,21 @@ export function spawnAttackTarget(
   maxN: number,
   level: number,
   rng: () => number,
+  height: number,
 ): AttackTarget {
   const gorilla = spawnRotten(level, rng);
   const value = gorilla ? 1 : nextBananaValue(maxN, remaining, rng);
   const count = gorilla ? 1 : apeCountForValue(value);
-  const w = 46 + (count - 1) * 18;
-  const h = 52;
+  const w = 52 + (count - 1) * 22;
+  const h = 64;
+  const band = attackPeekBand(height);
+  const span = Math.max(8, band.maxY - band.minY - h);
   return {
     id: nextTargetId++,
     kind: gorilla ? "gorilla" : "orangutan",
     value,
     x: 12 + rng() * Math.max(8, width - 24 - w),
-    y: 28 + rng() * 36,
+    y: band.minY + rng() * span,
     w,
     h,
     age: 0,
@@ -94,12 +103,13 @@ export function maybeSpawnTarget(
   level: number,
   dt: number,
   rng: () => number,
+  height: number,
 ): void {
   world.spawnAcc += dt;
   if (world.targets.length >= attackMaxTargets(level)) return;
   if (world.spawnAcc < attackSpawnInterval(level)) return;
   world.spawnAcc = 0;
-  world.targets.push(spawnAttackTarget(width, remaining, maxN, level, rng));
+  world.targets.push(spawnAttackTarget(width, remaining, maxN, level, rng, height));
 }
 
 export function throwAt(world: AttackWorld, fromX: number, fromY: number, toX: number, toY: number, level: number): void {

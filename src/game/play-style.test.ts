@@ -18,6 +18,7 @@ describe("resolvePlayStyle", () => {
 
 describe("level helpers", () => {
   it("shortens peek time on later levels", () => {
+    expect(peekTime(1)).toBeGreaterThanOrEqual(4);
     expect(peekTime(6)).toBeLessThan(peekTime(1));
   });
 

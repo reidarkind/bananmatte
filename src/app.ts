@@ -1,6 +1,6 @@
 import { sfx } from "./game/audio";
 import { createPlaySession, type PlaySession } from "./game/session";
-import { t } from "./i18n";
+import { overCopy, t } from "./i18n";
 import { applyScore, mathBonus } from "./math/scoring";
 import { answersMatch, planRound } from "./math/questions";
 import { createRng } from "./math/rng";
@@ -151,13 +151,8 @@ export function startApp(root: HTMLElement): void {
         }, settings.locale);
       },
       onGameOver: (state) => {
-        const rotten = state.endReason === "rotten";
-        endGame(
-          t(settings.locale, rotten ? "over.rottenTitle" : "over.missTitle"),
-          t(settings.locale, rotten ? "over.rottenDetail" : "over.missDetail"),
-          state.score,
-          level,
-        );
+        const copy = overCopy(settings.locale, session?.getPlayStyle() ?? "sank", state.endReason ?? "misses");
+        endGame(copy.title, copy.detail, state.score, level);
       },
     });
     session.start();

@@ -20,7 +20,7 @@ export function resolvePlayStyle(choice: PlayStyleChoice, rng: () => number, pre
 }
 
 export function peekTime(level: number): number {
-  return Math.max(0.8, 2.3 - (level - 1) * 0.14);
+  return Math.max(2.6, 4.4 - (level - 1) * 0.16);
 }
 
 export function attackSpawnInterval(level: number): number {

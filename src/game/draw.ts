@@ -192,8 +192,15 @@ export function drawBanana(ctx: CanvasRenderingContext2D, item: FallingItem): vo
   ctx.restore();
 }
 
-const FUR = "#3b2416";
-const FUR_LIGHT = "#5a3824";
+export const APE_FUR = {
+  gorilla: "#3b2416",
+  gorillaLight: "#5a3824",
+  orangutan: "#e67a22",
+  orangutanLight: "#f6b15a",
+} as const;
+
+const FUR = APE_FUR.gorilla;
+const FUR_LIGHT = APE_FUR.gorillaLight;
 const FACE = "#f0c4a0";
 const EAR_IN = "#d49274";
 const BASKET = "#e0b07a";
@@ -271,7 +278,7 @@ function drawBasketFront(ctx: CanvasRenderingContext2D): void {
   ctx.fill();
 }
 
-function drawGorillaBody(ctx: CanvasRenderingContext2D, fur = FUR, furLight = FUR_LIGHT): void {
+function drawGorillaBody(ctx: CanvasRenderingContext2D, fur: string = FUR, furLight: string = FUR_LIGHT): void {
   ctx.fillStyle = fur;
   ctx.beginPath();
   ctx.ellipse(-13, 46, 9, 5.5, 0, 0, Math.PI * 2);
@@ -383,14 +390,21 @@ export function drawGorilla(
   ctx.restore();
 }
 
-const ORANG_FUR = "#b4531a";
-const ORANG_LIGHT = "#ea8c2e";
-
 function drawApeHands(ctx: CanvasRenderingContext2D, fur: string): void {
   ctx.fillStyle = fur;
   ctx.beginPath();
   ctx.arc(-27, 14, 6.5, 0, Math.PI * 2);
   ctx.arc(27, 14, 6.5, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawOrangutanMane(ctx: CanvasRenderingContext2D): void {
+  const { cx, cy } = GORILLA.head;
+  ctx.fillStyle = APE_FUR.orangutan;
+  ctx.beginPath();
+  ctx.ellipse(cx - 18, cy - 8, 10, 14, -0.4, 0, Math.PI * 2);
+  ctx.ellipse(cx + 18, cy - 8, 10, 14, 0.4, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy - 18, 14, 9, 0, 0, Math.PI * 2);
   ctx.fill();
 }
 
@@ -402,14 +416,57 @@ export function drawApe(
   kind: "gorilla" | "orangutan",
   scale = 1,
 ): void {
-  const fur = kind === "orangutan" ? ORANG_FUR : FUR;
-  const light = kind === "orangutan" ? ORANG_LIGHT : FUR_LIGHT;
+  const fur = kind === "orangutan" ? APE_FUR.orangutan : APE_FUR.gorilla;
+  const light = kind === "orangutan" ? APE_FUR.orangutanLight : APE_FUR.gorillaLight;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale((facing < 0 ? -1 : 1) * scale, scale);
+  if (kind === "orangutan") drawOrangutanMane(ctx);
   drawGorillaBody(ctx, fur, light);
   drawApeHands(ctx, fur);
   ctx.restore();
+}
+
+export function drawAttackGrove(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+  const trunks = [0.12, 0.3, 0.48, 0.66, 0.84];
+  ctx.strokeStyle = "#5c3a1e";
+  ctx.lineCap = "round";
+  for (const t of trunks) {
+    const x = width * t;
+    ctx.lineWidth = 14;
+    ctx.beginPath();
+    ctx.moveTo(x, height * 0.62);
+    ctx.quadraticCurveTo(x + 10, height * 0.4, x - 4, height * 0.18);
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#245c3b";
+  const clumps = [
+    [0.1, 0.26], [0.28, 0.22], [0.46, 0.28], [0.64, 0.2], [0.82, 0.27],
+    [0.18, 0.38], [0.4, 0.42], [0.58, 0.36], [0.76, 0.4],
+  ];
+  for (const [tx, ty] of clumps) {
+    ctx.beginPath();
+    ctx.ellipse(width * tx, height * ty, 48, 28, -0.25, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.fillStyle = "#2f7a4e";
+  for (const [tx, ty] of clumps) {
+    ctx.beginPath();
+    ctx.ellipse(width * tx + 10, height * ty + 6, 32, 18, 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+export function drawAttackLeaves(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+  ctx.fillStyle = "rgba(27, 67, 50, 0.72)";
+  const leaves = [
+    [0.16, 0.34], [0.34, 0.3], [0.52, 0.36], [0.7, 0.29], [0.88, 0.35],
+  ];
+  for (const [tx, ty] of leaves) {
+    ctx.beginPath();
+    ctx.ellipse(width * tx, height * ty, 36, 16, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }
 
 export function drawCanopy(ctx: CanvasRenderingContext2D, width: number, height: number): void {

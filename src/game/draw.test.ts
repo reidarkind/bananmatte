@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bananaCurves, pointOnCubic } from "./draw";
+import { APE_FUR, bananaCurves, pointOnCubic } from "./draw";
 import { GORILLA, bananaInBasketPose, basketRect } from "./entities";
 
 function distToChord(
@@ -37,6 +37,14 @@ describe("bananas in the basket", () => {
     expect(cx).toBeLessThan(box.x + box.w);
     expect(cy).toBeGreaterThan(box.y);
     expect(cy).toBeLessThan(box.y + box.h + 8);
+  });
+});
+
+describe("ape colors", () => {
+  it("keeps gorillas dark brown and orangutans orange", () => {
+    expect(APE_FUR.gorilla).toBe("#3b2416");
+    expect(APE_FUR.orangutan.startsWith("#e") || APE_FUR.orangutan.startsWith("#f")).toBe(true);
+    expect(APE_FUR.gorilla).not.toBe(APE_FUR.orangutan);
   });
 });
 

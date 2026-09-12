@@ -1,4 +1,4 @@
-import type { Locale, ModeId, PlaySelection, PlayStyleChoice } from "./types";
+import type { Locale, ModeId, PlaySelection, PlayStyle, PlayStyleChoice } from "./types";
 
 const NB: Record<string, string> = {
   "menu.lead": "Fang bananer. Regn etterpå.",
@@ -45,6 +45,15 @@ const NB: Record<string, string> = {
   "game.canvas": "Spillbrett",
   "game.rotten": "Råtten",
   "game.rottenCount": "Råtne bananer {n} av {max}",
+  "hud.progress.sank": "Fanget",
+  "hud.progress.angrep": "Truffet",
+  "hud.progress.forsvar": "Klart",
+  "hud.rotten.sank": "Råtten",
+  "hud.rotten.angrep": "Gorilla",
+  "hud.rotten.forsvar": "Mistet gul",
+  "hud.rottenCount.sank": "Råtne bananer {n} av {max}",
+  "hud.rottenCount.angrep": "Gorillaer {n} av {max}",
+  "hud.rottenCount.forsvar": "Mistede gule {n} av {max}",
   "math.bananas": "{n} bananer",
   "math.even": "Partall",
   "math.odd": "Oddetall",
@@ -60,6 +69,18 @@ const NB: Record<string, string> = {
   "over.missDetail": "Prøv å fange de gule. La de brune falle.",
   "over.rottenTitle": "Du tok for mange brune bananer!",
   "over.rottenDetail": "La de brune falle. Du kan ta tre, men ikke mer.",
+  "over.missTitle.sank": "Du mistet for mange bananer!",
+  "over.missDetail.sank": "Prøv å fange de gule. La de brune falle.",
+  "over.rottenTitle.sank": "Du tok for mange brune bananer!",
+  "over.rottenDetail.sank": "La de brune falle. Du kan ta tre, men ikke mer.",
+  "over.missTitle.angrep": "For mange orangutanger slapp unna!",
+  "over.missDetail.angrep": "Treff de oransje apene før de gjemmer seg.",
+  "over.rottenTitle.angrep": "Du traff for mange gorillaer!",
+  "over.rottenDetail.angrep": "Kast bare på orangutanger. Tre gorillaer går, men ikke mer.",
+  "over.missTitle.forsvar": "De brune traff deg for mange ganger!",
+  "over.missDetail.forsvar": "Flytt deg unna de brune. Fang de gule.",
+  "over.rottenTitle.forsvar": "Du mistet for mange gule bananer!",
+  "over.rottenDetail.forsvar": "Fang de gule før de faller. Tre kan gli unna, men ikke mer.",
   "over.score": "Poeng {score} · nivå {level}",
   "over.name": "Navn",
   "over.placeholder": "Skriv navnet ditt",
@@ -141,6 +162,15 @@ const EN: Record<string, string> = {
   "game.canvas": "Game board",
   "game.rotten": "Rotten",
   "game.rottenCount": "Rotten bananas {n} of {max}",
+  "hud.progress.sank": "Caught",
+  "hud.progress.angrep": "Hit",
+  "hud.progress.forsvar": "Cleared",
+  "hud.rotten.sank": "Rotten",
+  "hud.rotten.angrep": "Gorilla",
+  "hud.rotten.forsvar": "Missed ripe",
+  "hud.rottenCount.sank": "Rotten bananas {n} of {max}",
+  "hud.rottenCount.angrep": "Gorillas {n} of {max}",
+  "hud.rottenCount.forsvar": "Missed ripe bananas {n} of {max}",
   "math.bananas": "{n} bananas",
   "math.even": "Even",
   "math.odd": "Odd",
@@ -156,6 +186,18 @@ const EN: Record<string, string> = {
   "over.missDetail": "Try to catch the yellow ones. Let the brown ones fall.",
   "over.rottenTitle": "You caught too many brown bananas!",
   "over.rottenDetail": "Let the brown ones fall. You may catch three, but not more.",
+  "over.missTitle.sank": "You missed too many bananas!",
+  "over.missDetail.sank": "Try to catch the yellow ones. Let the brown ones fall.",
+  "over.rottenTitle.sank": "You caught too many brown bananas!",
+  "over.rottenDetail.sank": "Let the brown ones fall. You may catch three, but not more.",
+  "over.missTitle.angrep": "Too many orangutans got away!",
+  "over.missDetail.angrep": "Hit the orange apes before they hide.",
+  "over.rottenTitle.angrep": "You hit too many gorillas!",
+  "over.rottenDetail.angrep": "Throw only at orangutans. Three gorillas are allowed, but not more.",
+  "over.missTitle.forsvar": "The brown bananas hit you too many times!",
+  "over.missDetail.forsvar": "Dodge the brown ones. Catch the yellow ones.",
+  "over.rottenTitle.forsvar": "You missed too many yellow bananas!",
+  "over.rottenDetail.forsvar": "Catch the yellow ones before they fall. Three may slip, but not more.",
   "over.score": "Score {score} · level {level}",
   "over.name": "Name",
   "over.placeholder": "Type your name",
@@ -208,4 +250,16 @@ export function modeLabel(locale: Locale, id: ModeId | PlaySelection): string {
 
 export function playStyleLabel(locale: Locale, style: PlayStyleChoice): string {
   return t(locale, `play.${style}`);
+}
+
+export function overCopy(
+  locale: Locale,
+  style: PlayStyle,
+  reason: "misses" | "rotten",
+): { title: string; detail: string } {
+  const kind = reason === "rotten" ? "rotten" : "miss";
+  return {
+    title: t(locale, `over.${kind}Title.${style}`),
+    detail: t(locale, `over.${kind}Detail.${style}`),
+  };
 }

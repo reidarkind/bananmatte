@@ -180,7 +180,8 @@ select {
   color: var(--banana);
   text-shadow: 0 1px 0 #1b140c;
 }
-.hud-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+.hud-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+[data-progress] { white-space: nowrap; }
 .rotten-meter {
   display: flex;
   align-items: center;
@@ -210,6 +211,11 @@ select {
 .rotten-icon .peel { fill: #6c584c; stroke: #3d3226; stroke-width: 1.5; }
 .rotten-icon .stem { fill: #3f2f22; }
 .rotten-icon .spot { fill: #4d7c4a; }
+.rotten-icon.ripe .peel { fill: #f4d35e; stroke: #c2780a; }
+.rotten-icon.ripe .stem { fill: #6b4226; }
+.rotten-icon.ripe .spot { fill: transparent; }
+.rotten-icon.ape .ape-head, .rotten-icon.ape .ape-ear { fill: #3b2416; }
+.rotten-icon.ape .ape-face { fill: #f0c4a0; }
 .rotten-icon .cross {
   opacity: 0;
   fill: none;

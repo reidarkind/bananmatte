@@ -11,7 +11,7 @@ import {
 } from "./attack";
 import { createDecor, type Decor } from "./backgrounds";
 import { intersects } from "./collision";
-import { drawApe, drawBackground, drawBanana, drawCanopy, drawDecor, drawGorilla, drawTreeLine } from "./draw";
+import { drawApe, drawAttackGrove, drawAttackLeaves, drawBackground, drawBanana, drawCanopy, drawDecor, drawGorilla, drawTreeLine } from "./draw";
 import { attachKeys, attachPointer, attachTap } from "./input";
 import { bananaInBasketPose, basketRect, gorillaRect, spawnFalling, type FallingItem } from "./entities";
 import { attackHitEvent, attackLeaveEvent, attackMissEvent, defendEscapeEvent, defendHitEvent } from "./play-map";
@@ -185,15 +185,11 @@ export function createPlaySession(opts: {
   };
 
   const tickAttack = (dt: number) => {
-    maybeSpawnTarget(attack, width, Math.max(1, state.target - state.collected), opts.settings.maxN, level, dt, opts.rng);
-    const { hits, whiffs } = stepShots(attack, dt, width, height);
+    maybeSpawnTarget(attack, width, Math.max(1, state.target - state.collected), opts.settings.maxN, level, dt, opts.rng, height);
+    const { hits } = stepShots(attack, dt, width, height);
     for (const hit of hits) {
       const event = attackHitEvent(hit.target.kind, hit.target.value);
       applyEvent(event, hit.target.kind === "gorilla" ? "rotten" : "catch");
-      if (state.ended || state.roundComplete) return;
-    }
-    for (let i = 0; i < whiffs; i += 1) {
-      applyEvent(attackMissEvent(), "miss");
       if (state.ended || state.roundComplete) return;
     }
     for (const left of stepTargets(attack, dt)) {
@@ -208,13 +204,15 @@ export function createPlaySession(opts: {
     drawDecor(ctx, decor, now);
 
     if (style === "angrep") {
-      drawApe(ctx, gorillaX, gorillaY, throwerFacing, "orangutan");
+      drawAttackGrove(ctx, width, height);
       for (const target of attack.targets) {
         const count = target.kind === "gorilla" ? 1 : apeCountForValue(target.value);
+        const scale = target.kind === "gorilla" ? 0.72 : 0.58;
         for (let i = 0; i < count; i += 1) {
-          drawApe(ctx, target.x + 18 + i * 16, target.y + 30, 1, target.kind, 0.52);
+          drawApe(ctx, target.x + target.w / 2 + (i - (count - 1) / 2) * 20, target.y + target.h * 0.7, 1, target.kind, scale);
         }
       }
+      drawAttackLeaves(ctx, width, height);
       for (const shot of attack.shots) {
         drawBanana(ctx, {
           id: -8,
@@ -229,7 +227,7 @@ export function createPlaySession(opts: {
           spin: 0,
         });
       }
-      drawCanopy(ctx, width, height);
+      drawApe(ctx, gorillaX, gorillaY, throwerFacing, "orangutan");
       return;
     }
 

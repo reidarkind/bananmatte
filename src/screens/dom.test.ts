@@ -55,7 +55,7 @@ describe("game HUD", () => {
       updateHud(hud, { mode: "tiervenn", level: 1, lives: 2, collected: 1, target: 5, score: 10 }),
     ).not.toThrow();
     expect(hud.querySelector("[data-score]")?.textContent).toBe("10");
-    expect(hud.querySelector("[data-progress]")?.textContent).toBe("1 / 5");
+    expect(hud.querySelector("[data-progress]")?.textContent).toBe("Fanget 1 / 5");
     root.remove();
   });
 
@@ -84,6 +84,40 @@ describe("game HUD", () => {
     expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(2);
     expect(hud.querySelectorAll(".rotten-slot.on .cross")).toHaveLength(2);
     expect(meter?.getAttribute("aria-label")).toContain("2");
+    root.remove();
+  });
+
+  it("renames the banana meters for attack and defense", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    const { hud } = renderGameShell(root, "addisjon", () => {});
+    updateHud(hud, {
+      mode: "addisjon",
+      level: 1,
+      lives: 2,
+      collected: 2,
+      target: 7,
+      score: 4,
+      playStyle: "angrep",
+    });
+    expect(hud.querySelector("[data-progress]")?.textContent).toBe("Truffet 2 / 7");
+    expect(hud.querySelector("[data-rotten]")?.textContent).toContain("Gorilla");
+    expect(hud.querySelectorAll(".rotten-icon.ape")).toHaveLength(3);
+
+    updateHud(hud, {
+      mode: "addisjon",
+      level: 1,
+      lives: 2,
+      collected: 3,
+      target: 7,
+      score: 8,
+      playStyle: "forsvar",
+      rottenCaught: 1,
+    });
+    expect(hud.querySelector("[data-progress]")?.textContent).toBe("Klart 3 / 7");
+    expect(hud.querySelector("[data-rotten]")?.textContent).toContain("Mistet gul");
+    expect(hud.querySelectorAll(".rotten-icon.ripe")).toHaveLength(3);
+    expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(1);
     root.remove();
   });
 });
