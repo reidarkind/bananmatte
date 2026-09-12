@@ -1,0 +1,183 @@
+:root {
+  color-scheme: light;
+  --leaf: #2d6a4f;
+  --leaf-dark: #1b4332;
+  --banana: #f4d35e;
+  --cream: #fff8e7;
+  --ink: #1b1b1b;
+  --sky: #8ecae6;
+  --btn: #40916c;
+  --btn-ink: #fff8e7;
+  font-family: Nunito, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  margin: 0;
+  min-height: 100%;
+  height: 100%;
+  background: var(--leaf-dark);
+  color: var(--ink);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+#app, .screen, .play {
+  min-height: 100%;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.2rem 1rem 2rem;
+  background:
+    radial-gradient(circle at 20% 10%, #95d5b2 0, transparent 28%),
+    linear-gradient(180deg, var(--sky), #52b788 55%, var(--leaf));
+}
+
+.menu h1, .pad h1 { margin: 0.2rem 0; font-size: 2.1rem; color: #081c15; }
+.lead, .muted { text-align: center; max-width: 22rem; }
+.logo {
+  width: 160px;
+  height: 160px;
+  border-radius: 28px;
+  box-shadow: 0 10px 0 #1b4332;
+  background: #fff;
+  object-fit: cover;
+}
+
+.stack, fieldset { display: flex; flex-direction: column; gap: 0.7rem; width: min(22rem, 100%); }
+.row { display: flex; gap: 0.6rem; }
+
+.btn, .key, .tab, .back, .letter {
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  font-weight: 800;
+  padding: 0.85rem 1rem;
+  background: var(--cream);
+  color: var(--leaf-dark);
+  box-shadow: 0 5px 0 #1b4332;
+}
+
+.btn.primary { background: var(--banana); }
+.btn.ghost { background: transparent; box-shadow: none; color: var(--cream); }
+.btn.wide { grid-column: 1 / -1; }
+.btn:active, .key:active, .tab:active { transform: translateY(3px); box-shadow: 0 2px 0 #1b4332; }
+
+.back { align-self: flex-start; padding: 0.45rem 0.8rem; }
+.back.tiny { font-size: 0.85rem; }
+
+.pad { align-items: stretch; text-align: left; }
+.pad h2 { margin-top: 1.2rem; }
+label, .check { display: flex; flex-direction: column; gap: 0.35rem; font-weight: 800; }
+.check { flex-direction: row; align-items: center; gap: 0.6rem; }
+select {
+  font: inherit;
+  font-weight: 800;
+  padding: 0.7rem;
+  border-radius: 12px;
+  border: 3px solid var(--leaf-dark);
+}
+
+.tabs { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.tab.on, .letter.on { background: var(--banana); }
+
+.scores { width: min(22rem, 100%); padding: 0; list-style: none; }
+.scores li, .scoreline {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  background: rgba(255,248,231,0.85);
+  padding: 0.65rem 0.8rem;
+  border-radius: 12px;
+  margin-bottom: 0.45rem;
+}
+
+.play { position: relative; background: #1b4332; }
+.hud {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 2;
+  padding: 0.45rem 0.6rem;
+  background: linear-gradient(180deg, rgba(27,67,50,0.75), transparent);
+  color: var(--cream);
+  font-weight: 800;
+}
+.hud-row { display: flex; justify-content: space-between; gap: 0.5rem; }
+#stage { width: 100%; height: 100dvh; display: block; touch-action: none; }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(27, 67, 50, 0.88);
+  color: var(--cream);
+  text-align: center;
+}
+.overlay h2 { font-size: 1.6rem; }
+.mode-pill {
+  background: var(--banana);
+  color: var(--leaf-dark);
+  border-radius: 999px;
+  padding: 0.2rem 0.8rem;
+  font-weight: 800;
+}
+.answer {
+  min-width: 7rem;
+  font-size: 2.4rem;
+  font-weight: 900;
+  background: var(--cream);
+  color: var(--leaf-dark);
+  border-radius: 16px;
+  padding: 0.3rem 0.8rem;
+  margin-bottom: 0.6rem;
+}
+.pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+  width: min(20rem, 100%);
+}
+.arcade { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+.letter { font-size: 2rem; min-width: 3rem; }
+
+.install-page {
+  align-items: stretch;
+  text-align: left;
+  max-width: 40rem;
+  margin: 0 auto;
+  overflow: auto;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.install-hero {
+  text-align: center;
+  margin-bottom: 0.6rem;
+}
+
+.logo.small {
+  width: 96px;
+  height: 96px;
+  border-radius: 20px;
+  box-shadow: 0 6px 0 #1b4332;
+}
+
+.install-page h2 { margin: 1.2rem 0 0.4rem; }
+.install-page h3 { margin: 1rem 0 0.3rem; }
+.install-page p, .install-page li { font-weight: 600; line-height: 1.45; }
+.install-page ol { padding-left: 1.2em; }
+.install-page li { margin-bottom: 0.55rem; }

@@ -1,0 +1,47 @@
+import { INSTALL_COPY as c } from "./install-copy";
+import { html, onClick } from "./dom";
+
+export function renderInstall(root: HTMLElement, back: () => void): void {
+  root.replaceChildren(html`
+    <article class="screen pad install-page">
+      <button class="back" data-back type="button">Tilbake</button>
+      <header class="install-hero">
+        <img class="logo small" src="${import.meta.env.BASE_URL}logo.png" alt="Gorilla med banan og kurv" width="96" height="96" />
+        <h1>Bananmatte</h1>
+      </header>
+      <section>
+        <h2>${c.whatThisIs}</h2>
+        <p>${c.whatThisIsBody}</p>
+      </section>
+      <section>
+        <h2>${c.privacy}</h2>
+        <p>${c.privacyBody1}</p>
+        <p>${c.privacyBody2}</p>
+      </section>
+      <section>
+        <h2>${c.addToHome}</h2>
+        <p>${c.addToHomeBody}</p>
+        <h3>iPhone</h3>
+        <ol>
+          <li>${c.ios1}</li>
+          <li>${c.ios2}</li>
+          <li>${c.ios3}</li>
+          <li>${c.ios4}</li>
+        </ol>
+        <p>${c.iosNote}</p>
+        <h3>Android</h3>
+        <ol>
+          <li>${c.android1}</li>
+          <li>${c.android2}</li>
+          <li>${c.android3}</li>
+        </ol>
+        <p>${c.androidNote}</p>
+      </section>
+      <section>
+        <h2>${c.origin}</h2>
+        <p>${c.originBody}</p>
+      </section>
+    </article>
+  `);
+  onClick(root, "[data-back]", back);
+}

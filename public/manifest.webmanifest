@@ -1,0 +1,24 @@
+{
+  "name": "Bananmatte",
+  "short_name": "Bananmatte",
+  "description": "Fang bananer og øv matte for 1. og 2. klasse.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1b4332",
+  "theme_color": "#2d6a4f",
+  "lang": "nb",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
