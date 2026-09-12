@@ -1,42 +1,50 @@
-import {
-  ALL_MODES,
-  type ModeId,
-  type Settings,
-} from "../types";
+import { ALL_MODES, type ModeId, type Settings } from "../types";
 
 export function isHundrevennAvailable(settings: Pick<Settings, "maxN" | "hundrevennEnabled">): boolean {
   return settings.maxN === 1000 && settings.hundrevennEnabled;
 }
 
-export function availableModes(settings: Settings): ModeId[] {
-  return ALL_MODES.filter((mode) => {
-    if (mode === "hundrevenn") {
-      return isHundrevennAvailable(settings);
-    }
-    return true;
-  });
+export function isModeAvailable(mode: ModeId, settings: Pick<Settings, "maxN" | "hundrevennEnabled">): boolean {
+  if (mode === "hundrevenn") return isHundrevennAvailable(settings);
+  if (mode === "tiervenn") return settings.maxN === 10;
+  if (mode.startsWith("avrunding-")) return settings.maxN > 10;
+  return true;
 }
 
-export function resolveRoundMode(settings: Settings, rng: () => number): ModeId {
+export function availableModes(settings: Pick<Settings, "maxN" | "hundrevennEnabled">): ModeId[] {
+  return ALL_MODES.filter((mode) => isModeAvailable(mode, settings));
+}
+
+export function fallbackMode(settings: Pick<Settings, "maxN" | "hundrevennEnabled">): ModeId {
+  return availableModes(settings)[0] ?? "addisjon";
+}
+
+export function sanitizeSettings<T extends Settings>(settings: T): T {
   const available = availableModes(settings);
-
-  if (settings.playSelection === "mix") {
-    return available[Math.floor(rng() * available.length)] ?? "tiervenn";
+  let selectedModes = settings.selectedModes.filter((mode) => available.includes(mode));
+  if (selectedModes.length === 0) selectedModes = [fallbackMode(settings)];
+  let playSelection = settings.playSelection;
+  if (playSelection !== "mix" && playSelection !== "selected" && !available.includes(playSelection)) {
+    playSelection = "mix";
   }
+  return { ...settings, selectedModes, playSelection };
+}
 
-  if (settings.playSelection === "selected") {
-    const picked = settings.selectedModes.filter((mode) => available.includes(mode));
-    if (picked.length === 0) return "tiervenn";
-    return picked[Math.floor(rng() * picked.length)] ?? "tiervenn";
+export function resolveRoundMode(settings: Settings, rng: () => number, previous?: ModeId): ModeId {
+  const clean = sanitizeSettings(settings);
+  const available = availableModes(clean);
+  let pool: ModeId[] = [];
+  if (clean.playSelection === "mix") {
+    pool = available;
+  } else if (clean.playSelection === "selected") {
+    pool = clean.selectedModes.filter((mode) => available.includes(mode));
+  } else {
+    pool = [clean.playSelection];
   }
-
-  if (settings.playSelection === "hundrevenn" && !isHundrevennAvailable(settings)) {
-    return "tiervenn";
+  if (pool.length === 0) pool = [fallbackMode(clean)];
+  if (previous && pool.length > 1) {
+    const rest = pool.filter((mode) => mode !== previous);
+    if (rest.length > 0) pool = rest;
   }
-
-  if (!available.includes(settings.playSelection)) {
-    return "tiervenn";
-  }
-
-  return settings.playSelection;
+  return pool[Math.floor(rng() * pool.length)] ?? fallbackMode(clean);
 }

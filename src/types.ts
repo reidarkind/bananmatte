@@ -1,7 +1,14 @@
 export type MaxN = 10 | 50 | 100 | 1000;
 
+export type Locale = "nb" | "en";
+
 export type ModeId =
   | "tiervenn"
+  | "femmervenn"
+  | "sekservenn"
+  | "syvervenn"
+  | "attervenn"
+  | "niervenn"
   | "hundrevenn"
   | "addisjon"
   | "subtraksjon-positiv"
@@ -12,13 +19,24 @@ export type ModeId =
   | "divisjon-liten"
   | "partall-oddetall"
   | "partall-oddetall-addisjon"
-  | "partall-oddetall-subtraksjon";
+  | "partall-oddetall-subtraksjon"
+  | "avrunding-tier-opp"
+  | "avrunding-tier-ned"
+  | "avrunding-tier"
+  | "avrunding-tier-ned-sma"
+  | "avrunding-hundre-opp"
+  | "avrunding-hundre-ned"
+  | "avrunding-hundre"
+  | "ulikhet-tegn"
+  | "ulikhet-ord";
 
 export type PlaySelection = ModeId | "mix" | "selected";
 
-export type AnswerKind = "number" | "parity";
+export type AnswerKind = "number" | "parity" | "compare";
 
 export type Parity = "partall" | "oddetall";
+
+export type CompareAnswer = "gt" | "lt" | "eq";
 
 export type Rng = () => number;
 
@@ -28,6 +46,7 @@ export interface Settings {
   selectedModes: ModeId[];
   hundrevennEnabled: boolean;
   sound: boolean;
+  locale: Locale;
 }
 
 export interface HighscoreEntry {
@@ -42,7 +61,7 @@ export interface RoundPlan {
   catchTarget: number;
   prompt: string;
   kind: AnswerKind;
-  answer: number | Parity;
+  answer: number | Parity | CompareAnswer;
   explanation: string;
   operand?: number;
 }
@@ -56,6 +75,11 @@ export interface Rect {
 
 export const ALL_MODES: ModeId[] = [
   "tiervenn",
+  "femmervenn",
+  "sekservenn",
+  "syvervenn",
+  "attervenn",
+  "niervenn",
   "hundrevenn",
   "addisjon",
   "subtraksjon-positiv",
@@ -67,23 +91,25 @@ export const ALL_MODES: ModeId[] = [
   "partall-oddetall",
   "partall-oddetall-addisjon",
   "partall-oddetall-subtraksjon",
+  "avrunding-tier-opp",
+  "avrunding-tier-ned",
+  "avrunding-tier",
+  "avrunding-tier-ned-sma",
+  "avrunding-hundre-opp",
+  "avrunding-hundre-ned",
+  "avrunding-hundre",
+  "ulikhet-tegn",
+  "ulikhet-ord",
 ];
 
-export const MODE_LABELS: Record<ModeId | "mix" | "selected", string> = {
-  tiervenn: "Tiervenn",
-  hundrevenn: "Hundrevenn",
-  addisjon: "Addering",
-  "subtraksjon-positiv": "Subtraksjon",
-  "subtraksjon-negativ": "Subtraksjon (±)",
-  "multiplikasjon-mini": "Multiplikasjon mini",
-  "multiplikasjon-liten": "Multiplikasjon liten",
-  "divisjon-mini": "Divisjon mini",
-  "divisjon-liten": "Divisjon liten",
-  "partall-oddetall": "Partall / oddetall",
-  "partall-oddetall-addisjon": "Partall / oddetall +",
-  "partall-oddetall-subtraksjon": "Partall / oddetall −",
-  mix: "Mix",
-  selected: "Utvalg",
+export const FRIEND_BASE: Partial<Record<ModeId, number>> = {
+  femmervenn: 5,
+  sekservenn: 6,
+  syvervenn: 7,
+  attervenn: 8,
+  niervenn: 9,
+  tiervenn: 10,
+  hundrevenn: 100,
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -92,4 +118,5 @@ export const DEFAULT_SETTINGS: Settings = {
   selectedModes: ["tiervenn", "addisjon", "partall-oddetall"],
   hundrevennEnabled: true,
   sound: true,
+  locale: "nb",
 };

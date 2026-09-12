@@ -173,6 +173,7 @@ select {
   font-weight: 800;
 }
 .hud-row { display: flex; justify-content: space-between; gap: 0.5rem; }
+.hud [data-rotten] { letter-spacing: 0.08em; min-width: 2.4rem; text-align: center; }
 #stage {
   position: absolute;
   inset: 0;

@@ -39,4 +39,17 @@ describe("game over name", () => {
     expect(again).toBe(false);
     root.remove();
   });
+
+  it("uses English save label when locale is en", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    renderGameOver(
+      root,
+      { title: "Over", detail: "Nice", score: 10, level: 1, askName: true, locale: "en" },
+      { submit: () => {}, afterSave: () => {}, again: () => {}, menu: () => {} },
+    );
+    expect(root.querySelector("[data-save]")?.textContent).toBe("Save");
+    expect(root.textContent).toContain("Score 10");
+    root.remove();
+  });
 });

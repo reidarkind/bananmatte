@@ -19,4 +19,10 @@ describe("settings storage", () => {
     const store = memoryStore({ [SETTINGS_KEY]: "{not json" });
     expect(loadSettings(store).maxN).toBe(10);
   });
+
+  it("roundtrips English locale", () => {
+    const store = memoryStore();
+    saveSettings({ ...DEFAULT_SETTINGS, locale: "en" }, store);
+    expect(loadSettings(store).locale).toBe("en");
+  });
 });

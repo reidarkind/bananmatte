@@ -1,14 +1,16 @@
-import { MODE_LABELS, type ModeId } from "../types";
+import { modeLabel, t } from "../i18n";
+import type { Locale, ModeId } from "../types";
 import { html, onClick } from "./dom";
 
 export function renderGameShell(
   root: HTMLElement,
   mode: ModeId,
   onQuit: () => void,
+  locale: Locale = "nb",
 ): { canvas: HTMLCanvasElement; overlay: HTMLElement; hud: HTMLElement } {
   root.replaceChildren(html`
     <section class="play">
-      <canvas id="stage" aria-label="Spillbrett"></canvas>
+      <canvas id="stage" aria-label="${t(locale, "game.canvas")}"></canvas>
       <div id="overlay" class="overlay-layer"></div>
       <header class="hud" id="hud"></header>
     </section>
@@ -17,12 +19,13 @@ export function renderGameShell(
   hud.replaceChildren(html`
     <div class="hud-stack">
       <div class="hud-row">
-        <button class="back tiny" data-quit type="button">Avslutt</button>
-        <span data-mode>${MODE_LABELS[mode]}</span>
-        <span data-level>Nivå 1</span>
+        <button class="back tiny" data-quit type="button">${t(locale, "quit")}</button>
+        <span data-mode>${modeLabel(locale, mode)}</span>
+        <span data-level>${t(locale, "level", { n: 1 })}</span>
       </div>
       <div class="hud-row">
         <span data-lives></span>
+        <span data-rotten></span>
         <span data-progress></span>
         <span data-score>0</span>
       </div>
@@ -38,12 +41,24 @@ export function renderGameShell(
 
 export function updateHud(
   hud: HTMLElement,
-  info: { mode: ModeId; level: number; lives: number; collected: number; target: number; score: number },
+  info: {
+    mode: ModeId;
+    level: number;
+    lives: number;
+    collected: number;
+    target: number;
+    score: number;
+    rottenCaught?: number;
+    locale?: Locale;
+  },
 ): void {
+  const locale = info.locale ?? "nb";
   const lives = "🍌".repeat(info.lives) + "✕".repeat(Math.max(0, 2 - info.lives));
-  setText(hud, "[data-mode]", MODE_LABELS[info.mode]);
-  setText(hud, "[data-level]", `Nivå ${info.level}`);
+  const rotten = "🟤".repeat(info.rottenCaught ?? 0);
+  setText(hud, "[data-mode]", modeLabel(locale, info.mode));
+  setText(hud, "[data-level]", t(locale, "level", { n: info.level }));
   setText(hud, "[data-lives]", lives);
+  setText(hud, "[data-rotten]", rotten);
   setText(hud, "[data-progress]", `${info.collected} / ${info.target}`);
   setText(hud, "[data-score]", String(info.score));
 }

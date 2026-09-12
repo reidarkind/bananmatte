@@ -29,7 +29,20 @@ describe("applyCatchEvent", () => {
     const state = applyCatchEvent(createPlayState(5, 30), { type: "caught", kind: "rotten", value: 1 });
     expect(state.score).toBe(10);
     expect(state.lives).toBe(2);
+    expect(state.rottenCaught).toBe(1);
     expect(state.roundComplete).toBe(false);
+  });
+
+  it("ends the game after more than three rotten catches and keeps the count across rounds", () => {
+    let state = createPlayState(5, 0, 2);
+    state = applyCatchEvent(state, { type: "caught", kind: "rotten", value: 1 });
+    expect(state.ended).toBe(false);
+    expect(state.rottenCaught).toBe(3);
+    const nextRound = createPlayState(8, state.score, state.rottenCaught);
+    expect(nextRound.rottenCaught).toBe(3);
+    const ended = applyCatchEvent(nextRound, { type: "caught", kind: "rotten", value: 1 });
+    expect(ended.ended).toBe(true);
+    expect(ended.endReason).toBe("rotten");
   });
 
   it("completes the round when collected reaches the target", () => {
@@ -47,8 +60,8 @@ describe("level helpers", () => {
     expect(fallSpeed(2)).toBeGreaterThan(fallSpeed(1));
   });
 
-  it("does not spawn rotten bananas before level 3", () => {
+  it("does not spawn rotten bananas before level 2", () => {
     expect(spawnRotten(1, () => 0)).toBe(false);
-    expect(spawnRotten(3, () => 0)).toBe(true);
+    expect(spawnRotten(2, () => 0)).toBe(true);
   });
 });

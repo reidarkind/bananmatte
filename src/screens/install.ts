@@ -1,12 +1,15 @@
-import { INSTALL_COPY as c } from "./install-copy";
+import { t } from "../i18n";
+import type { Locale } from "../types";
+import { installCopy } from "./install-copy";
 import { html, onClick } from "./dom";
 
-export function renderInstall(root: HTMLElement, back: () => void): void {
+export function renderInstall(root: HTMLElement, back: () => void, locale: Locale = "nb"): void {
+  const c = installCopy(locale);
   root.replaceChildren(html`
     <article class="screen pad install-page">
-      <button class="back" data-back type="button">Tilbake</button>
+      <button class="back" data-back type="button">${t(locale, "back")}</button>
       <header class="install-hero">
-        <img class="logo small" src="${import.meta.env.BASE_URL}logo.png" alt="Gorilla med banan og kurv" width="96" height="96" />
+        <img class="logo small" src="${import.meta.env.BASE_URL}logo.png" alt="${t(locale, "menu.logo")}" width="96" height="96" />
         <h1>Bananmatte</h1>
       </header>
       <section>

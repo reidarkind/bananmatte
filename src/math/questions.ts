@@ -1,14 +1,19 @@
-import type { ModeId, Parity, Rng, RoundPlan, Settings } from "../types";
+import { modeLabel } from "../i18n";
+import { FRIEND_BASE, type CompareAnswer, type Locale, type ModeId, type Parity, type Rng, type RoundPlan, type Settings } from "../types";
 import {
+  compareOf,
   explainAdd,
+  explainCompare,
   explainDiv,
-  explainHundrevenn,
+  explainFriend,
   explainMul,
   explainParity,
   explainParityDiff,
   explainParitySum,
+  explainRound,
   explainSub,
-  explainTiervenn,
+  nFriend,
+  roundTo,
 } from "./explanations";
 import { resolveRoundMode } from "./modes";
 import { pickOne, randomInt } from "./rng";
@@ -17,45 +22,25 @@ function parityOf(n: number): Parity {
   return n % 2 === 0 ? "partall" : "oddetall";
 }
 
-function tensFriend(n: number): number {
-  return (10 - (n % 10)) % 10;
-}
-
-function hundredsFriend(n: number): number {
-  return (100 - (n % 100)) % 100;
-}
-
 function randomX(maxN: number, rng: Rng, min = 1, max = maxN): number {
   return randomInt(Math.max(1, min), Math.max(Math.max(1, min), Math.min(maxN, max)), rng);
 }
 
-function planTiervenn(maxN: number, rng: Rng): RoundPlan {
+function planFriend(mode: ModeId, base: number, maxN: number, rng: Rng, locale: Locale): RoundPlan {
   const x = randomX(maxN, rng);
-  const answer = tensFriend(x);
+  const answer = nFriend(x, base);
+  const name = modeLabel(locale, mode);
   return {
-    mode: "tiervenn",
+    mode,
     catchTarget: x,
-    prompt: `Hva er tiervennen til ${x}?`,
+    prompt: locale === "en" ? `What is the ${name.toLowerCase()} of ${x}?` : `Hva er ${name.toLowerCase()}en til ${x}?`,
     kind: "number",
     answer,
-    explanation: explainTiervenn(x, answer),
+    explanation: explainFriend(name, x, answer, base, locale),
   };
 }
 
-function planHundrevenn(maxN: number, rng: Rng): RoundPlan {
-  const x = randomX(maxN, rng);
-  const answer = hundredsFriend(x);
-  return {
-    mode: "hundrevenn",
-    catchTarget: x,
-    prompt: `Hva er hundrevennen til ${x}?`,
-    kind: "number",
-    answer,
-    explanation: explainHundrevenn(x, answer),
-  };
-}
-
-function planAddisjon(maxN: number, rng: Rng): RoundPlan {
+function planAddisjon(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   let x = randomX(maxN, rng);
   if (x >= maxN) {
     x = randomX(maxN, rng, 1, Math.max(1, maxN - 1));
@@ -65,95 +50,92 @@ function planAddisjon(maxN: number, rng: Rng): RoundPlan {
   return {
     mode: "addisjon",
     catchTarget: x,
-    prompt: `Hva er ${x} + ${y}?`,
+    prompt: locale === "en" ? `What is ${x} + ${y}?` : `Hva er ${x} + ${y}?`,
     kind: "number",
     answer: x + y,
     operand: y,
-    explanation: explainAdd(x, y),
+    explanation: explainAdd(x, y, locale),
   };
 }
 
-function planSubtraksjonPositiv(maxN: number, rng: Rng): RoundPlan {
+function planSubtraksjonPositiv(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   const x = randomX(maxN, rng);
   const y = randomInt(0, x, rng);
   return {
     mode: "subtraksjon-positiv",
     catchTarget: x,
-    prompt: `Hva er ${x} − ${y}?`,
+    prompt: locale === "en" ? `What is ${x} − ${y}?` : `Hva er ${x} − ${y}?`,
     kind: "number",
     answer: x - y,
     operand: y,
-    explanation: explainSub(x, y),
+    explanation: explainSub(x, y, locale),
   };
 }
 
-function planSubtraksjonNegativ(maxN: number, rng: Rng): RoundPlan {
+function planSubtraksjonNegativ(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   const x = randomX(maxN, rng);
   const y = randomX(maxN, rng);
   return {
     mode: "subtraksjon-negativ",
     catchTarget: x,
-    prompt: `Hva er ${x} − ${y}?`,
+    prompt: locale === "en" ? `What is ${x} − ${y}?` : `Hva er ${x} − ${y}?`,
     kind: "number",
     answer: x - y,
     operand: y,
-    explanation: explainSub(x, y),
+    explanation: explainSub(x, y, locale),
   };
 }
 
-function planMultiplikasjon(mode: "multiplikasjon-mini" | "multiplikasjon-liten", maxN: number, rng: Rng): RoundPlan {
+function planMultiplikasjon(mode: "multiplikasjon-mini" | "multiplikasjon-liten", maxN: number, rng: Rng, locale: Locale): RoundPlan {
   const kMax = mode === "multiplikasjon-mini" ? 5 : 10;
   const x = randomX(maxN, rng);
   const k = randomInt(1, kMax, rng);
   return {
     mode,
     catchTarget: x,
-    prompt: `Hva er ${x} · ${k}?`,
+    prompt: locale === "en" ? `What is ${x} · ${k}?` : `Hva er ${x} · ${k}?`,
     kind: "number",
     answer: x * k,
     operand: k,
-    explanation: explainMul(x, k),
+    explanation: explainMul(x, k, locale),
   };
 }
 
 function multiplesUpTo(maxN: number, d: number): number[] {
   const values: number[] = [];
-  for (let n = d; n <= maxN; n += d) {
-    values.push(n);
-  }
+  for (let n = d; n <= maxN; n += d) values.push(n);
   if (values.length === 0) values.push(d <= maxN ? d : 1);
   return values;
 }
 
-function planDivisjonMini(maxN: number, rng: Rng): RoundPlan {
+function planDivisjonMini(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   const d = pickOne([1, 2, 3] as const, rng);
   const x = pickOne(multiplesUpTo(maxN, d), rng);
   return {
     mode: "divisjon-mini",
     catchTarget: x,
-    prompt: `Hva er ${x} : ${d}?`,
+    prompt: locale === "en" ? `What is ${x} : ${d}?` : `Hva er ${x} : ${d}?`,
     kind: "number",
     answer: x / d,
     operand: d,
-    explanation: explainDiv(x, d, x / d),
+    explanation: explainDiv(x, d, x / d, locale),
   };
 }
 
-function planDivisjonLiten(maxN: number, rng: Rng): RoundPlan {
+function planDivisjonLiten(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   if (rng() < 0.5) {
     const d = randomInt(1, 10, rng);
     const x = pickOne(multiplesUpTo(maxN, d), rng);
     return {
       mode: "divisjon-liten",
       catchTarget: x,
-      prompt: `Hva er ${x} : ${d}?`,
+      prompt: locale === "en" ? `What is ${x} : ${d}?` : `Hva er ${x} : ${d}?`,
       kind: "number",
       answer: x / d,
       operand: d,
-      explanation: explainDiv(x, d, x / d),
+      explanation: explainDiv(x, d, x / d, locale),
     };
   }
-
   const x = randomInt(1, Math.min(10, maxN), rng);
   const maxQuotient = Math.max(1, Math.floor(maxN / x));
   const quotient = randomInt(1, maxQuotient, rng);
@@ -161,90 +143,164 @@ function planDivisjonLiten(maxN: number, rng: Rng): RoundPlan {
   return {
     mode: "divisjon-liten",
     catchTarget: x,
-    prompt: `Hva er ${numerator} : ${x}?`,
+    prompt: locale === "en" ? `What is ${numerator} : ${x}?` : `Hva er ${numerator} : ${x}?`,
     kind: "number",
     answer: quotient,
     operand: numerator,
-    explanation: explainDiv(numerator, x, quotient),
+    explanation: explainDiv(numerator, x, quotient, locale),
   };
 }
 
-function planParity(maxN: number, rng: Rng): RoundPlan {
+function planParity(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   const x = randomX(maxN, rng);
-  const answer = parityOf(x);
   return {
     mode: "partall-oddetall",
     catchTarget: x,
-    prompt: `Er ${x} partall eller oddetall?`,
+    prompt: locale === "en" ? `Is ${x} even or odd?` : `Er ${x} partall eller oddetall?`,
     kind: "parity",
-    answer,
-    explanation: explainParity(x),
+    answer: parityOf(x),
+    explanation: explainParity(x, locale),
   };
 }
 
-function planParityAdd(maxN: number, rng: Rng): RoundPlan {
+function planParityAdd(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   const x = randomX(maxN, rng);
   const y = randomX(maxN, rng);
   const sum = x + y;
   return {
     mode: "partall-oddetall-addisjon",
     catchTarget: x,
-    prompt: `Er ${x} + ${y} partall eller oddetall?`,
+    prompt: locale === "en" ? `Is ${x} + ${y} even or odd?` : `Er ${x} + ${y} partall eller oddetall?`,
     kind: "parity",
     answer: parityOf(sum),
     operand: y,
-    explanation: explainParitySum(x, y),
+    explanation: explainParitySum(x, y, locale),
   };
 }
 
-function planParitySub(maxN: number, rng: Rng): RoundPlan {
+function planParitySub(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   const x = randomX(maxN, rng);
   const y = randomInt(0, x, rng);
   const diff = x - y;
   return {
     mode: "partall-oddetall-subtraksjon",
     catchTarget: x,
-    prompt: `Er ${x} − ${y} partall eller oddetall?`,
+    prompt: locale === "en" ? `Is ${x} − ${y} even or odd?` : `Er ${x} − ${y} partall eller oddetall?`,
     kind: "parity",
     answer: parityOf(diff),
     operand: y,
-    explanation: explainParityDiff(x, y),
+    explanation: explainParityDiff(x, y, locale),
   };
 }
 
-export function planMode(mode: ModeId, maxN: number, rng: Rng): RoundPlan {
+function planRoundMode(
+  mode: ModeId,
+  maxN: number,
+  rng: Rng,
+  locale: Locale,
+  base: number,
+  dir: "up" | "down" | "nearest",
+  small = false,
+): RoundPlan {
+  const x = small ? randomInt(1, Math.min(9, maxN), rng) : randomX(maxN, rng);
+  const answer = roundTo(x, base, dir);
+  const unit = base === 100
+    ? locale === "en" ? "hundred" : "hundre"
+    : locale === "en" ? "ten" : "tier";
+  let prompt: string;
+  if (small) {
+    prompt = locale === "en"
+      ? `Numbers under 10 rounded down to the nearest ten: what is ${x}?`
+      : `Hvordan rundes tall mindre enn 10 nedover til nærmeste tier? Hva blir ${x}?`;
+  } else if (dir === "up") {
+    prompt = locale === "en" ? `Round ${x} up to the nearest ${unit}.` : `Rund ${x} opp til nærmeste ${unit}.`;
+  } else if (dir === "down") {
+    prompt = locale === "en" ? `Round ${x} down to the nearest ${unit}.` : `Rund ${x} ned til nærmeste ${unit}.`;
+  } else {
+    prompt = locale === "en" ? `Round ${x} to the nearest ${unit}.` : `Rund av ${x} til nærmeste ${unit}.`;
+  }
+  return {
+    mode,
+    catchTarget: x,
+    prompt,
+    kind: "number",
+    answer,
+    explanation: explainRound(x, answer, base, dir, locale),
+  };
+}
+
+function planCompare(mode: "ulikhet-tegn" | "ulikhet-ord", maxN: number, rng: Rng, locale: Locale): RoundPlan {
+  const x = randomX(maxN, rng);
+  let y = randomX(maxN, rng);
+  if (rng() < 0.22) y = x;
+  const answer = compareOf(x, y);
+  const prompt = mode === "ulikhet-tegn"
+    ? (locale === "en" ? `Which sign fits? ${x} □ ${y}` : `Hvilket tegn passer? ${x} □ ${y}`)
+    : (locale === "en" ? `${x} is ___ ${y}` : `${x} er ___ ${y}`);
+  return {
+    mode,
+    catchTarget: x,
+    prompt,
+    kind: "compare",
+    answer,
+    operand: y,
+    explanation: explainCompare(x, y, answer, locale),
+  };
+}
+
+export function planMode(mode: ModeId, maxN: number, rng: Rng, locale: Locale = "nb"): RoundPlan {
+  const friendBase = FRIEND_BASE[mode];
+  if (friendBase) return planFriend(mode, friendBase, maxN, rng, locale);
   switch (mode) {
-    case "tiervenn":
-      return planTiervenn(maxN, rng);
-    case "hundrevenn":
-      return planHundrevenn(maxN, rng);
     case "addisjon":
-      return planAddisjon(maxN, rng);
+      return planAddisjon(maxN, rng, locale);
     case "subtraksjon-positiv":
-      return planSubtraksjonPositiv(maxN, rng);
+      return planSubtraksjonPositiv(maxN, rng, locale);
     case "subtraksjon-negativ":
-      return planSubtraksjonNegativ(maxN, rng);
+      return planSubtraksjonNegativ(maxN, rng, locale);
     case "multiplikasjon-mini":
     case "multiplikasjon-liten":
-      return planMultiplikasjon(mode, maxN, rng);
+      return planMultiplikasjon(mode, maxN, rng, locale);
     case "divisjon-mini":
-      return planDivisjonMini(maxN, rng);
+      return planDivisjonMini(maxN, rng, locale);
     case "divisjon-liten":
-      return planDivisjonLiten(maxN, rng);
+      return planDivisjonLiten(maxN, rng, locale);
     case "partall-oddetall":
-      return planParity(maxN, rng);
+      return planParity(maxN, rng, locale);
     case "partall-oddetall-addisjon":
-      return planParityAdd(maxN, rng);
+      return planParityAdd(maxN, rng, locale);
     case "partall-oddetall-subtraksjon":
-      return planParitySub(maxN, rng);
+      return planParitySub(maxN, rng, locale);
+    case "avrunding-tier-opp":
+      return planRoundMode(mode, maxN, rng, locale, 10, "up");
+    case "avrunding-tier-ned":
+      return planRoundMode(mode, maxN, rng, locale, 10, "down");
+    case "avrunding-tier":
+      return planRoundMode(mode, maxN, rng, locale, 10, "nearest");
+    case "avrunding-tier-ned-sma":
+      return planRoundMode(mode, maxN, rng, locale, 10, "down", true);
+    case "avrunding-hundre-opp":
+      return planRoundMode(mode, maxN, rng, locale, 100, "up");
+    case "avrunding-hundre-ned":
+      return planRoundMode(mode, maxN, rng, locale, 100, "down");
+    case "avrunding-hundre":
+      return planRoundMode(mode, maxN, rng, locale, 100, "nearest");
+    case "ulikhet-tegn":
+    case "ulikhet-ord":
+      return planCompare(mode, maxN, rng, locale);
+    default:
+      return planAddisjon(maxN, rng, locale);
   }
 }
 
-export function planRound(settings: Settings, rng: Rng): RoundPlan {
-  const mode = resolveRoundMode(settings, rng);
-  return planMode(mode, settings.maxN, rng);
+export function planRound(settings: Settings, rng: Rng, previous?: ModeId): RoundPlan {
+  const mode = resolveRoundMode(settings, rng, previous);
+  return planMode(mode, settings.maxN, rng, settings.locale);
 }
 
-export function answersMatch(expected: number | Parity, given: number | Parity): boolean {
+export function answersMatch(
+  expected: number | Parity | CompareAnswer,
+  given: number | Parity | CompareAnswer,
+): boolean {
   return expected === given;
 }

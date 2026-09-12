@@ -1,5 +1,6 @@
 import { sfx } from "./game/audio";
 import { createPlaySession, type PlaySession } from "./game/session";
+import { t } from "./i18n";
 import { applyScore, mathBonus } from "./math/scoring";
 import { answersMatch, planRound } from "./math/questions";
 import { createRng } from "./math/rng";
@@ -14,15 +15,21 @@ import { renderMenu } from "./screens/menu";
 import { renderSettings } from "./screens/settings";
 import { clearHighscores, loadHighscores, qualifies, saveHighscores, submitHighscore } from "./storage/highscores";
 import { loadSettings, saveSettings } from "./storage/settings";
-import type { MaxN, RoundPlan, Settings } from "./types";
+import type { Locale, MaxN, RoundPlan, Settings } from "./types";
+
+function applyDocumentLocale(locale: Locale): void {
+  document.documentElement.lang = locale === "en" ? "en" : "no";
+}
 
 export function startApp(root: HTMLElement): void {
   let settings = loadSettings();
+  applyDocumentLocale(settings.locale);
   let session: PlaySession | null = null;
   let plan: RoundPlan | null = null;
   let level = 1;
   let score = 0;
   let savedHighlight: { maxN: MaxN; index: number } | undefined;
+
   const showMenu = () => {
     session?.stop();
     session = null;
@@ -30,15 +37,15 @@ export function startApp(root: HTMLElement): void {
       play: startGame,
       scores: () => showScores(settings.maxN),
       settings: showSettings,
-      about: () => renderAbout(root, showMenu),
+      about: () => renderAbout(root, showMenu, settings.locale),
       install: goInstall,
-    });
+    }, settings.locale);
   };
 
   const showInstall = () => {
     session?.stop();
     session = null;
-    renderInstall(root, goHome);
+    renderInstall(root, goHome, settings.locale);
   };
 
   const goInstall = () => {
@@ -73,6 +80,7 @@ export function startApp(root: HTMLElement): void {
         change: (next) => showScores(next, highlight),
       },
       highlight?.maxN === maxN ? highlight.index : undefined,
+      settings.locale,
     );
   };
 
@@ -82,10 +90,24 @@ export function startApp(root: HTMLElement): void {
       save: (next: Settings) => {
         settings = next;
         saveSettings(settings);
+        applyDocumentLocale(settings.locale);
       },
       resetHighscores: () => {
         clearHighscores();
       },
+    });
+  };
+
+  const paintHud = (
+    hud: HTMLElement,
+    extra: { lives: number; collected: number; target: number; score: number; rottenCaught?: number },
+  ) => {
+    if (!plan) return;
+    updateHud(hud, {
+      ...extra,
+      mode: plan.mode,
+      level,
+      locale: settings.locale,
     });
   };
 
@@ -94,15 +116,14 @@ export function startApp(root: HTMLElement): void {
     score = 0;
     const rng = createRng(Date.now() % 1_000_000);
     plan = planRound(settings, rng);
-    const shell = renderGameShell(root, plan.mode, showMenu);
+    const shell = renderGameShell(root, plan.mode, showMenu, settings.locale);
     session?.stop();
     session = createPlaySession({
       canvas: shell.canvas,
       settings,
       rng,
       onHud: (hud) => {
-        if (!plan) return;
-        updateHud(shell.hud, { ...hud, mode: plan.mode });
+        paintHud(shell.hud, hud);
       },
       onRoundComplete: (state) => {
         score = state.score;
@@ -112,36 +133,40 @@ export function startApp(root: HTMLElement): void {
             sfx.ok(settings.sound);
             score = applyScore(score, mathBonus(level));
             level += 1;
-            plan = planRound(settings, rng);
+            plan = planRound(settings, rng, plan!.mode);
             shell.overlay.replaceChildren();
             session?.beginRound(plan.catchTarget, level, score);
-            updateHud(shell.hud, {
-              mode: plan.mode,
-              level,
+            paintHud(shell.hud, {
               lives: 2,
               collected: 0,
               target: plan.catchTarget,
               score,
+              rottenCaught: state.rottenCaught,
             });
           } else {
             sfx.fail(settings.sound);
-            endGame("Feil svar", plan!.explanation, score, level);
+            endGame(t(settings.locale, "over.wrong"), plan!.explanation, score, level);
           }
-        });
+        }, settings.locale);
       },
       onGameOver: (state) => {
-        endGame("Du mistet for mange bananer!", "Prøv å fange de gule. La de brune falle.", state.score, level);
+        const rotten = state.endReason === "rotten";
+        endGame(
+          t(settings.locale, rotten ? "over.rottenTitle" : "over.missTitle"),
+          t(settings.locale, rotten ? "over.rottenDetail" : "over.missDetail"),
+          state.score,
+          level,
+        );
       },
     });
     session.start();
     session.beginRound(plan.catchTarget, level, score);
-    updateHud(shell.hud, {
-      mode: plan.mode,
-      level,
+    paintHud(shell.hud, {
       lives: 2,
       collected: 0,
       target: plan.catchTarget,
       score,
+      rottenCaught: 0,
     });
   };
 
@@ -152,7 +177,7 @@ export function startApp(root: HTMLElement): void {
     const askName = qualifies(board, settings.maxN, finalScore);
     renderGameOver(
       root,
-      { title, detail, score: finalScore, level: finalLevel, askName },
+      { title, detail, score: finalScore, level: finalLevel, askName, locale: settings.locale },
       {
         submit: (name) => {
           const date = new Date().toISOString();

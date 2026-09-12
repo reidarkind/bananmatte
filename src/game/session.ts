@@ -14,6 +14,7 @@ export interface HudSnapshot {
   collected: number;
   target: number;
   level: number;
+  rottenCaught: number;
 }
 
 export interface PlaySession {
@@ -67,6 +68,7 @@ export function createPlaySession(opts: {
         collected: state.collected,
         target: state.target,
         level,
+        rottenCaught: state.rottenCaught,
       });
     } catch {
       // HUD-feil skal ikke stoppe spilløkken
@@ -203,7 +205,7 @@ export function createPlaySession(opts: {
     },
     beginRound(target, nextLevel, score) {
       level = nextLevel;
-      state = createPlayState(target, score);
+      state = createPlayState(target, score, state.rottenCaught);
       items = [];
       inBasket = [];
       spawnAcc = 0.4;

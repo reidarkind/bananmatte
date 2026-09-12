@@ -24,3 +24,34 @@ export const INSTALL_COPY = {
   android3: "Åpne Bananmatte fra startskjermen.",
   androidNote: "Etter installasjon åpner du appen fra ikonet, ikke fra en vanlig fane.",
 } as const;
+
+export const INSTALL_COPY_EN = {
+  whatThisIs: "What this is",
+  whatThisIsBody:
+    "Bananmatte is a math and catch game for grades 1 and 2. You steer a gorilla with a basket, catch bananas, and answer a math question after each round.",
+  privacy: "Privacy",
+  privacyBody1:
+    "The app stores nothing in the cloud. Scores, names and settings stay on this phone. Bananmatte does not sync between devices.",
+  privacyBody2:
+    "Change phone, or clear website data: the scores are gone. Nothing is sent online.",
+  addToHome: "Add to the home screen",
+  addToHomeBody:
+    "Bananmatte is a website you install as an app. It is not in the App Store or Google Play. Open it over HTTPS.",
+  origin: "Origin",
+  originBody: "The idea is Reidar Kind's. Built with help from AI.",
+  ios1: "Open Bananmatte in Safari (not Chrome, not a link inside another app).",
+  ios2: "Tap Share (the square with the arrow up) at the bottom of the screen.",
+  ios3:
+    "Scroll the Share sheet and tap Add to Home Screen. If you do not see it: swipe the bottom row, or tap Edit Actions.",
+  ios4: "Tap Add. Open Bananmatte from the new icon.",
+  iosNote: "Play from the home-screen icon so the app fills the whole screen.",
+  android1: "Open Bananmatte in Chrome (or Samsung Internet).",
+  android2:
+    "Tap the menu (three dots) at the top right, then Install app or Add to Home screen. Some phones also show an install banner at the bottom.",
+  android3: "Open Bananmatte from the home screen.",
+  androidNote: "After install, open the app from the icon, not from a regular tab.",
+} as const;
+
+export function installCopy(locale: "nb" | "en"): typeof INSTALL_COPY | typeof INSTALL_COPY_EN {
+  return locale === "en" ? INSTALL_COPY_EN : INSTALL_COPY;
+}

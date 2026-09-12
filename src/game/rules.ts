@@ -11,17 +11,21 @@ export interface PlayState {
   score: number;
   collected: number;
   target: number;
+  rottenCaught: number;
   ended: boolean;
-  endReason: "misses" | null;
+  endReason: "misses" | "rotten" | null;
   roundComplete: boolean;
 }
 
-export function createPlayState(target: number, score = 0): PlayState {
+export const ROTTEN_LIMIT = 3;
+
+export function createPlayState(target: number, score = 0, rottenCaught = 0): PlayState {
   return {
     lives: 2,
     score,
     collected: 0,
     target,
+    rottenCaught,
     ended: false,
     endReason: null,
     roundComplete: false,
@@ -45,9 +49,14 @@ export function applyCatchEvent(state: PlayState, event: CatchEvent): PlayState 
   }
 
   if (event.kind === "rotten") {
+    const rottenCaught = state.rottenCaught + 1;
+    const ended = rottenCaught > ROTTEN_LIMIT;
     return {
       ...state,
+      rottenCaught,
       score: applyScore(state.score, SCORE_ROTTEN),
+      ended,
+      endReason: ended ? "rotten" : null,
     };
   }
 
@@ -65,7 +74,7 @@ export function fallSpeed(level: number): number {
 }
 
 export function spawnRotten(level: number, rng: () => number): boolean {
-  if (level < 3) return false;
-  const chance = Math.min(0.08 + level * 0.02, 0.28);
+  if (level < 2) return false;
+  const chance = Math.min(0.2 + (level - 2) * 0.06, 0.5);
   return rng() < chance;
 }
