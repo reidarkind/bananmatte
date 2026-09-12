@@ -5,8 +5,8 @@ import { createDecor, type Decor } from "./backgrounds";
 import { intersects } from "./collision";
 import { drawBackground, drawBanana, drawDecor, drawGorilla } from "./draw";
 import { attachKeys, attachPointer } from "./input";
-import { basketRect, spawnFalling, type FallingItem } from "./entities";
-import { applyCatchEvent, createPlayState, fallSpeed, spawnRotten, type PlayState } from "./rules";
+import { bananaInBasketPose, basketRect, spawnFalling, type FallingItem } from "./entities";
+import { applyCatchEvent, createPlayState, fallSpeed, spawnRotten, type FallingKind, type PlayState } from "./rules";
 
 export interface HudSnapshot {
   lives: number;
@@ -42,6 +42,7 @@ export function createPlaySession(opts: {
   let gorillaX = 180;
   let keyDir: -1 | 0 | 1 = 0;
   let items: FallingItem[] = [];
+  let inBasket: { kind: FallingKind; value: number; rot: number; age: number }[] = [];
   let decor: Decor[] = [];
   let spawnAcc = 0;
   let state = createPlayState(1);
@@ -123,6 +124,7 @@ export function createPlaySession(opts: {
           item.rot += item.spin * dt;
           const box = { x: item.x, y: item.y, w: item.w, h: item.h };
           if (intersects(box, basket)) {
+            inBasket.push({ kind: item.kind, value: item.value, rot: item.rot, age: 0 });
             apply(
               applyCatchEvent(state, { type: "caught", kind: item.kind, value: item.value }),
               item.kind === "rotten" ? "rotten" : "catch",
@@ -148,10 +150,30 @@ export function createPlaySession(opts: {
         }
       }
 
+      for (const caught of inBasket) caught.age += dt;
+      inBasket = inBasket.filter((caught) => caught.age < 0.55);
+
+      const gorillaY = height - 58;
       drawBackground(ctx, width, height, level);
       drawDecor(ctx, decor, now);
+      drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "back");
       for (const item of items) drawBanana(ctx, item);
-      drawGorilla(ctx, gorillaX, height - 58, keyDir || 1);
+      inBasket.forEach((caught, slot) => {
+        const pose = bananaInBasketPose(gorillaX, gorillaY, slot);
+        drawBanana(ctx, {
+          id: -1 - slot,
+          kind: caught.kind,
+          value: caught.value,
+          x: pose.x,
+          y: pose.y,
+          w: pose.w,
+          h: pose.h,
+          vy: 0,
+          rot: caught.rot * 0.15,
+          spin: 0,
+        });
+      });
+      drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "front");
     } finally {
       if (running) raf = requestAnimationFrame(tick);
     }
@@ -183,6 +205,7 @@ export function createPlaySession(opts: {
       level = nextLevel;
       state = createPlayState(target, score);
       items = [];
+      inBasket = [];
       spawnAcc = 0.4;
       decor = createDecor(level, width, height, opts.rng);
       paused = false;

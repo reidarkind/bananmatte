@@ -200,7 +200,7 @@ const BASKET = "#e0b07a";
 const BASKET_DARK = "#c4924c";
 const BASKET_LINE = "#a87438";
 
-function drawBasket(ctx: CanvasRenderingContext2D): void {
+function drawBasketBack(ctx: CanvasRenderingContext2D): void {
   const { x, y, w, h } = GORILLA.basket;
   const cx = x + w / 2;
   const rimY = y + 3;
@@ -216,12 +216,49 @@ function drawBasket(ctx: CanvasRenderingContext2D): void {
   ctx.lineWidth = 1.2;
   ctx.stroke();
 
-  ctx.fillStyle = BASKET;
+  ctx.fillStyle = BASKET_DARK;
   ctx.beginPath();
   ctx.moveTo(x + 3, rimY);
   ctx.quadraticCurveTo(cx, y + h + 6, x + w - 3, rimY);
   ctx.quadraticCurveTo(cx, y + 1, x + 3, rimY);
   ctx.fill();
+
+  ctx.strokeStyle = BASKET_LINE;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.45;
+  for (let i = 0; i < 3; i += 1) {
+    const wy = rimY + 5 + i * 3.6;
+    ctx.beginPath();
+    ctx.moveTo(x + 8, wy);
+    ctx.quadraticCurveTo(cx, wy + 3, x + w - 8, wy);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawBasketFront(ctx: CanvasRenderingContext2D): void {
+  const { x, y, w, h } = GORILLA.basket;
+  const cx = x + w / 2;
+  const rimY = y + 3;
+
+  ctx.fillStyle = BASKET;
+  ctx.beginPath();
+  ctx.moveTo(x + 3, rimY + 5);
+  ctx.quadraticCurveTo(cx, y + h + 6, x + w - 3, rimY + 5);
+  ctx.quadraticCurveTo(cx, y + h * 0.55, x + 3, rimY + 5);
+  ctx.fill();
+
+  ctx.strokeStyle = BASKET_LINE;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.5;
+  for (let i = 0; i < 3; i += 1) {
+    const wy = rimY + 7 + i * 3.2;
+    ctx.beginPath();
+    ctx.moveTo(x + 10, wy);
+    ctx.quadraticCurveTo(cx, wy + 2.4, x + w - 10, wy);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
 
   ctx.strokeStyle = BASKET_DARK;
   ctx.lineWidth = 2;
@@ -232,25 +269,9 @@ function drawBasket(ctx: CanvasRenderingContext2D): void {
   ctx.beginPath();
   ctx.ellipse(cx, rimY, w * 0.42, 2.4, 0, 0, Math.PI * 2);
   ctx.fill();
-
-  ctx.strokeStyle = BASKET_LINE;
-  ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.55;
-  for (let i = 0; i < 4; i += 1) {
-    const wy = rimY + 4 + i * 3.4;
-    ctx.beginPath();
-    ctx.moveTo(x + 8, wy);
-    ctx.quadraticCurveTo(cx, wy + 3, x + w - 8, wy);
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
 }
 
-export function drawGorilla(ctx: CanvasRenderingContext2D, x: number, y: number, facing: number): void {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(facing < 0 ? -1 : 1, 1);
-
+function drawGorillaBody(ctx: CanvasRenderingContext2D): void {
   ctx.fillStyle = FUR;
   ctx.beginPath();
   ctx.ellipse(-13, 46, 9, 5.5, 0, 0, Math.PI * 2);
@@ -336,14 +357,28 @@ export function drawGorilla(ctx: CanvasRenderingContext2D, x: number, y: number,
   ctx.beginPath();
   ctx.ellipse(cx, cy + 11.4, 2.6, 1.6, 0, 0, Math.PI);
   ctx.fill();
+}
 
-  drawBasket(ctx);
-
-  ctx.fillStyle = FUR;
-  ctx.beginPath();
-  ctx.arc(-27, 14, 6.5, 0, Math.PI * 2);
-  ctx.arc(27, 14, 6.5, 0, Math.PI * 2);
-  ctx.fill();
-
+export function drawGorilla(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  facing: number,
+  layer: "back" | "front" = "back",
+): void {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(facing < 0 ? -1 : 1, 1);
+  if (layer === "back") {
+    drawGorillaBody(ctx);
+    drawBasketBack(ctx);
+  } else {
+    drawBasketFront(ctx);
+    ctx.fillStyle = FUR;
+    ctx.beginPath();
+    ctx.arc(-27, 14, 6.5, 0, Math.PI * 2);
+    ctx.arc(27, 14, 6.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.restore();
 }

@@ -50,3 +50,20 @@ export function basketRect(x: number, y: number) {
   const box = GORILLA.basket;
   return { x: x + box.x, y: y + box.y, w: box.w, h: box.h };
 }
+
+export function bananaInBasketPose(gorillaX: number, gorillaY: number, slot: number): {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+} {
+  const box = basketRect(gorillaX, gorillaY);
+  const wobble = (slot % 3) * 8 - 8;
+  const size = 28;
+  return {
+    x: box.x + box.w / 2 - size / 2 + wobble,
+    y: box.y - 2,
+    w: size,
+    h: size,
+  };
+}

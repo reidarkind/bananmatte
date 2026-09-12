@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { bananaCurves, pointOnCubic } from "./draw";
-import { GORILLA, basketRect } from "./entities";
+import { GORILLA, bananaInBasketPose, basketRect } from "./entities";
 
 function distToChord(
   point: { x: number; y: number },
@@ -23,6 +23,20 @@ describe("gorilla layout", () => {
       w: GORILLA.basket.w,
       h: GORILLA.basket.h,
     });
+  });
+});
+
+describe("bananas in the basket", () => {
+  it("places a caught banana inside the basket bowl", () => {
+    const gorilla = { x: 120, y: 400 };
+    const box = basketRect(gorilla.x, gorilla.y);
+    const pose = bananaInBasketPose(gorilla.x, gorilla.y, 0);
+    const cx = pose.x + pose.w / 2;
+    const cy = pose.y + pose.h / 2;
+    expect(cx).toBeGreaterThan(box.x);
+    expect(cx).toBeLessThan(box.x + box.w);
+    expect(cy).toBeGreaterThan(box.y);
+    expect(cy).toBeLessThan(box.y + box.h + 8);
   });
 });
 
