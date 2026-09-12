@@ -67,7 +67,7 @@ describe("game HUD", () => {
     expect(meter).not.toBeNull();
     expect(meter?.textContent).toContain("Råtten");
     expect(hud.querySelectorAll(".rotten-slot")).toHaveLength(3);
-    expect(hud.querySelectorAll(".rotten-icon")).toHaveLength(3);
+    expect(hud.querySelectorAll("[data-rotten] .rotten-icon")).toHaveLength(3);
     expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(0);
     expect(hud.querySelectorAll(".rotten-slot .cross")).toHaveLength(3);
 
@@ -80,7 +80,7 @@ describe("game HUD", () => {
       score: 20,
       rottenCaught: 2,
     });
-    expect(hud.querySelectorAll(".rotten-icon")).toHaveLength(3);
+    expect(hud.querySelectorAll("[data-rotten] .rotten-icon")).toHaveLength(3);
     expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(2);
     expect(hud.querySelectorAll(".rotten-slot.on .cross")).toHaveLength(2);
     expect(meter?.getAttribute("aria-label")).toContain("2");
@@ -116,8 +116,41 @@ describe("game HUD", () => {
     });
     expect(hud.querySelector("[data-progress]")?.textContent).toBe("Klart 3 / 7");
     expect(hud.querySelector("[data-rotten]")?.textContent).toContain("Mistet gul");
-    expect(hud.querySelectorAll(".rotten-icon.ripe")).toHaveLength(3);
+    expect(hud.querySelectorAll("[data-rotten] .ripe")).toHaveLength(0);
     expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(1);
+    root.remove();
+  });
+
+  it("shows orangutan lives in attack and rotten bananas in defense", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    const { hud } = renderGameShell(root, "addisjon", () => {});
+
+    updateHud(hud, {
+      mode: "addisjon",
+      level: 1,
+      lives: 2,
+      collected: 1,
+      target: 6,
+      score: 2,
+      playStyle: "angrep",
+    });
+    expect(hud.querySelector("[data-lives]")?.textContent).not.toMatch(/🍌/);
+    expect(hud.querySelectorAll("[data-lives] .orangutan")).toHaveLength(2);
+
+    updateHud(hud, {
+      mode: "addisjon",
+      level: 1,
+      lives: 1,
+      collected: 1,
+      target: 6,
+      score: 2,
+      playStyle: "forsvar",
+    });
+    expect(hud.querySelector("[data-lives]")?.textContent).not.toMatch(/🍌/);
+    expect(hud.querySelectorAll("[data-lives] .ripe")).toHaveLength(0);
+    expect(hud.querySelectorAll("[data-lives] .life-icon")).toHaveLength(2);
+    expect(hud.querySelectorAll("[data-lives] .life-slot.lost")).toHaveLength(1);
     root.remove();
   });
 });

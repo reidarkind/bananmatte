@@ -24,6 +24,7 @@ export interface AttackShot {
   vx: number;
   vy: number;
   rot: number;
+  targetId?: number;
 }
 
 export interface AttackWorld {
@@ -65,6 +66,53 @@ export function shotRect(shot: AttackShot): Rect {
 
 export function targetRect(target: AttackTarget): Rect {
   return { x: target.x, y: target.y, w: target.w, h: target.h };
+}
+
+export function visualTargetRect(target: AttackTarget): Rect {
+  const scale = target.kind === "gorilla" ? 0.72 : 0.58;
+  const cx = target.x + target.w / 2;
+  const cy = target.y + target.h * 0.7;
+  const w = 46 * scale;
+  const h = 70 * scale;
+  return { x: cx - w / 2, y: cy - h * 0.58, w, h };
+}
+
+function containsPoint(box: Rect, x: number, y: number): boolean {
+  return x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h;
+}
+
+function apeCenterDist(target: AttackTarget, x: number, y: number): number {
+  return Math.hypot(target.x + target.w / 2 - x, target.y + target.h * 0.7 - y);
+}
+
+const AIM_SNAP = 110;
+
+export function apeAtPoint(targets: AttackTarget[], x: number, y: number): AttackTarget | undefined {
+  if (targets.length === 0) return undefined;
+  const inside = targets.filter((target) => containsPoint(targetRect(target), x, y));
+  const pool = inside.length > 0 ? inside : targets;
+  const nearest = pool.reduce((best, target) =>
+    apeCenterDist(target, x, y) < apeCenterDist(best, x, y) ? target : best,
+  );
+  if (inside.length === 0 && apeCenterDist(nearest, x, y) > AIM_SNAP) return undefined;
+  return nearest;
+}
+
+function shotHit(shot: AttackShot, targets: AttackTarget[]): AttackTarget | undefined {
+  if (shot.targetId == null) return undefined;
+  const box = shotRect(shot);
+  const pool = targets.filter((target) => target.id === shot.targetId);
+  const hits = pool.filter((target) => intersects(box, visualTargetRect(target)));
+  if (hits.length === 0) return undefined;
+  const sx = shot.x + shot.w / 2;
+  const sy = shot.y + shot.h / 2;
+  return hits.reduce((best, target) => {
+    const bestBox = visualTargetRect(best);
+    const nextBox = visualTargetRect(target);
+    const bestDist = Math.hypot(bestBox.x + bestBox.w / 2 - sx, bestBox.y + bestBox.h / 2 - sy);
+    const nextDist = Math.hypot(nextBox.x + nextBox.w / 2 - sx, nextBox.y + nextBox.h / 2 - sy);
+    return nextDist < bestDist ? target : best;
+  });
 }
 
 export function spawnAttackTarget(
@@ -114,7 +162,12 @@ export function maybeSpawnTarget(
 
 export function throwAt(world: AttackWorld, fromX: number, fromY: number, toX: number, toY: number, level: number): void {
   if (world.shots.length > 0) return;
-  world.shots.push(aimShot(fromX, fromY, toX, toY, throwSpeed(level)));
+  const aimed = apeAtPoint(world.targets, toX, toY);
+  const aimX = aimed ? aimed.x + aimed.w / 2 : toX;
+  const aimY = aimed ? aimed.y + aimed.h * 0.7 : toY;
+  const shot = aimShot(fromX, fromY, aimX, aimY, throwSpeed(level));
+  shot.targetId = aimed?.id;
+  world.shots.push(shot);
 }
 
 export function stepShots(world: AttackWorld, dt: number, width: number, height: number): {
@@ -128,8 +181,7 @@ export function stepShots(world: AttackWorld, dt: number, width: number, height:
     shot.x += shot.vx * dt;
     shot.y += shot.vy * dt;
     shot.rot += 8 * dt;
-    const box = shotRect(shot);
-    const hit = world.targets.find((target) => intersects(box, targetRect(target)));
+    const hit = shotHit(shot, world.targets);
     if (hit) {
       world.targets = world.targets.filter((target) => target.id !== hit.id);
       hits.push({ target: hit });

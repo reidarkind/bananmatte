@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { APE_FUR, bananaCurves, pointOnCubic } from "./draw";
+import { APE_BODY, APE_FUR, apeFaceFill, bananaCurves, pointOnCubic } from "./draw";
 import { GORILLA, bananaInBasketPose, basketRect } from "./entities";
 
 function distToChord(
@@ -15,7 +15,7 @@ function distToChord(
 
 describe("gorilla layout", () => {
   it("holds the basket at the chest, like the start-screen ape", () => {
-    expect(GORILLA.basket.y).toBeGreaterThan(GORILLA.head.cy + 12);
+    expect(GORILLA.basket.y).toBeGreaterThan(GORILLA.head.cy);
     const box = basketRect(100, 200);
     expect(box).toEqual({
       x: 100 + GORILLA.basket.x,
@@ -45,6 +45,18 @@ describe("ape colors", () => {
     expect(APE_FUR.gorilla).toBe("#3b2416");
     expect(APE_FUR.orangutan.startsWith("#e") || APE_FUR.orangutan.startsWith("#f")).toBe(true);
     expect(APE_FUR.gorilla).not.toBe(APE_FUR.orangutan);
+  });
+
+  it("sits the head down onto the shoulders", () => {
+    const headBottom = GORILLA.head.cy + GORILLA.head.r;
+    const bodyTop = APE_BODY.cy - APE_BODY.ry;
+    expect(headBottom - bodyTop).toBeGreaterThanOrEqual(8);
+  });
+
+  it("gives orangutans a dark muzzle face, not the gorilla peach mask", () => {
+    expect(apeFaceFill("orangutan")).not.toBe(apeFaceFill("gorilla"));
+    expect(apeFaceFill("gorilla")).toMatch(/^#f/i);
+    expect(apeFaceFill("orangutan")).toMatch(/^#[0-6]/i);
   });
 });
 

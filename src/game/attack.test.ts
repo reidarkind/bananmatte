@@ -1,5 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { attackPeekBand, aimShot, createAttackWorld, maybeSpawnTarget, spawnAttackTarget, throwAt } from "./attack";
+import {
+  attackPeekBand,
+  aimShot,
+  createAttackWorld,
+  maybeSpawnTarget,
+  spawnAttackTarget,
+  stepShots,
+  throwAt,
+  type AttackTarget,
+} from "./attack";
+
+function ape(partial: Partial<AttackTarget> & Pick<AttackTarget, "id" | "kind" | "y">): AttackTarget {
+  return {
+    value: partial.kind === "gorilla" ? 1 : 4,
+    x: 140,
+    w: 52,
+    h: 64,
+    age: 0,
+    life: 8,
+    ...partial,
+  };
+}
 
 describe("attack throw", () => {
   it("aims a banana toward the tap", () => {
@@ -27,5 +48,62 @@ describe("attack throw", () => {
     throwAt(world, 100, 400, 80, 60, 1);
     throwAt(world, 100, 400, 140, 60, 1);
     expect(world.shots).toHaveLength(1);
+  });
+
+  it("flies past a lower gorilla when the tap was on a higher orangutan", () => {
+    const world = createAttackWorld();
+    const orangutan = ape({ id: 1, kind: "orangutan", y: 140 });
+    const gorilla = ape({ id: 2, kind: "gorilla", y: 154 });
+    world.targets = [orangutan, gorilla];
+    throwAt(world, 166, 520, 166, orangutan.y + orangutan.h * 0.7, 1);
+
+    const hitKinds: string[] = [];
+    while (world.shots.length > 0) {
+      const shot = world.shots[0];
+      if (!shot) break;
+      const overGorilla =
+        shot.y + shot.h > gorilla.y + gorilla.h * 0.45 && shot.y < gorilla.y + gorilla.h;
+      const { hits } = stepShots(world, 0.016, 360, 640);
+      hitKinds.push(...hits.map((hit) => hit.target.kind));
+      if (overGorilla && world.shots.length > 0) {
+        expect(world.targets.map((target) => target.kind)).toContain("orangutan");
+        expect(hits.map((hit) => hit.target.kind)).not.toContain("orangutan");
+      }
+    }
+
+    expect(hitKinds).toEqual(["orangutan"]);
+    expect(world.targets.map((target) => target.kind)).toEqual(["gorilla"]);
+  });
+
+  it("still hits a gorilla you tap even if an orangutan sits above it", () => {
+    const world = createAttackWorld();
+    const orangutan = ape({ id: 1, kind: "orangutan", y: 140 });
+    const gorilla = ape({ id: 2, kind: "gorilla", y: 154 });
+    world.targets = [orangutan, gorilla];
+    throwAt(world, 166, 520, 166, gorilla.y + gorilla.h * 0.7, 1);
+    const hitKinds: string[] = [];
+    while (world.shots.length > 0) {
+      const { hits } = stepShots(world, 0.016, 360, 640);
+      hitKinds.push(...hits.map((hit) => hit.target.kind));
+    }
+    expect(hitKinds).toEqual(["gorilla"]);
+    expect(world.targets.map((target) => target.kind)).toEqual(["orangutan"]);
+  });
+
+  it("does not hit an orangutan that pops into the shot path after the throw", () => {
+    const world = createAttackWorld();
+    const aimed = ape({ id: 1, kind: "orangutan", y: 130 });
+    world.targets = [aimed];
+    throwAt(world, 166, 520, 200, 118, 1);
+    world.targets.push(ape({ id: 3, kind: "orangutan", y: 220 }));
+
+    const hitIds: number[] = [];
+    while (world.shots.length > 0) {
+      const { hits } = stepShots(world, 0.016, 360, 640);
+      hitIds.push(...hits.map((hit) => hit.target.id));
+    }
+
+    expect(hitIds).toEqual([1]);
+    expect(world.targets.map((target) => target.id)).toEqual([3]);
   });
 });

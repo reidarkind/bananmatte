@@ -33,6 +33,7 @@ export function renderGameShell(
       </div>
     </div>
   `);
+  paintLives(hud, 2, "sank");
   paintRotten(hud, 0, locale, "sank");
   onClick(hud, "[data-quit]", onQuit);
   return {
@@ -58,11 +59,10 @@ export function updateHud(
 ): void {
   const locale = info.locale ?? "nb";
   const style = info.playStyle ?? "sank";
-  const lives = "🍌".repeat(info.lives) + "✕".repeat(Math.max(0, 2 - info.lives));
   setText(hud, "[data-style]", playStyleLabel(locale, style));
   setText(hud, "[data-mode]", modeLabel(locale, info.mode));
   setText(hud, "[data-level]", t(locale, "level", { n: info.level }));
-  setText(hud, "[data-lives]", lives);
+  paintLives(hud, info.lives, style);
   paintRotten(hud, info.rottenCaught ?? 0, locale, style);
   setText(hud, "[data-progress]", `${t(locale, `hud.progress.${style}`)} ${info.collected} / ${info.target}`);
   setText(hud, "[data-score]", String(info.score));
@@ -78,24 +78,45 @@ function meterCross(): string {
     </g>`;
 }
 
-function meterIcon(style: PlayStyle): string {
-  if (style === "angrep") {
-    return `<svg class="rotten-icon ape" viewBox="-24 -28 50 52" aria-hidden="true">
-      <circle class="ape-head" cx="0" cy="-2" r="14"/>
-      <circle class="ape-ear" cx="-13" cy="-6" r="5"/>
-      <circle class="ape-ear" cx="13" cy="-6" r="5"/>
-      <ellipse class="ape-face" cx="0" cy="1" rx="8" ry="9"/>
-      ${meterCross()}
-    </svg>`;
-  }
-  const ripe = style === "forsvar" ? " ripe" : "";
-  return `<svg class="rotten-icon${ripe}" viewBox="-24 -28 50 52" aria-hidden="true">
+function bananaSvg(className: string, crossed: boolean): string {
+  return `<svg class="${className}" viewBox="-24 -28 50 52" aria-hidden="true">
     <path class="peel" d="M-16-10C-4-22 18-8 16 14C8 8-8 2-16-10Z"/>
     <path class="stem" d="M-18-11c-1.2-4.2 1.6-7.6 3.6-6.2 1.4 1.4.2 5.2-1.8 6.2z"/>
     <ellipse class="spot" cx="2" cy="1" rx="3.1" ry="2.2" transform="rotate(23 2 1)"/>
     <ellipse class="spot" cx="9" cy="8" rx="2.3" ry="1.7" transform="rotate(-17 9 8)"/>
-    ${meterCross()}
+    ${crossed ? meterCross() : ""}
   </svg>`;
+}
+
+function apeSvg(className: string, crossed: boolean): string {
+  return `<svg class="${className}" viewBox="-24 -28 50 52" aria-hidden="true">
+    <circle class="ape-head" cx="0" cy="2" r="13"/>
+    <ellipse class="ape-pad" cx="-12" cy="6" rx="7" ry="9"/>
+    <ellipse class="ape-pad" cx="12" cy="6" rx="7" ry="9"/>
+    <ellipse class="ape-face" cx="0" cy="2" rx="6" ry="5.5"/>
+    <ellipse class="ape-face" cx="0" cy="10" rx="7" ry="6"/>
+    ${crossed ? meterCross() : ""}
+  </svg>`;
+}
+
+function meterIcon(style: PlayStyle): string {
+  if (style === "angrep") return apeSvg("rotten-icon ape gorilla", true);
+  return bananaSvg("rotten-icon", true);
+}
+
+function lifeIcon(style: PlayStyle): string {
+  if (style === "angrep") return apeSvg("life-icon rotten-icon orangutan", false);
+  if (style === "forsvar") return bananaSvg("life-icon rotten-icon", false);
+  return bananaSvg("life-icon rotten-icon ripe", false);
+}
+
+function paintLives(hud: HTMLElement, lives: number, style: PlayStyle): void {
+  const node = hud.querySelector("[data-lives]");
+  if (!node) return;
+  const left = Math.max(0, Math.min(2, lives));
+  node.innerHTML = Array.from({ length: 2 }, (_, i) =>
+    `<i class="life-slot${i < left ? "" : " lost"}" aria-hidden="true">${lifeIcon(style)}</i>`,
+  ).join("");
 }
 
 function paintRotten(hud: HTMLElement, caught: number, locale: Locale, style: PlayStyle = "sank"): void {

@@ -182,6 +182,10 @@ select {
 }
 .hud-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
 [data-progress] { white-space: nowrap; }
+[data-lives] { display: flex; align-items: center; gap: 0.12rem; }
+.life-slot { display: block; width: 1.55rem; height: 1.55rem; }
+.life-slot.lost { opacity: 0.28; }
+.life-icon { display: block; width: 100%; height: 100%; overflow: visible; }
 .rotten-meter {
   display: flex;
   align-items: center;
@@ -214,8 +218,10 @@ select {
 .rotten-icon.ripe .peel { fill: #f4d35e; stroke: #c2780a; }
 .rotten-icon.ripe .stem { fill: #6b4226; }
 .rotten-icon.ripe .spot { fill: transparent; }
-.rotten-icon.ape .ape-head, .rotten-icon.ape .ape-ear { fill: #3b2416; }
+.rotten-icon.ape .ape-head, .rotten-icon.ape .ape-ear, .rotten-icon.ape .ape-pad { fill: #3b2416; }
 .rotten-icon.ape .ape-face { fill: #f0c4a0; }
+.orangutan .ape-head, .orangutan .ape-pad { fill: #e67a22; }
+.orangutan .ape-face { fill: #3a2418; }
 .rotten-icon .cross {
   opacity: 0;
   fill: none;

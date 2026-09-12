@@ -38,8 +38,8 @@ export function spawnFalling(
 }
 
 export const GORILLA = {
-  head: { cx: 0, cy: -14, r: 20 },
-  basket: { x: -27, y: 6, w: 54, h: 20 },
+  head: { cx: 0, cy: -2, r: 20 },
+  basket: { x: -27, y: 14, w: 54, h: 20 },
 };
 
 export function gorillaRect(x: number, y: number) {
