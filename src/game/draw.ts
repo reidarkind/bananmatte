@@ -195,14 +195,15 @@ export function drawBanana(ctx: CanvasRenderingContext2D, item: FallingItem): vo
 export const APE_FUR = {
   gorilla: "#3b2416",
   gorillaLight: "#5a3824",
-  orangutan: "#e67a22",
-  orangutanLight: "#f6b15a",
+  orangutan: "#c4541a",
+  orangutanDark: "#8a3010",
+  orangutanLight: "#d97a32",
 } as const;
 
 export const APE_BODY = { cx: 0, cy: 26, rx: 22, ry: 18 };
 
 export function apeFaceFill(kind: "gorilla" | "orangutan"): string {
-  return kind === "orangutan" ? "#3a2418" : "#f0c4a0";
+  return kind === "orangutan" ? "#241610" : "#f0c4a0";
 }
 
 const FUR = APE_FUR.gorilla;
@@ -408,78 +409,114 @@ export function drawGorilla(
   ctx.restore();
 }
 
-function drawApeHands(ctx: CanvasRenderingContext2D, fur: string): void {
+function drawApeHands(ctx: CanvasRenderingContext2D, fur: string, long = false): void {
   ctx.fillStyle = fur;
   ctx.beginPath();
-  ctx.arc(-27, 14, 6.5, 0, Math.PI * 2);
-  ctx.arc(27, 14, 6.5, 0, Math.PI * 2);
+  if (long) {
+    ctx.ellipse(-30, 26, 6, 7.5, 0.2, 0, Math.PI * 2);
+    ctx.ellipse(30, 26, 6, 7.5, -0.2, 0, Math.PI * 2);
+  } else {
+    ctx.arc(-27, 14, 6.5, 0, Math.PI * 2);
+    ctx.arc(27, 14, 6.5, 0, Math.PI * 2);
+  }
+  ctx.fill();
+}
+
+function drawOrangutanTorso(ctx: CanvasRenderingContext2D): void {
+  const fur = APE_FUR.orangutan;
+  const dark = APE_FUR.orangutanDark;
+  ctx.fillStyle = fur;
+  ctx.beginPath();
+  ctx.ellipse(-12, 48, 8, 5, 0, 0, Math.PI * 2);
+  ctx.ellipse(12, 48, 8, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(0, 28, 18, 20, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = APE_FUR.orangutanLight;
+  ctx.beginPath();
+  ctx.ellipse(0, 30, 9, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = dark;
+  ctx.lineWidth = 7;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-12, 16);
+  ctx.quadraticCurveTo(-30, 8, -30, 24);
+  ctx.moveTo(12, 16);
+  ctx.quadraticCurveTo(30, 8, 30, 24);
+  ctx.stroke();
+  ctx.fillStyle = fur;
+  ctx.beginPath();
+  ctx.ellipse(-18, 18, 10, 14, -0.5, 0, Math.PI * 2);
+  ctx.ellipse(18, 18, 10, 14, 0.5, 0, Math.PI * 2);
+  ctx.ellipse(0, 12, 12, 10, 0, 0, Math.PI * 2);
   ctx.fill();
 }
 
 function drawOrangutanHead(ctx: CanvasRenderingContext2D): void {
-  const { cx, cy, r } = GORILLA.head;
+  const { cx, cy } = GORILLA.head;
   const fur = APE_FUR.orangutan;
+  const dark = APE_FUR.orangutanDark;
   const face = apeFaceFill("orangutan");
 
   ctx.fillStyle = fur;
   ctx.beginPath();
-  ctx.ellipse(cx - 20, cy + 4, 13, 18, -0.35, 0, Math.PI * 2);
-  ctx.ellipse(cx + 20, cy + 4, 13, 18, 0.35, 0, Math.PI * 2);
-  ctx.ellipse(cx, cy - 14, 17, 13, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx - 18, cy + 10, 12, 20, -0.45, 0, Math.PI * 2);
+  ctx.ellipse(cx + 18, cy + 10, 12, 20, 0.45, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy - 16, 16, 14, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx - 10, cy - 12, 10, 12, -0.6, 0, Math.PI * 2);
+  ctx.ellipse(cx + 10, cy - 12, 10, 12, 0.6, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#c44e14";
+  ctx.fillStyle = dark;
   ctx.beginPath();
-  ctx.ellipse(cx - 17, cy + 7, 12, 15, -0.12, 0, Math.PI * 2);
-  ctx.ellipse(cx + 17, cy + 7, 12, 15, 0.12, 0, Math.PI * 2);
+  ctx.ellipse(cx - 16, cy + 8, 10, 14, -0.08, 0, Math.PI * 2);
+  ctx.ellipse(cx + 16, cy + 8, 10, 14, 0.08, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = APE_FUR.orangutanLight;
+  ctx.fillStyle = "#5a3218";
   ctx.beginPath();
-  ctx.ellipse(cx - 16, cy + 7, 7.5, 10, -0.12, 0, Math.PI * 2);
-  ctx.ellipse(cx + 16, cy + 7, 7.5, 10, 0.12, 0, Math.PI * 2);
+  ctx.ellipse(cx - 15, cy + 8, 6.5, 10, -0.08, 0, Math.PI * 2);
+  ctx.ellipse(cx + 15, cy + 8, 6.5, 10, 0.08, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.fillStyle = fur;
   ctx.beginPath();
-  ctx.ellipse(cx, cy - 1, r - 1, r - 2, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy - 2, 16, 17, 0, 0, Math.PI * 2);
   ctx.fill();
 
   ctx.fillStyle = face;
   ctx.beginPath();
-  ctx.ellipse(cx, cy - 1, 9.6, 8.4, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy + 1, 8.2, 7.6, 0, 0, Math.PI * 2);
   ctx.fill();
+  ctx.fillStyle = "#3a2418";
   ctx.beginPath();
-  ctx.ellipse(cx, cy + 11, 11, 9.2, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy + 12, 9.4, 8.4, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#f3e2c4";
+  ctx.fillStyle = "#4a3420";
   ctx.beginPath();
-  ctx.ellipse(cx - 3.5, cy - 3, 2.7, 3.1, 0, 0, Math.PI * 2);
-  ctx.ellipse(cx + 3.5, cy - 3, 2.7, 3.1, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx - 3.2, cy - 1.5, 2.4, 2.8, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 3.2, cy - 1.5, 2.4, 2.8, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#1a1008";
+  ctx.fillStyle = "#140c08";
   ctx.beginPath();
-  ctx.arc(cx - 3.3, cy - 2.6, 1.55, 0, Math.PI * 2);
-  ctx.arc(cx + 3.3, cy - 2.6, 1.55, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = "#f7e7c8";
-  ctx.beginPath();
-  ctx.arc(cx - 2.7, cy - 3.3, 0.55, 0, Math.PI * 2);
-  ctx.arc(cx + 3.9, cy - 3.3, 0.55, 0, Math.PI * 2);
+  ctx.arc(cx - 3.1, cy - 1.3, 1.35, 0, Math.PI * 2);
+  ctx.arc(cx + 3.1, cy - 1.3, 1.35, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#1a1008";
+  ctx.fillStyle = "#140c08";
   ctx.beginPath();
-  ctx.ellipse(cx - 2.1, cy + 8.2, 1.7, 1.3, 0, 0, Math.PI * 2);
-  ctx.ellipse(cx + 2.1, cy + 8.2, 1.7, 1.3, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx - 2.4, cy + 9.2, 1.8, 1.4, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 2.4, cy + 9.2, 1.8, 1.4, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = "#1a1008";
-  ctx.lineWidth = 1.7;
+  ctx.strokeStyle = "#140c08";
+  ctx.lineWidth = 1.5;
   ctx.lineCap = "round";
   ctx.beginPath();
-  ctx.moveTo(cx - 5.2, cy + 14.2);
-  ctx.quadraticCurveTo(cx, cy + 17.4, cx + 5.2, cy + 14.2);
+  ctx.moveTo(cx - 4.4, cy + 15);
+  ctx.quadraticCurveTo(cx, cy + 17.6, cx + 4.4, cy + 15);
   ctx.stroke();
 }
 
@@ -491,15 +528,20 @@ export function drawApe(
   kind: "gorilla" | "orangutan",
   scale = 1,
 ): void {
-  const fur = kind === "orangutan" ? APE_FUR.orangutan : APE_FUR.gorilla;
+  const fur = kind === "orangutan" ? APE_FUR.orangutanDark : APE_FUR.gorilla;
   const light = kind === "orangutan" ? APE_FUR.orangutanLight : APE_FUR.gorillaLight;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale((facing < 0 ? -1 : 1) * scale, scale);
-  drawApeTorso(ctx, fur, light);
-  if (kind === "orangutan") drawOrangutanHead(ctx);
-  else drawGorillaHead(ctx, fur);
-  drawApeHands(ctx, fur);
+  if (kind === "orangutan") {
+    drawOrangutanTorso(ctx);
+    drawOrangutanHead(ctx);
+    drawApeHands(ctx, fur, true);
+  } else {
+    drawApeTorso(ctx, fur, light);
+    drawGorillaHead(ctx, fur);
+    drawApeHands(ctx, fur);
+  }
   ctx.restore();
 }
 

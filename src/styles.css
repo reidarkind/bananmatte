@@ -226,8 +226,8 @@ select {
 .rotten-icon.ripe .spot { fill: transparent; }
 .rotten-icon.ape .ape-head, .rotten-icon.ape .ape-ear, .rotten-icon.ape .ape-pad { fill: #3b2416; }
 .rotten-icon.ape .ape-face { fill: #f0c4a0; }
-.orangutan .ape-head, .orangutan .ape-pad { fill: #e67a22; }
-.orangutan .ape-face { fill: #3a2418; }
+.orangutan .ape-head, .orangutan .ape-pad { fill: #c4541a; }
+.orangutan .ape-face { fill: #241610; }
 .rotten-icon .cross {
   opacity: 0;
   fill: none;

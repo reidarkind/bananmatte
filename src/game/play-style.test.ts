@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createRng } from "../math/rng";
-import { apeCountForValue, peekTime, resolvePlayStyle } from "./play-style";
+import { ATTACK_THROWER_KIND, apeCountForValue, peekTime, resolvePlayStyle } from "./play-style";
 
 describe("resolvePlayStyle", () => {
   it("keeps a fixed style", () => {
@@ -20,6 +20,10 @@ describe("level helpers", () => {
   it("shortens peek time on later levels", () => {
     expect(peekTime(1)).toBeGreaterThanOrEqual(4);
     expect(peekTime(6)).toBeLessThan(peekTime(1));
+  });
+
+  it("lets a gorilla throw in banana attack", () => {
+    expect(ATTACK_THROWER_KIND).toBe("gorilla");
   });
 
   it("grows orangutan gangs with banana value", () => {

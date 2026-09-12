@@ -39,6 +39,8 @@ export function defendSpawnInterval(level: number): number {
   return Math.max(0.42, 1.2 - level * 0.07);
 }
 
+export const ATTACK_THROWER_KIND = "gorilla" as const;
+
 export function apeCountForValue(value: number): number {
   if (value >= 10) return 3;
   if (value >= 5) return 2;

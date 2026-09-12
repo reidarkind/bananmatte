@@ -101,6 +101,7 @@ function apeSvg(className: string, crossed: boolean): string {
 
 function meterIcon(style: PlayStyle): string {
   if (style === "angrep") return apeSvg("rotten-icon ape gorilla", true);
+  if (style === "forsvar") return bananaSvg("rotten-icon ripe", true);
   return bananaSvg("rotten-icon", true);
 }
 

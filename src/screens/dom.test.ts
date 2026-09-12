@@ -116,7 +116,7 @@ describe("game HUD", () => {
     });
     expect(hud.querySelector("[data-progress]")?.textContent).toBe("Klart 3 / 7");
     expect(hud.querySelector("[data-rotten]")?.textContent).toContain("Mistet gul");
-    expect(hud.querySelectorAll("[data-rotten] .ripe")).toHaveLength(0);
+    expect(hud.querySelectorAll("[data-rotten] .ripe")).toHaveLength(3);
     expect(hud.querySelectorAll(".rotten-slot.on")).toHaveLength(1);
     root.remove();
   });

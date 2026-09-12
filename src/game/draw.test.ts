@@ -43,7 +43,7 @@ describe("bananas in the basket", () => {
 describe("ape colors", () => {
   it("keeps gorillas dark brown and orangutans orange", () => {
     expect(APE_FUR.gorilla).toBe("#3b2416");
-    expect(APE_FUR.orangutan.startsWith("#e") || APE_FUR.orangutan.startsWith("#f")).toBe(true);
+    expect(APE_FUR.orangutan.startsWith("#c") || APE_FUR.orangutan.startsWith("#b")).toBe(true);
     expect(APE_FUR.gorilla).not.toBe(APE_FUR.orangutan);
   });
 

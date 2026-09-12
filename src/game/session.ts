@@ -15,7 +15,7 @@ import { drawApe, drawAttackGrove, drawAttackLeaves, drawBackground, drawBanana,
 import { attachKeys, attachPointer, attachTap } from "./input";
 import { bananaInBasketPose, basketRect, gorillaRect, spawnFalling, type FallingItem } from "./entities";
 import { attackHitEvent, attackLeaveEvent, attackMissEvent, defendEscapeEvent, defendHitEvent } from "./play-map";
-import { apeCountForValue, defendSpawnInterval, resolvePlayStyle, type PlayStyle } from "./play-style";
+import { ATTACK_THROWER_KIND, apeCountForValue, defendSpawnInterval, resolvePlayStyle, type PlayStyle } from "./play-style";
 import { applyCatchEvent, createPlayState, fallSpeed, spawnRotten, type FallingKind, type PlayState } from "./rules";
 
 export interface HudSnapshot {
@@ -227,7 +227,7 @@ export function createPlaySession(opts: {
           spin: 0,
         });
       }
-      drawApe(ctx, gorillaX, gorillaY, throwerFacing, "orangutan");
+      drawApe(ctx, gorillaX, gorillaY, throwerFacing, ATTACK_THROWER_KIND);
       return;
     }
 
