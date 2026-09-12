@@ -10,10 +10,18 @@ const mix = {
 };
 
 describe("availableModes", () => {
-  it("keeps tiervenn only when maxN is 10", () => {
-    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 10 })).toContain("tiervenn");
-    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 50 })).not.toContain("tiervenn");
-    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 50 })).toContain("femmervenn");
+  it("keeps friend modes only when maxN is 10", () => {
+    const atTen = availableModes({ ...DEFAULT_SETTINGS, maxN: 10 });
+    const atFifty = availableModes({ ...DEFAULT_SETTINGS, maxN: 50 });
+    for (const mode of ["tiervenn", "femmervenn", "sekservenn", "syvervenn", "attervenn", "niervenn"] as const) {
+      expect(atTen).toContain(mode);
+      expect(atFifty).not.toContain(mode);
+    }
+  });
+
+  it("does not offer rounding down under 10", () => {
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 50 }).join(" ")).not.toMatch(/ned-sma/);
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 10 }).join(" ")).not.toMatch(/ned-sma/);
   });
 
   it("keeps rounding modes only when maxN is over 10", () => {
@@ -29,15 +37,16 @@ describe("sanitizeSettings", () => {
     expect(next.selectedModes.length).toBeGreaterThan(0);
   });
 
-  it("drops tiervenn from the selection when maxN is 50", () => {
+  it("drops friend modes from the selection when maxN is 50", () => {
     const next = sanitizeSettings({
       ...DEFAULT_SETTINGS,
       maxN: 50,
-      playSelection: "tiervenn",
-      selectedModes: ["tiervenn", "addisjon"],
+      playSelection: "femmervenn",
+      selectedModes: ["tiervenn", "femmervenn", "addisjon"],
     });
     expect(next.playSelection).toBe("mix");
     expect(next.selectedModes).not.toContain("tiervenn");
+    expect(next.selectedModes).not.toContain("femmervenn");
     expect(next.selectedModes).toContain("addisjon");
   });
 });

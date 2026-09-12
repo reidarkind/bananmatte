@@ -200,19 +200,14 @@ function planRoundMode(
   locale: Locale,
   base: number,
   dir: "up" | "down" | "nearest",
-  small = false,
 ): RoundPlan {
-  const x = small ? randomInt(1, Math.min(9, maxN), rng) : randomX(maxN, rng);
+  const x = randomX(maxN, rng);
   const answer = roundTo(x, base, dir);
   const unit = base === 100
     ? locale === "en" ? "hundred" : "hundre"
     : locale === "en" ? "ten" : "tier";
   let prompt: string;
-  if (small) {
-    prompt = locale === "en"
-      ? `Numbers under 10 rounded down to the nearest ten: what is ${x}?`
-      : `Hvordan rundes tall mindre enn 10 nedover til nærmeste tier? Hva blir ${x}?`;
-  } else if (dir === "up") {
+  if (dir === "up") {
     prompt = locale === "en" ? `Round ${x} up to the nearest ${unit}.` : `Rund ${x} opp til nærmeste ${unit}.`;
   } else if (dir === "down") {
     prompt = locale === "en" ? `Round ${x} down to the nearest ${unit}.` : `Rund ${x} ned til nærmeste ${unit}.`;
@@ -277,8 +272,6 @@ export function planMode(mode: ModeId, maxN: number, rng: Rng, locale: Locale = 
       return planRoundMode(mode, maxN, rng, locale, 10, "down");
     case "avrunding-tier":
       return planRoundMode(mode, maxN, rng, locale, 10, "nearest");
-    case "avrunding-tier-ned-sma":
-      return planRoundMode(mode, maxN, rng, locale, 10, "down", true);
     case "avrunding-hundre-opp":
       return planRoundMode(mode, maxN, rng, locale, 100, "up");
     case "avrunding-hundre-ned":

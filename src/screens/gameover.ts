@@ -16,6 +16,7 @@ export function renderGameOver(
   actions: {
     submit: (name: string) => void;
     afterSave: () => void;
+    cancel: () => void;
     again: () => void;
     menu: () => void;
   },
@@ -28,7 +29,8 @@ export function renderGameOver(
     : "";
 
   const buttons = info.askName
-    ? `<button class="btn primary" data-save>${t(locale, "over.save")}</button>`
+    ? `<button class="btn primary" data-save>${t(locale, "over.save")}</button>
+       <button class="btn ghost" data-cancel>${t(locale, "over.cancel")}</button>`
     : `<button class="btn primary" data-again>${t(locale, "over.again")}</button>
        <button class="btn ghost" data-menu>${t(locale, "over.menu")}</button>`;
 
@@ -51,6 +53,7 @@ export function renderGameOver(
   };
 
   onClick(root, "[data-save]", save);
+  onClick(root, "[data-cancel]", actions.cancel);
   onClick(root, "[data-again]", actions.again);
   onClick(root, "[data-menu]", actions.menu);
   input?.addEventListener("keydown", (event) => {

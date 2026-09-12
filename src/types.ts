@@ -23,7 +23,6 @@ export type ModeId =
   | "avrunding-tier-opp"
   | "avrunding-tier-ned"
   | "avrunding-tier"
-  | "avrunding-tier-ned-sma"
   | "avrunding-hundre-opp"
   | "avrunding-hundre-ned"
   | "avrunding-hundre"
@@ -94,7 +93,6 @@ export const ALL_MODES: ModeId[] = [
   "avrunding-tier-opp",
   "avrunding-tier-ned",
   "avrunding-tier",
-  "avrunding-tier-ned-sma",
   "avrunding-hundre-opp",
   "avrunding-hundre-ned",
   "avrunding-hundre",

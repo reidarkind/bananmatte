@@ -174,32 +174,35 @@ export function startApp(root: HTMLElement): void {
     session?.stop();
     session = null;
     const board = loadHighscores();
-    const askName = qualifies(board, settings.maxN, finalScore);
-    renderGameOver(
-      root,
-      { title, detail, score: finalScore, level: finalLevel, askName, locale: settings.locale },
-      {
-        submit: (name) => {
-          const date = new Date().toISOString();
-          const updated = submitHighscore(loadHighscores(), settings.maxN, {
-            name,
-            score: finalScore,
-            level: finalLevel,
-            date,
-          });
-          saveHighscores(updated);
-          savedHighlight = {
-            maxN: settings.maxN,
-            index: (updated[String(settings.maxN)] ?? []).findIndex((entry) => entry.date === date),
-          };
+    const showOver = (askName: boolean) => {
+      renderGameOver(
+        root,
+        { title, detail, score: finalScore, level: finalLevel, askName, locale: settings.locale },
+        {
+          submit: (name) => {
+            const date = new Date().toISOString();
+            const updated = submitHighscore(loadHighscores(), settings.maxN, {
+              name,
+              score: finalScore,
+              level: finalLevel,
+              date,
+            });
+            saveHighscores(updated);
+            savedHighlight = {
+              maxN: settings.maxN,
+              index: (updated[String(settings.maxN)] ?? []).findIndex((entry) => entry.date === date),
+            };
+          },
+          afterSave: () => {
+            showScores(settings.maxN, savedHighlight?.index === -1 ? undefined : savedHighlight);
+          },
+          cancel: () => showOver(false),
+          again: startGame,
+          menu: showMenu,
         },
-        afterSave: () => {
-          showScores(settings.maxN, savedHighlight?.index === -1 ? undefined : savedHighlight);
-        },
-        again: startGame,
-        menu: showMenu,
-      },
-    );
+      );
+    };
+    showOver(qualifies(board, settings.maxN, finalScore));
   };
 
   window.addEventListener("popstate", syncRoute);

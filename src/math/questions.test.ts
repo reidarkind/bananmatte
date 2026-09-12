@@ -78,9 +78,8 @@ describe("planMode", () => {
     expect(roundTo(14, 10, "down")).toBe(10);
     expect(roundTo(15, 10, "nearest")).toBe(20);
     expect(roundTo(7, 10, "down")).toBe(0);
-    const down = planMode("avrunding-tier-ned-sma", 50, () => 0.2);
-    expect(down.catchTarget).toBeLessThan(10);
-    expect(down.answer).toBe(0);
+    const down = planMode("avrunding-tier-ned", 50, () => 0.2);
+    expect(down.answer).toBe(roundTo(down.catchTarget, 10, "down"));
   });
 
   it("compares with signs", () => {

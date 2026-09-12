@@ -20,6 +20,7 @@ describe("game over name", () => {
         afterSave: () => {
           afterSave = true;
         },
+        cancel: () => {},
         again: () => {
           again = true;
         },
@@ -40,13 +41,45 @@ describe("game over name", () => {
     root.remove();
   });
 
+  it("lets the player cancel the name prompt without saving", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    let submitted = false;
+    let afterSave = false;
+    let cancelled = false;
+    renderGameOver(
+      root,
+      { title: "Slutt", detail: "Bra jobba", score: 40, level: 3, askName: true },
+      {
+        submit: () => {
+          submitted = true;
+        },
+        afterSave: () => {
+          afterSave = true;
+        },
+        cancel: () => {
+          cancelled = true;
+        },
+        again: () => {},
+        menu: () => {},
+      },
+    );
+    const cancel = root.querySelector<HTMLButtonElement>("[data-cancel]");
+    expect(cancel?.textContent).toBe("Avbryt");
+    cancel!.click();
+    expect(submitted).toBe(false);
+    expect(afterSave).toBe(false);
+    expect(cancelled).toBe(true);
+    root.remove();
+  });
+
   it("uses English save label when locale is en", () => {
     const root = document.createElement("div");
     document.body.append(root);
     renderGameOver(
       root,
       { title: "Over", detail: "Nice", score: 10, level: 1, askName: true, locale: "en" },
-      { submit: () => {}, afterSave: () => {}, again: () => {}, menu: () => {} },
+      { submit: () => {}, afterSave: () => {}, cancel: () => {}, again: () => {}, menu: () => {} },
     );
     expect(root.querySelector("[data-save]")?.textContent).toBe("Save");
     expect(root.textContent).toContain("Score 10");
