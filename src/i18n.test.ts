@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { overCopy } from "./i18n";
+import { overCopy, t } from "./i18n";
+
+describe("menu lead", () => {
+  it("talks about ape tricks, not only catching bananas", () => {
+    expect(t("nb", "menu.lead")).toBe("Gjør apestreker. Regn etterpå.");
+  });
+});
 
 describe("overCopy", () => {
   it("keeps harvest wording for sanking", () => {

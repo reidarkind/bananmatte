@@ -1,7 +1,7 @@
 import type { Locale, ModeId, PlaySelection, PlayStyle, PlayStyleChoice } from "./types";
 
 const NB: Record<string, string> = {
-  "menu.lead": "Fang bananer. Regn etterpå.",
+  "menu.lead": "Gjør apestreker. Regn etterpå.",
   "menu.play": "Spill",
   "menu.scores": "Rekorder",
   "menu.settings": "Innstillinger",
@@ -118,7 +118,7 @@ const NB: Record<string, string> = {
 };
 
 const EN: Record<string, string> = {
-  "menu.lead": "Catch bananas. Then do the math.",
+  "menu.lead": "Play ape tricks. Then do the math.",
   "menu.play": "Play",
   "menu.scores": "High scores",
   "menu.settings": "Settings",
