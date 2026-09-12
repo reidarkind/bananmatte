@@ -54,8 +54,6 @@ export interface Rect {
   h: number;
 }
 
-export const ARCADE_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ";
-
 export const ALL_MODES: ModeId[] = [
   "tiervenn",
   "hundrevenn",

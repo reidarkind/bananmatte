@@ -7,12 +7,13 @@ const MAX_OPTIONS: MaxN[] = [10, 50, 100, 1000];
 export function renderSettings(
   root: HTMLElement,
   settings: Settings,
-  actions: { back: () => void; save: (next: Settings) => void },
+  actions: { back: () => void; save: (next: Settings) => void; resetHighscores: () => void },
 ): void {
   const next: Settings = {
     ...settings,
     selectedModes: [...settings.selectedModes],
   };
+  let resetStep: "idle" | "confirm" | "done" = "idle";
 
   const paint = () => {
     const modeOptions = (["mix", "selected", ...ALL_MODES] as const)
@@ -48,6 +49,14 @@ export function renderSettings(
           <input type="checkbox" data-sound ${next.sound ? "checked" : ""} />
           Lyd
         </label>
+        ${resetStep === "idle" ? `<button class="btn" data-reset-scores type="button">Slett rekorder</button>` : ""}
+        ${resetStep === "confirm" ? `
+          <div class="reset-box">
+            <p>Vil du slette alle rekorder?</p>
+            <button class="btn" data-reset-confirm type="button">Ja, slett</button>
+            <button class="btn" data-reset-cancel type="button">Nei</button>
+          </div>` : ""}
+        ${resetStep === "done" ? `<p class="muted">Rekordene er slettet.</p>` : ""}
       </section>
     `);
 
@@ -79,6 +88,19 @@ export function renderSettings(
         if (box.checked && !next.selectedModes.includes(id)) next.selectedModes.push(id);
         if (!box.checked) next.selectedModes = next.selectedModes.filter((modeId) => modeId !== id);
       });
+    });
+    onClick(root, "[data-reset-scores]", () => {
+      resetStep = "confirm";
+      paint();
+    });
+    onClick(root, "[data-reset-confirm]", () => {
+      actions.resetHighscores();
+      resetStep = "done";
+      paint();
+    });
+    onClick(root, "[data-reset-cancel]", () => {
+      resetStep = "idle";
+      paint();
     });
   };
 

@@ -30,6 +30,7 @@ describe("info screens", () => {
     renderSettings(root, { ...DEFAULT_SETTINGS, selectedModes: [...DEFAULT_SETTINGS.selectedModes] }, {
       back: () => {},
       save: () => {},
+      resetHighscores: () => {},
     });
     expect(root.querySelector(".screen.pad")).not.toBeNull();
     expect(root.querySelector(".numpad")).toBeNull();

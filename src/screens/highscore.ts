@@ -1,6 +1,6 @@
 import { MODE_LABELS, type MaxN } from "../types";
 import type { HighscoreBoard } from "../storage/highscores";
-import { html, onClick } from "./dom";
+import { escapeHtml, html, onClick } from "./dom";
 
 const TABS: MaxN[] = [10, 50, 100, 1000];
 
@@ -11,7 +11,7 @@ export function renderHighscores(
   actions: { back: () => void; change: (maxN: MaxN) => void },
 ): void {
   const rows = (board[String(selected)] ?? [])
-    .map((entry, i) => `<li><span>${i + 1}. ${entry.name}</span><strong>${entry.score}</strong><em>nivå ${entry.level}</em></li>`)
+    .map((entry, i) => `<li><span>${i + 1}. ${escapeHtml(entry.name)}</span><strong>${entry.score}</strong><em>nivå ${entry.level}</em></li>`)
     .join("") || "<li class='empty'>Ingen rekorder ennå.</li>";
 
   root.replaceChildren(html`

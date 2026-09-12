@@ -12,7 +12,7 @@ import { renderInstall } from "./screens/install";
 import { renderMath } from "./screens/math";
 import { renderMenu } from "./screens/menu";
 import { renderSettings } from "./screens/settings";
-import { loadHighscores, qualifies, saveHighscores, submitHighscore } from "./storage/highscores";
+import { clearHighscores, loadHighscores, qualifies, saveHighscores, submitHighscore } from "./storage/highscores";
 import { loadSettings, saveSettings } from "./storage/settings";
 import type { MaxN, RoundPlan, Settings } from "./types";
 
@@ -75,6 +75,9 @@ export function startApp(root: HTMLElement): void {
       save: (next: Settings) => {
         settings = next;
         saveSettings(settings);
+      },
+      resetHighscores: () => {
+        clearHighscores();
       },
     });
   };

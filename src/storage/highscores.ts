@@ -1,8 +1,9 @@
-import { ARCADE_ALPHABET, type HighscoreEntry, type MaxN } from "../types";
+import { type HighscoreEntry, type MaxN } from "../types";
 import { browserStore, type KeyValueStore } from "./adapter";
 
 export const HIGHSCORE_KEY = "bananmatte.highscores.v1";
 export const HIGHSCORE_LIMIT = 10;
+export const PLAYER_NAME_MAX = 20;
 
 export type HighscoreBoard = Record<string, HighscoreEntry[]>;
 
@@ -34,16 +35,20 @@ export function saveHighscores(board: HighscoreBoard, store: KeyValueStore = bro
   store.setItem(HIGHSCORE_KEY, JSON.stringify(board));
 }
 
-export function normalizeArcadeName(name: string): string {
+export function clearHighscores(store: KeyValueStore = browserStore()): HighscoreBoard {
+  const board = emptyBoard();
+  saveHighscores(board, store);
+  return board;
+}
+
+export function normalizePlayerName(name: string): string {
   const cleaned = name
-    .toUpperCase()
-    .replace(/AE/g, "Æ")
-    .replace(/OE/g, "Ø")
-    .split("")
-    .filter((ch) => ARCADE_ALPHABET.includes(ch))
-    .join("")
-    .slice(0, 3);
-  return cleaned.padEnd(3, "A");
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, PLAYER_NAME_MAX)
+    .trim();
+  return cleaned || "Anonym";
 }
 
 export function qualifies(board: HighscoreBoard, maxN: MaxN, score: number): boolean {
@@ -60,7 +65,7 @@ export function submitHighscore(
 ): HighscoreBoard {
   const key = String(maxN);
   const next = { ...board, [key]: [...(board[key] ?? [])] };
-  next[key].push({ ...entry, name: normalizeArcadeName(entry.name) });
+  next[key].push({ ...entry, name: normalizePlayerName(entry.name) });
   next[key].sort((a, b) => b.score - a.score || b.level - a.level);
   next[key] = next[key].slice(0, HIGHSCORE_LIMIT);
   return next;

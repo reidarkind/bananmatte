@@ -1,3 +1,11 @@
+export function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 export function html(strings: TemplateStringsArray, ...values: unknown[]): HTMLElement {
   const raw = strings.reduce((acc, part, i) => acc + part + (values[i] ?? ""), "");
   const template = document.createElement("template");
