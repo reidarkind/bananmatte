@@ -93,6 +93,7 @@ body {
 .pad {
   align-items: stretch;
   text-align: left;
+  gap: 1.2rem;
 }
 
 .screen.pad > * {
@@ -115,8 +116,13 @@ body {
 .pad h2 { margin-top: 1.2rem; }
 
 .hud-stack { display: flex; flex-direction: column; gap: 0.15rem; }
-label, .check { display: flex; flex-direction: column; gap: 0.35rem; font-weight: 800; }
-.check { flex-direction: row; align-items: center; gap: 0.6rem; }
+label, .check { display: flex; flex-direction: column; gap: 0.5rem; font-weight: 800; }
+.check { flex-direction: row; align-items: center; gap: 0.7rem; padding: 0.35rem 0; min-height: 2.6rem; }
+.pad .tab { padding: 0.48rem 0.85rem; }
+.screen.pad > .btn,
+.screen.pad > .reset-box {
+  margin-top: 0.45rem;
+}
 select {
   width: 100%;
   max-width: 100%;
