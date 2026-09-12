@@ -70,7 +70,13 @@ function rottenBananaSvg(): string {
     <path class="stem" d="M-18-11c-1.2-4.2 1.6-7.6 3.6-6.2 1.4 1.4.2 5.2-1.8 6.2z"/>
     <ellipse class="spot" cx="2" cy="1" rx="3.1" ry="2.2" transform="rotate(23 2 1)"/>
     <ellipse class="spot" cx="9" cy="8" rx="2.3" ry="1.7" transform="rotate(-17 9 8)"/>
-    <path class="cross" d="M-12-18 12 16M12-18-12 16"/>
+    <g class="cross">
+      <path class="cross-shadow" d="M-13.2-17.4C-3.4-6.2 3.8 5.4 12.6 15.8"/>
+      <path class="cross-shadow" d="M12.1-16.8C2.6-5.1-5.8 6.4-13.4 16.2"/>
+      <path class="cross-body" d="M-12.6-16.8C-3-5.6 4.2 5.8 12.2 15.2"/>
+      <path class="cross-body" d="M11.4-16.2C2.2-4.6-5.2 6.8-12.6 15.6"/>
+      <path class="cross-shine" d="M-10.4-14.2C-3.6-5.2 3.2 4.6 9.6 12.4"/>
+    </g>
   </svg>`;
 }
 

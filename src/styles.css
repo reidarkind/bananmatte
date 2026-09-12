@@ -203,13 +203,29 @@ select {
 .rotten-icon .stem { fill: #3f2f22; }
 .rotten-icon .spot { fill: #4d7c4a; }
 .rotten-icon .cross {
+  opacity: 0;
   fill: none;
-  stroke: transparent;
-  stroke-width: 5.2;
   stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .rotten-slot:not(.on) { opacity: 0.78; }
-.rotten-slot.on .cross { stroke: #fff4e0; }
+.rotten-slot.on .cross {
+  opacity: 1;
+  filter: drop-shadow(0 0 2px rgba(140, 18, 32, 0.55));
+}
+.rotten-icon .cross-shadow {
+  stroke: #4a0d14;
+  stroke-width: 6.4;
+}
+.rotten-icon .cross-body {
+  stroke: #d0172c;
+  stroke-width: 3.8;
+}
+.rotten-icon .cross-shine {
+  stroke: #ff8a8a;
+  stroke-width: 1.35;
+  opacity: 0.8;
+}
 #stage {
   position: absolute;
   inset: 0;
