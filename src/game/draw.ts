@@ -59,39 +59,42 @@ export function drawDecor(ctx: CanvasRenderingContext2D, items: Decor[], t: numb
   }
 }
 
+function bananaPath(ctx: CanvasRenderingContext2D): void {
+  ctx.beginPath();
+  ctx.moveTo(-16, -8);
+  ctx.bezierCurveTo(-6, -20, 14, -16, 18, 2);
+  ctx.bezierCurveTo(20, 10, 12, 16, 4, 14);
+  ctx.bezierCurveTo(-8, 12, -18, 6, -16, -8);
+  ctx.closePath();
+}
+
 export function drawBanana(ctx: CanvasRenderingContext2D, item: FallingItem): void {
   ctx.save();
   ctx.translate(item.x + item.w / 2, item.y + item.h / 2);
   ctx.rotate(item.rot);
   ctx.scale(item.w / 36, item.h / 36);
+  bananaPath(ctx);
+  ctx.fillStyle = item.kind === "rotten" ? "#6c584c" : "#f4d35e";
+  ctx.fill();
+  ctx.strokeStyle = item.kind === "rotten" ? "#3d405b" : "#e09f3e";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = "#6b4226";
+  ctx.beginPath();
+  ctx.ellipse(-15, -10, 3, 5, -0.6, 0, Math.PI * 2);
+  ctx.fill();
   if (item.kind === "rotten") {
-    ctx.fillStyle = "#6c584c";
-    ctx.beginPath();
-    ctx.ellipse(0, 4, 16, 11, 0.7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#3d405b";
-    ctx.fillRect(-2, -16, 4, 8);
     ctx.fillStyle = "#588157";
     ctx.beginPath();
-    ctx.arc(6, 2, 3, 0, Math.PI * 2);
+    ctx.arc(4, 2, 3.2, 0, Math.PI * 2);
+    ctx.arc(10, 8, 2.2, 0, Math.PI * 2);
     ctx.fill();
-  } else {
-    ctx.fillStyle = "#f4d35e";
-    ctx.beginPath();
-    ctx.ellipse(0, 4, 16, 11, 0.7, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = "#e09f3e";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.fillStyle = "#6b4226";
-    ctx.fillRect(-2, -16, 4, 8);
-    if (item.value > 1) {
-      ctx.fillStyle = "#1b4332";
-      ctx.font = "bold 14px Nunito, sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(String(item.value), 0, 6);
-    }
+  } else if (item.value > 1) {
+    ctx.fillStyle = "#1b4332";
+    ctx.font = "bold 14px Nunito, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(String(item.value), 2, 2);
   }
   ctx.restore();
 }

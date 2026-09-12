@@ -8,9 +8,9 @@ export function renderGameShell(
 ): { canvas: HTMLCanvasElement; overlay: HTMLElement; hud: HTMLElement } {
   root.replaceChildren(html`
     <section class="play">
-      <header class="hud" id="hud"></header>
       <canvas id="stage" aria-label="Spillbrett"></canvas>
-      <div id="overlay"></div>
+      <div id="overlay" class="overlay-layer"></div>
+      <header class="hud" id="hud"></header>
     </section>
   `);
   const hud = root.querySelector("#hud") as HTMLElement;

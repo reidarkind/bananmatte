@@ -5,7 +5,7 @@ import { createDecor, type Decor } from "./backgrounds";
 import { intersects } from "./collision";
 import { drawBackground, drawBanana, drawDecor, drawGorilla } from "./draw";
 import { attachKeys, attachPointer } from "./input";
-import { basketRect, gorillaRect, spawnFalling, type FallingItem } from "./entities";
+import { basketRect, spawnFalling, type FallingItem } from "./entities";
 import { applyCatchEvent, createPlayState, fallSpeed, spawnRotten, type PlayState } from "./rules";
 
 export interface HudSnapshot {
@@ -74,78 +74,83 @@ export function createPlaySession(opts: {
     if (sound) sfx[sound](opts.settings.sound);
     if (state.ended) {
       paused = true;
+      items = [];
       opts.onGameOver(state);
     } else if (state.roundComplete) {
       paused = true;
+      items = [];
       opts.onRoundComplete(state);
     }
   };
 
   const tick = (now: number) => {
     if (!running) return;
-    const dt = Math.min(0.04, (now - last) / 1000 || 0.016);
-    last = now;
-    const speed = fallSpeed(level);
+    try {
+      if (height < 80) resize();
+      const dt = Math.min(0.04, (now - last) / 1000 || 0.016);
+      last = now;
+      const speed = fallSpeed(level);
 
-    if (!paused && !state.ended && !state.roundComplete) {
-      gorillaX += keyDir * 280 * dt;
-      gorillaX = Math.max(36, Math.min(width - 36, gorillaX));
-      const basket = basketRect(gorillaX, height - 58);
-      const body = gorillaRect(gorillaX, height - 58);
+      if (!paused && !state.ended && !state.roundComplete) {
+        gorillaX += keyDir * 280 * dt;
+        gorillaX = Math.max(36, Math.min(width - 36, gorillaX));
+        const basket = basketRect(gorillaX, height - 58);
 
-      spawnAcc += dt;
-      const interval = Math.max(0.55, 1.35 - level * 0.06);
-      if (spawnAcc >= interval && items.length < 5) {
-        spawnAcc = 0;
-        const remaining = Math.max(1, state.target - state.collected);
-        const rotten = spawnRotten(level, opts.rng);
-        items.push(
-          spawnFalling(
-            rotten ? "rotten" : "banana",
-            rotten ? 1 : nextBananaValue(opts.settings.maxN, remaining, opts.rng),
-            width,
-            speed,
-            opts.rng,
-          ),
-        );
-      }
-
-      const kept: FallingItem[] = [];
-      for (const item of items) {
-        item.y += item.vy * dt;
-        item.rot += item.spin * dt;
-        const box = { x: item.x, y: item.y, w: item.w, h: item.h };
-        if (intersects(box, basket) || intersects(box, body)) {
-          apply(
-            applyCatchEvent(state, { type: "caught", kind: item.kind, value: item.value }),
-            item.kind === "rotten" ? "rotten" : "catch",
+        spawnAcc += dt;
+        const interval = Math.max(0.55, 1.35 - level * 0.06);
+        if (spawnAcc >= interval && items.length < 5) {
+          spawnAcc = 0;
+          const remaining = Math.max(1, state.target - state.collected);
+          const rotten = spawnRotten(level, opts.rng);
+          items.push(
+            spawnFalling(
+              rotten ? "rotten" : "banana",
+              rotten ? 1 : nextBananaValue(opts.settings.maxN, remaining, opts.rng),
+              width,
+              speed,
+              opts.rng,
+            ),
           );
-          if (state.ended || state.roundComplete) break;
-          continue;
         }
-        if (item.y > height) {
-          apply(applyCatchEvent(state, { type: "missed", kind: item.kind, value: item.value }), item.kind === "banana" ? "miss" : null);
-          if (state.ended || state.roundComplete) break;
-          continue;
-        }
-        kept.push(item);
-      }
-      items = kept;
 
-      for (const d of decor) {
-        d.y += d.vy * dt * 0.35;
-        d.x += d.vx * dt * 0.2;
-        if (d.y > height) d.y = -20;
-        if (d.x < -20) d.x = width + 10;
-        if (d.x > width + 20) d.x = -10;
+        const kept: FallingItem[] = [];
+        for (const item of items) {
+          item.y += item.vy * dt;
+          item.rot += item.spin * dt;
+          const box = { x: item.x, y: item.y, w: item.w, h: item.h };
+          if (intersects(box, basket)) {
+            apply(
+              applyCatchEvent(state, { type: "caught", kind: item.kind, value: item.value }),
+              item.kind === "rotten" ? "rotten" : "catch",
+            );
+            if (state.ended || state.roundComplete) break;
+            continue;
+          }
+          if (item.y > height) {
+            apply(applyCatchEvent(state, { type: "missed", kind: item.kind, value: item.value }), item.kind === "banana" ? "miss" : null);
+            if (state.ended || state.roundComplete) break;
+            continue;
+          }
+          kept.push(item);
+        }
+        items = kept;
+
+        for (const d of decor) {
+          d.y += d.vy * dt * 0.35;
+          d.x += d.vx * dt * 0.2;
+          if (d.y > height) d.y = -20;
+          if (d.x < -20) d.x = width + 10;
+          if (d.x > width + 20) d.x = -10;
+        }
       }
+
+      drawBackground(ctx, width, height, level);
+      drawDecor(ctx, decor, now);
+      for (const item of items) drawBanana(ctx, item);
+      drawGorilla(ctx, gorillaX, height - 58, keyDir || 1);
+    } finally {
+      if (running) raf = requestAnimationFrame(tick);
     }
-
-    drawBackground(ctx, width, height, level);
-    drawDecor(ctx, decor, now);
-    for (const item of items) drawBanana(ctx, item);
-    drawGorilla(ctx, gorillaX, height - 58, keyDir || 1);
-    raf = requestAnimationFrame(tick);
   };
 
   const pointerOff = attachPointer(opts.canvas, (x) => {

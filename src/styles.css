@@ -101,18 +101,41 @@ select {
   margin-bottom: 0.45rem;
 }
 
-.play { position: relative; background: #1b4332; }
+.play {
+  position: relative;
+  isolation: isolate;
+  height: 100dvh;
+  overflow: hidden;
+  background: #1b4332;
+}
 .hud {
   position: absolute;
   inset: 0 0 auto 0;
-  z-index: 2;
+  z-index: 4;
   padding: 0.45rem 0.6rem;
   background: linear-gradient(180deg, rgba(27,67,50,0.75), transparent);
   color: var(--cream);
   font-weight: 800;
 }
 .hud-row { display: flex; justify-content: space-between; gap: 0.5rem; }
-#stage { width: 100%; height: 100dvh; display: block; touch-action: none; }
+#stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
+  touch-action: none;
+}
+.overlay-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.overlay-layer:not(:empty) {
+  pointer-events: auto;
+}
 
 .overlay {
   position: absolute;
