@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { bananaCurves, pointOnCubic } from "./draw";
+import { GORILLA, basketRect } from "./entities";
 
 function distToChord(
   point: { x: number; y: number },
@@ -11,6 +12,19 @@ function distToChord(
   const length = Math.hypot(dx, dy) || 1;
   return (dx * (a.y - point.y) - dy * (a.x - point.x)) / length;
 }
+
+describe("gorilla layout", () => {
+  it("holds the basket at the chest, like the start-screen ape", () => {
+    expect(GORILLA.basket.y).toBeGreaterThan(GORILLA.head.cy + 12);
+    const box = basketRect(100, 200);
+    expect(box).toEqual({
+      x: 100 + GORILLA.basket.x,
+      y: 200 + GORILLA.basket.y,
+      w: GORILLA.basket.w,
+      h: GORILLA.basket.h,
+    });
+  });
+});
 
 describe("banana silhouette", () => {
   it("is a long crescent, not a round blob", () => {

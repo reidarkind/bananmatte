@@ -37,10 +37,16 @@ export function spawnFalling(
   };
 }
 
+export const GORILLA = {
+  head: { cx: 0, cy: -14, r: 20 },
+  basket: { x: -27, y: 6, w: 54, h: 20 },
+};
+
 export function gorillaRect(x: number, y: number) {
-  return { x: x - 28, y: y - 18, w: 56, h: 28 };
+  return { x: x - 30, y: y - 36, w: 60, h: 86 };
 }
 
 export function basketRect(x: number, y: number) {
-  return { x: x - 30, y: y - 36, w: 60, h: 22 };
+  const box = GORILLA.basket;
+  return { x: x + box.x, y: y + box.y, w: box.w, h: box.h };
 }

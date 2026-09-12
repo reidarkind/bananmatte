@@ -1,5 +1,5 @@
 import { backgroundFor, type Decor } from "./backgrounds";
-import type { FallingItem } from "./entities";
+import { GORILLA, type FallingItem } from "./entities";
 
 export function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, level: number): void {
   const bg = backgroundFor(level);
@@ -192,47 +192,158 @@ export function drawBanana(ctx: CanvasRenderingContext2D, item: FallingItem): vo
   ctx.restore();
 }
 
+const FUR = "#3b2416";
+const FUR_LIGHT = "#5a3824";
+const FACE = "#f0c4a0";
+const EAR_IN = "#d49274";
+const BASKET = "#e0b07a";
+const BASKET_DARK = "#c4924c";
+const BASKET_LINE = "#a87438";
+
+function drawBasket(ctx: CanvasRenderingContext2D): void {
+  const { x, y, w, h } = GORILLA.basket;
+  const cx = x + w / 2;
+  const rimY = y + 3;
+
+  ctx.strokeStyle = BASKET;
+  ctx.lineWidth = 3.2;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(x + 10, rimY);
+  ctx.quadraticCurveTo(cx, y - 8, x + w - 10, rimY);
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(255, 236, 210, 0.55)";
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+
+  ctx.fillStyle = BASKET;
+  ctx.beginPath();
+  ctx.moveTo(x + 3, rimY);
+  ctx.quadraticCurveTo(cx, y + h + 6, x + w - 3, rimY);
+  ctx.quadraticCurveTo(cx, y + 1, x + 3, rimY);
+  ctx.fill();
+
+  ctx.strokeStyle = BASKET_DARK;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(cx, rimY, w * 0.46, 3.4, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.fillStyle = "#f3d2a4";
+  ctx.beginPath();
+  ctx.ellipse(cx, rimY, w * 0.42, 2.4, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = BASKET_LINE;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.55;
+  for (let i = 0; i < 4; i += 1) {
+    const wy = rimY + 4 + i * 3.4;
+    ctx.beginPath();
+    ctx.moveTo(x + 8, wy);
+    ctx.quadraticCurveTo(cx, wy + 3, x + w - 8, wy);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
 export function drawGorilla(ctx: CanvasRenderingContext2D, x: number, y: number, facing: number): void {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(facing < 0 ? -1 : 1, 1);
 
-  ctx.fillStyle = "#6b4226";
+  ctx.fillStyle = FUR;
   ctx.beginPath();
-  ctx.ellipse(0, 18, 28, 22, 0, 0, Math.PI * 2);
+  ctx.ellipse(-13, 46, 9, 5.5, 0, 0, Math.PI * 2);
+  ctx.ellipse(13, 46, 9, 5.5, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#8d5b32";
   ctx.beginPath();
-  ctx.ellipse(0, -6, 20, 18, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, 26, 22, 18, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = FUR_LIGHT;
+  ctx.beginPath();
+  ctx.ellipse(0, 28, 12, 11, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#f6bd60";
+  ctx.strokeStyle = FUR;
+  ctx.lineWidth = 9;
+  ctx.lineCap = "round";
   ctx.beginPath();
-  ctx.ellipse(2, -2, 13, 11, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#1d3557";
-  ctx.beginPath();
-  ctx.arc(-4, -8, 3.2, 0, Math.PI * 2);
-  ctx.arc(8, -8, 3.2, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#c9ada7";
-  ctx.beginPath();
-  ctx.ellipse(-22, 8, 10, 7, 0.3, 0, Math.PI * 2);
-  ctx.ellipse(24, 10, 10, 7, -0.2, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.fillStyle = "#d4a373";
-  ctx.beginPath();
-  ctx.moveTo(-26, -4);
-  ctx.quadraticCurveTo(0, -28, 26, -4);
-  ctx.quadraticCurveTo(0, -10, -26, -4);
-  ctx.fill();
-  ctx.strokeStyle = "#9c6644";
-  ctx.lineWidth = 2;
+  ctx.moveTo(-14, 16);
+  ctx.quadraticCurveTo(-28, 10, -28, 14);
+  ctx.moveTo(14, 16);
+  ctx.quadraticCurveTo(28, 10, 28, 14);
   ctx.stroke();
+
+  const { cx, cy, r } = GORILLA.head;
+  ctx.fillStyle = FUR;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(cx, cy - r + 2, 7, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(cx - 17, cy - 2, 7, 0, Math.PI * 2);
+  ctx.arc(cx + 17, cy - 2, 7, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = EAR_IN;
+  ctx.beginPath();
+  ctx.arc(cx - 17, cy - 2, 3.6, 0, Math.PI * 2);
+  ctx.arc(cx + 17, cy - 2, 3.6, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = FACE;
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 3, 13, 14, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.ellipse(cx - 6, cy - 4, 4.4, 5, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 6, cy - 4, 4.4, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#1a120c";
+  ctx.beginPath();
+  ctx.arc(cx - 5.4, cy - 3.4, 2.3, 0, Math.PI * 2);
+  ctx.arc(cx + 6.6, cy - 3.4, 2.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.arc(cx - 4.4, cy - 4.4, 0.8, 0, Math.PI * 2);
+  ctx.arc(cx + 7.6, cy - 4.4, 0.8, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#5a3320";
+  ctx.beginPath();
+  ctx.ellipse(cx - 2.2, cy + 3, 1.5, 1.1, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 2.2, cy + 3, 1.5, 1.1, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#4a2818";
+  ctx.beginPath();
+  ctx.arc(cx, cy + 9, 6.5, 0.15, Math.PI - 0.15);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.moveTo(cx - 4.5, cy + 8.2);
+  ctx.lineTo(cx + 4.5, cy + 8.2);
+  ctx.lineTo(cx + 3.6, cy + 10.2);
+  ctx.lineTo(cx - 3.6, cy + 10.2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#e07a7a";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 11.4, 2.6, 1.6, 0, 0, Math.PI);
+  ctx.fill();
+
+  drawBasket(ctx);
+
+  ctx.fillStyle = FUR;
+  ctx.beginPath();
+  ctx.arc(-27, 14, 6.5, 0, Math.PI * 2);
+  ctx.arc(27, 14, 6.5, 0, Math.PI * 2);
+  ctx.fill();
 
   ctx.restore();
 }
