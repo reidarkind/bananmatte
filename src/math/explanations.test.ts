@@ -18,8 +18,21 @@ describe("wrong-answer explanations", () => {
   });
 
   it("explains parity after adding or subtracting", () => {
-    expect(explainParitySum(3, 2)).toBe("3 + 2 = 5. 5 kan ikke deles på 2 og er derfor et oddetall.");
-    expect(explainParityDiff(9, 4)).toBe("9 − 4 = 5. 5 kan ikke deles på 2 og er derfor et oddetall.");
+    expect(explainParitySum(3, 2)).toBe(
+      "3 + 2 = 5. 3 er et oddetall og 2 er et partall. Oddetall + partall = oddetall. 5 kan ikke deles på 2 og er derfor et oddetall.",
+    );
+    expect(explainParitySum(3, 5)).toBe(
+      "3 + 5 = 8. 3 er et oddetall og 5 er et oddetall. Oddetall + oddetall = partall. 8 kan deles på 2 og er derfor et partall.",
+    );
+    expect(explainParitySum(4, 6)).toBe(
+      "4 + 6 = 10. 4 er et partall og 6 er et partall. Partall + partall = partall. 10 kan deles på 2 og er derfor et partall.",
+    );
+    expect(explainParityDiff(9, 4)).toBe(
+      "9 − 4 = 5. 9 er et oddetall og 4 er et partall. Oddetall − partall = oddetall. 5 kan ikke deles på 2 og er derfor et oddetall.",
+    );
+    expect(explainParityDiff(8, 2)).toBe(
+      "8 − 2 = 6. 8 er et partall og 2 er et partall. Partall − partall = partall. 6 kan deles på 2 og er derfor et partall.",
+    );
   });
 
   it("explains the other modes with a because", () => {

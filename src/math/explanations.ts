@@ -1,3 +1,18 @@
+function parityWord(n: number): "partall" | "oddetall" {
+  return n % 2 === 0 ? "partall" : "oddetall";
+}
+
+function capitalize(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+function explainParityCombo(x: number, y: number, op: "+" | "−", result: number): string {
+  const left = parityWord(x);
+  const right = parityWord(y);
+  const out = parityWord(result);
+  return `${x} er et ${left} og ${y} er et ${right}. ${capitalize(left)} ${op} ${right} = ${out}.`;
+}
+
 export function explainParity(n: number): string {
   if (n % 2 === 0) {
     return `${n} kan deles på 2 og er derfor et partall.`;
@@ -7,12 +22,12 @@ export function explainParity(n: number): string {
 
 export function explainParitySum(x: number, y: number): string {
   const sum = x + y;
-  return `${x} + ${y} = ${sum}. ${explainParity(sum)}`;
+  return `${x} + ${y} = ${sum}. ${explainParityCombo(x, y, "+", sum)} ${explainParity(sum)}`;
 }
 
 export function explainParityDiff(x: number, y: number): string {
   const diff = x - y;
-  return `${x} − ${y} = ${diff}. ${explainParity(diff)}`;
+  return `${x} − ${y} = ${diff}. ${explainParityCombo(x, y, "−", diff)} ${explainParity(diff)}`;
 }
 
 export function explainAdd(x: number, y: number): string {
