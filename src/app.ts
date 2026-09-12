@@ -22,6 +22,7 @@ export function startApp(root: HTMLElement): void {
   let plan: RoundPlan | null = null;
   let level = 1;
   let score = 0;
+  let savedHighlight: { maxN: MaxN; index: number } | undefined;
   const showMenu = () => {
     session?.stop();
     session = null;
@@ -62,11 +63,17 @@ export function startApp(root: HTMLElement): void {
     }
   };
 
-  const showScores = (maxN: MaxN) => {
-    renderHighscores(root, loadHighscores(), maxN, {
-      back: showMenu,
-      change: showScores,
-    });
+  const showScores = (maxN: MaxN, highlight?: { maxN: MaxN; index: number }) => {
+    renderHighscores(
+      root,
+      loadHighscores(),
+      maxN,
+      {
+        back: showMenu,
+        change: (next) => showScores(next, highlight),
+      },
+      highlight?.maxN === maxN ? highlight.index : undefined,
+    );
   };
 
   const showSettings = () => {
@@ -148,13 +155,21 @@ export function startApp(root: HTMLElement): void {
       { title, detail, score: finalScore, level: finalLevel, askName },
       {
         submit: (name) => {
+          const date = new Date().toISOString();
           const updated = submitHighscore(loadHighscores(), settings.maxN, {
             name,
             score: finalScore,
             level: finalLevel,
-            date: new Date().toISOString(),
+            date,
           });
           saveHighscores(updated);
+          savedHighlight = {
+            maxN: settings.maxN,
+            index: (updated[String(settings.maxN)] ?? []).findIndex((entry) => entry.date === date),
+          };
+        },
+        afterSave: () => {
+          showScores(settings.maxN, savedHighlight?.index === -1 ? undefined : savedHighlight);
         },
         again: startGame,
         menu: showMenu,

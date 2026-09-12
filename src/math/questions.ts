@@ -1,4 +1,15 @@
 import type { ModeId, Parity, Rng, RoundPlan, Settings } from "../types";
+import {
+  explainAdd,
+  explainDiv,
+  explainHundrevenn,
+  explainMul,
+  explainParity,
+  explainParityDiff,
+  explainParitySum,
+  explainSub,
+  explainTiervenn,
+} from "./explanations";
 import { resolveRoundMode } from "./modes";
 import { pickOne, randomInt } from "./rng";
 
@@ -27,7 +38,7 @@ function planTiervenn(maxN: number, rng: Rng): RoundPlan {
     prompt: `Hva er tiervennen til ${x}?`,
     kind: "number",
     answer,
-    explanation: `Tiervennen til ${x} er ${answer}, fordi ${x} + ${answer} = ${x + answer}.`,
+    explanation: explainTiervenn(x, answer),
   };
 }
 
@@ -40,7 +51,7 @@ function planHundrevenn(maxN: number, rng: Rng): RoundPlan {
     prompt: `Hva er hundrevennen til ${x}?`,
     kind: "number",
     answer,
-    explanation: `Hundrevennen til ${x} er ${answer}, fordi ${x} + ${answer} = ${x + answer}.`,
+    explanation: explainHundrevenn(x, answer),
   };
 }
 
@@ -58,7 +69,7 @@ function planAddisjon(maxN: number, rng: Rng): RoundPlan {
     kind: "number",
     answer: x + y,
     operand: y,
-    explanation: `${x} + ${y} = ${x + y}.`,
+    explanation: explainAdd(x, y),
   };
 }
 
@@ -72,7 +83,7 @@ function planSubtraksjonPositiv(maxN: number, rng: Rng): RoundPlan {
     kind: "number",
     answer: x - y,
     operand: y,
-    explanation: `${x} − ${y} = ${x - y}.`,
+    explanation: explainSub(x, y),
   };
 }
 
@@ -86,7 +97,7 @@ function planSubtraksjonNegativ(maxN: number, rng: Rng): RoundPlan {
     kind: "number",
     answer: x - y,
     operand: y,
-    explanation: `${x} − ${y} = ${x - y}.`,
+    explanation: explainSub(x, y),
   };
 }
 
@@ -101,7 +112,7 @@ function planMultiplikasjon(mode: "multiplikasjon-mini" | "multiplikasjon-liten"
     kind: "number",
     answer: x * k,
     operand: k,
-    explanation: `${x} · ${k} = ${x * k}.`,
+    explanation: explainMul(x, k),
   };
 }
 
@@ -124,7 +135,7 @@ function planDivisjonMini(maxN: number, rng: Rng): RoundPlan {
     kind: "number",
     answer: x / d,
     operand: d,
-    explanation: `${x} : ${d} = ${x / d}.`,
+    explanation: explainDiv(x, d, x / d),
   };
 }
 
@@ -139,7 +150,7 @@ function planDivisjonLiten(maxN: number, rng: Rng): RoundPlan {
       kind: "number",
       answer: x / d,
       operand: d,
-      explanation: `${x} : ${d} = ${x / d}.`,
+      explanation: explainDiv(x, d, x / d),
     };
   }
 
@@ -154,7 +165,7 @@ function planDivisjonLiten(maxN: number, rng: Rng): RoundPlan {
     kind: "number",
     answer: quotient,
     operand: numerator,
-    explanation: `${numerator} : ${x} = ${quotient}.`,
+    explanation: explainDiv(numerator, x, quotient),
   };
 }
 
@@ -167,7 +178,7 @@ function planParity(maxN: number, rng: Rng): RoundPlan {
     prompt: `Er ${x} partall eller oddetall?`,
     kind: "parity",
     answer,
-    explanation: `${x} er ${answer}.`,
+    explanation: explainParity(x),
   };
 }
 
@@ -182,7 +193,7 @@ function planParityAdd(maxN: number, rng: Rng): RoundPlan {
     kind: "parity",
     answer: parityOf(sum),
     operand: y,
-    explanation: `${x} + ${y} = ${sum}, og ${sum} er ${parityOf(sum)}.`,
+    explanation: explainParitySum(x, y),
   };
 }
 
@@ -197,7 +208,7 @@ function planParitySub(maxN: number, rng: Rng): RoundPlan {
     kind: "parity",
     answer: parityOf(diff),
     operand: y,
-    explanation: `${x} − ${y} = ${diff}, og ${diff} er ${parityOf(diff)}.`,
+    explanation: explainParityDiff(x, y),
   };
 }
 

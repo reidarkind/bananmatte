@@ -9,9 +9,13 @@ export function renderHighscores(
   board: HighscoreBoard,
   selected: MaxN,
   actions: { back: () => void; change: (maxN: MaxN) => void },
+  highlightIndex?: number,
 ): void {
   const rows = (board[String(selected)] ?? [])
-    .map((entry, i) => `<li><span>${i + 1}. ${escapeHtml(entry.name)}</span><strong>${entry.score}</strong><em>nivå ${entry.level}</em></li>`)
+    .map((entry, i) => {
+      const mine = i === highlightIndex;
+      return `<li class="${mine ? "mine" : ""}"><span>${i + 1}. ${escapeHtml(entry.name)}</span><strong>${entry.score}</strong><em>nivå ${entry.level}</em>${mine ? '<b class="tag">Ny</b>' : ""}</li>`;
+    })
     .join("") || "<li class='empty'>Ingen rekorder ennå.</li>";
 
   root.replaceChildren(html`

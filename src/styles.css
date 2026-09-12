@@ -131,6 +131,19 @@ select {
 .tab.on, .letter.on { background: var(--banana); }
 
 .scores { width: min(22rem, 100%); padding: 0; list-style: none; }
+.scores li.mine {
+  background: var(--banana);
+  box-shadow: 0 0 0 3px #1b4332;
+}
+
+.scores .tag {
+  background: var(--leaf-dark);
+  color: var(--cream);
+  border-radius: 999px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.75rem;
+}
+
 .scores li, .scoreline {
   display: flex;
   justify-content: space-between;
@@ -193,6 +206,7 @@ select {
   text-align: center;
 }
 .overlay h2 { font-size: 1.6rem; }
+.overlay p { max-width: 22rem; overflow-wrap: break-word; }
 .mode-pill {
   background: var(--banana);
   color: var(--leaf-dark);

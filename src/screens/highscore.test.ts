@@ -21,4 +21,20 @@ describe("highscore list", () => {
     expect(root.textContent).toContain("<img data-x>");
     root.remove();
   });
+
+  it("marks the newly placed row", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    const board = emptyBoard();
+    board["10"] = [
+      { name: "Ada", score: 90, level: 4, date: "a" },
+      { name: "Bo", score: 40, level: 2, date: "b" },
+    ];
+    renderHighscores(root, board, 10, { back: () => {}, change: () => {} }, 1);
+    const rows = root.querySelectorAll(".scores li");
+    expect(rows[0]?.classList.contains("mine")).toBe(false);
+    expect(rows[1]?.classList.contains("mine")).toBe(true);
+    expect(rows[1]?.textContent).toContain("Ny");
+    root.remove();
+  });
 });

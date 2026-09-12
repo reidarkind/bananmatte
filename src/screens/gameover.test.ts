@@ -8,6 +8,8 @@ describe("game over name", () => {
     const root = document.createElement("div");
     document.body.append(root);
     let submitted = "";
+    let afterSave = false;
+    let again = false;
     renderGameOver(
       root,
       { title: "Slutt", detail: "Bra jobba", score: 40, level: 3, askName: true },
@@ -15,17 +17,26 @@ describe("game over name", () => {
         submit: (name) => {
           submitted = name;
         },
-        again: () => {},
+        afterSave: () => {
+          afterSave = true;
+        },
+        again: () => {
+          again = true;
+        },
         menu: () => {},
       },
     );
     const input = root.querySelector<HTMLInputElement>("[data-name]");
+    const save = root.querySelector<HTMLButtonElement>("[data-save]");
     expect(input).not.toBeNull();
     expect(input?.maxLength).toBe(20);
-    expect(root.querySelector(".arcade")).toBeNull();
+    expect(save?.textContent).toBe("Lagre");
+    expect(root.querySelector("[data-again]")).toBeNull();
     input!.value = "Emma Sofie";
-    root.querySelector<HTMLButtonElement>("[data-again]")!.click();
+    save!.click();
     expect(submitted).toBe("Emma Sofie");
+    expect(afterSave).toBe(true);
+    expect(again).toBe(false);
     root.remove();
   });
 });
