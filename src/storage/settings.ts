@@ -1,3 +1,4 @@
+import { parsePlayStyle } from "../game/play-style";
 import { sanitizeSettings } from "../math/modes";
 import { DEFAULT_SETTINGS, type Settings } from "../types";
 import { browserStore, type KeyValueStore } from "./adapter";
@@ -21,6 +22,7 @@ export function parseSettings(raw: string | null): Settings {
       hundrevennEnabled: parsed.hundrevennEnabled ?? true,
       sound: parsed.sound ?? true,
       locale: parsed.locale === "en" ? "en" : "nb",
+      playStyle: parsePlayStyle(parsed.playStyle),
     });
   } catch {
     return { ...DEFAULT_SETTINGS, selectedModes: [...DEFAULT_SETTINGS.selectedModes] };

@@ -2,6 +2,10 @@ export type MaxN = 10 | 50 | 100 | 1000;
 
 export type Locale = "nb" | "en";
 
+export type PlayStyle = "sank" | "angrep" | "forsvar";
+
+export type PlayStyleChoice = PlayStyle | "mix";
+
 export type ModeId =
   | "tiervenn"
   | "femmervenn"
@@ -46,6 +50,7 @@ export interface Settings {
   hundrevennEnabled: boolean;
   sound: boolean;
   locale: Locale;
+  playStyle: PlayStyleChoice;
 }
 
 export interface HighscoreEntry {
@@ -117,4 +122,5 @@ export const DEFAULT_SETTINGS: Settings = {
   hundrevennEnabled: true,
   sound: true,
   locale: "nb",
+  playStyle: "sank",
 };

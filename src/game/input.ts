@@ -15,6 +15,17 @@ export function attachPointer(canvas: HTMLCanvasElement, onX: (x: number) => voi
   };
 }
 
+export function attachTap(canvas: HTMLCanvasElement, onTap: (x: number, y: number) => void): () => void {
+  const tap = (event: PointerEvent) => {
+    const rect = canvas.getBoundingClientRect();
+    onTap(event.clientX - rect.left, event.clientY - rect.top);
+  };
+  canvas.addEventListener("pointerdown", tap);
+  return () => {
+    canvas.removeEventListener("pointerdown", tap);
+  };
+}
+
 export function attachKeys(onDir: (dir: -1 | 0 | 1) => void): () => void {
   const down = new Set<string>();
   const update = () => {

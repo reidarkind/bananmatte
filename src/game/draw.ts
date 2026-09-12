@@ -271,8 +271,8 @@ function drawBasketFront(ctx: CanvasRenderingContext2D): void {
   ctx.fill();
 }
 
-function drawGorillaBody(ctx: CanvasRenderingContext2D): void {
-  ctx.fillStyle = FUR;
+function drawGorillaBody(ctx: CanvasRenderingContext2D, fur = FUR, furLight = FUR_LIGHT): void {
+  ctx.fillStyle = fur;
   ctx.beginPath();
   ctx.ellipse(-13, 46, 9, 5.5, 0, 0, Math.PI * 2);
   ctx.ellipse(13, 46, 9, 5.5, 0, 0, Math.PI * 2);
@@ -281,12 +281,12 @@ function drawGorillaBody(ctx: CanvasRenderingContext2D): void {
   ctx.beginPath();
   ctx.ellipse(0, 26, 22, 18, 0, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = FUR_LIGHT;
+  ctx.fillStyle = furLight;
   ctx.beginPath();
   ctx.ellipse(0, 28, 12, 11, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.strokeStyle = FUR;
+  ctx.strokeStyle = fur;
   ctx.lineWidth = 9;
   ctx.lineCap = "round";
   ctx.beginPath();
@@ -297,7 +297,7 @@ function drawGorillaBody(ctx: CanvasRenderingContext2D): void {
   ctx.stroke();
 
   const { cx, cy, r } = GORILLA.head;
-  ctx.fillStyle = FUR;
+  ctx.fillStyle = fur;
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.fill();
@@ -381,4 +381,63 @@ export function drawGorilla(
     ctx.fill();
   }
   ctx.restore();
+}
+
+const ORANG_FUR = "#b4531a";
+const ORANG_LIGHT = "#ea8c2e";
+
+function drawApeHands(ctx: CanvasRenderingContext2D, fur: string): void {
+  ctx.fillStyle = fur;
+  ctx.beginPath();
+  ctx.arc(-27, 14, 6.5, 0, Math.PI * 2);
+  ctx.arc(27, 14, 6.5, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+export function drawApe(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  facing: number,
+  kind: "gorilla" | "orangutan",
+  scale = 1,
+): void {
+  const fur = kind === "orangutan" ? ORANG_FUR : FUR;
+  const light = kind === "orangutan" ? ORANG_LIGHT : FUR_LIGHT;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale((facing < 0 ? -1 : 1) * scale, scale);
+  drawGorillaBody(ctx, fur, light);
+  drawApeHands(ctx, fur);
+  ctx.restore();
+}
+
+export function drawCanopy(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+  const h = height * 0.2;
+  ctx.fillStyle = "#1b4332";
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(width, 0);
+  ctx.lineTo(width, h * 0.45);
+  ctx.quadraticCurveTo(width * 0.7, h * 1.05, width * 0.5, h * 0.55);
+  ctx.quadraticCurveTo(width * 0.28, h * 1.1, 0, h * 0.5);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#2d6a4f";
+  for (let i = 0; i < 7; i += 1) {
+    const x = (width / 7) * i + width / 14;
+    ctx.beginPath();
+    ctx.ellipse(x, h * 0.35 + (i % 2) * 10, 34, 18, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+export function drawTreeLine(ctx: CanvasRenderingContext2D, width: number, y: number): void {
+  ctx.strokeStyle = "#6b4226";
+  ctx.lineWidth = 10;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(16, y);
+  ctx.quadraticCurveTo(width * 0.5, y - 18, width - 16, y + 4);
+  ctx.stroke();
 }

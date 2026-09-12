@@ -1,6 +1,6 @@
 import { ROTTEN_LIMIT } from "../game/rules";
-import { modeLabel, t } from "../i18n";
-import type { Locale, ModeId } from "../types";
+import { modeLabel, playStyleLabel, t } from "../i18n";
+import type { Locale, ModeId, PlayStyle } from "../types";
 import { html, onClick } from "./dom";
 
 export function renderGameShell(
@@ -19,6 +19,7 @@ export function renderGameShell(
   const hud = root.querySelector("#hud") as HTMLElement;
   hud.replaceChildren(html`
     <div class="hud-stack">
+      <p class="hud-goal" data-style>${playStyleLabel(locale, "sank")}</p>
       <div class="hud-row">
         <button class="back tiny" data-quit type="button">${t(locale, "quit")}</button>
         <span data-mode>${modeLabel(locale, mode)}</span>
@@ -51,11 +52,13 @@ export function updateHud(
     target: number;
     score: number;
     rottenCaught?: number;
+    playStyle?: PlayStyle;
     locale?: Locale;
   },
 ): void {
   const locale = info.locale ?? "nb";
   const lives = "🍌".repeat(info.lives) + "✕".repeat(Math.max(0, 2 - info.lives));
+  setText(hud, "[data-style]", playStyleLabel(locale, info.playStyle ?? "sank"));
   setText(hud, "[data-mode]", modeLabel(locale, info.mode));
   setText(hud, "[data-level]", t(locale, "level", { n: info.level }));
   setText(hud, "[data-lives]", lives);

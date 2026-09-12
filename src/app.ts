@@ -15,7 +15,7 @@ import { renderMenu } from "./screens/menu";
 import { renderSettings } from "./screens/settings";
 import { clearHighscores, loadHighscores, qualifies, saveHighscores, submitHighscore } from "./storage/highscores";
 import { loadSettings, saveSettings } from "./storage/settings";
-import type { Locale, MaxN, RoundPlan, Settings } from "./types";
+import type { Locale, MaxN, PlayStyle, RoundPlan, Settings } from "./types";
 
 function applyDocumentLocale(locale: Locale): void {
   document.documentElement.lang = locale === "en" ? "en" : "no";
@@ -100,7 +100,7 @@ export function startApp(root: HTMLElement): void {
 
   const paintHud = (
     hud: HTMLElement,
-    extra: { lives: number; collected: number; target: number; score: number; rottenCaught?: number },
+    extra: { lives: number; collected: number; target: number; score: number; rottenCaught?: number; playStyle?: PlayStyle },
   ) => {
     if (!plan) return;
     updateHud(hud, {
@@ -142,6 +142,7 @@ export function startApp(root: HTMLElement): void {
               target: plan.catchTarget,
               score,
               rottenCaught: state.rottenCaught,
+              playStyle: session?.getPlayStyle(),
             });
           } else {
             sfx.fail(settings.sound);
@@ -167,6 +168,7 @@ export function startApp(root: HTMLElement): void {
       target: plan.catchTarget,
       score,
       rottenCaught: 0,
+      playStyle: session.getPlayStyle(),
     });
   };
 

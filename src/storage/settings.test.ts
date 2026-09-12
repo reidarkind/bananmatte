@@ -12,12 +12,18 @@ describe("settings storage", () => {
     const store = memoryStore();
     saveSettings({ ...DEFAULT_SETTINGS, maxN: 100, sound: false }, store);
     expect(store.getItem(SETTINGS_KEY)).toContain("100");
-    expect(loadSettings(store)).toMatchObject({ maxN: 100, sound: false });
+    expect(loadSettings(store)).toMatchObject({ maxN: 100, sound: false, playStyle: "sank" });
   });
 
   it("recovers from corrupt JSON", () => {
     const store = memoryStore({ [SETTINGS_KEY]: "{not json" });
     expect(loadSettings(store).maxN).toBe(10);
+  });
+
+  it("roundtrips a play style", () => {
+    const store = memoryStore();
+    saveSettings({ ...DEFAULT_SETTINGS, playStyle: "angrep" }, store);
+    expect(loadSettings(store).playStyle).toBe("angrep");
   });
 
   it("roundtrips English locale", () => {

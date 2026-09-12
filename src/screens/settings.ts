@@ -1,9 +1,10 @@
 import { modeLabel, t } from "../i18n";
 import { availableModes, isHundrevennAvailable, sanitizeSettings } from "../math/modes";
-import type { Locale, MaxN, ModeId, PlaySelection, Settings } from "../types";
+import type { Locale, MaxN, ModeId, PlaySelection, PlayStyleChoice, Settings } from "../types";
 import { html, onClick } from "./dom";
 
 const MAX_OPTIONS: MaxN[] = [10, 50, 100, 1000];
+const PLAY_CHOICES: PlayStyleChoice[] = ["sank", "angrep", "forsvar", "mix"];
 
 export function renderSettings(
   root: HTMLElement,
@@ -33,6 +34,11 @@ export function renderSettings(
           <div class="tabs">
             <button class="tab ${next.locale === "nb" ? "on" : ""}" data-lang="nb">${t(locale, "settings.nb")}</button>
             <button class="tab ${next.locale === "en" ? "on" : ""}" data-lang="en">${t(locale, "settings.en")}</button>
+          </div>
+        </label>
+        <label>${t(locale, "settings.play")}
+          <div class="tabs">
+            ${PLAY_CHOICES.map((id) => `<button class="tab ${id === next.playStyle ? "on" : ""}" data-play="${id}">${t(locale, `play.${id}`)}</button>`).join("")}
           </div>
         </label>
         <label>${t(locale, "settings.max")}
@@ -77,6 +83,10 @@ export function renderSettings(
     });
     onClick(root, "[data-lang]", (button) => {
       next.locale = button.dataset.lang as Locale;
+      paint();
+    });
+    onClick(root, "[data-play]", (button) => {
+      next.playStyle = button.dataset.play as PlayStyleChoice;
       paint();
     });
     onClick(root, "[data-max]", (button) => {

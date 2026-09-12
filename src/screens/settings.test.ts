@@ -46,6 +46,24 @@ describe("settings highscores", () => {
     root.remove();
   });
 
+  it("lets the player pick banana attack", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    let saved = DEFAULT_SETTINGS.playStyle;
+    renderSettings(root, { ...DEFAULT_SETTINGS, selectedModes: [...DEFAULT_SETTINGS.selectedModes] }, {
+      back: () => {},
+      save: (next) => {
+        saved = next.playStyle;
+      },
+      resetHighscores: () => {},
+    });
+    expect(root.textContent).toContain("Banansanking");
+    root.querySelector<HTMLButtonElement>('[data-play="angrep"]')!.click();
+    root.querySelector<HTMLButtonElement>("[data-back]")!.click();
+    expect(saved).toBe("angrep");
+    root.remove();
+  });
+
   it("switches labels to English", () => {
     const root = document.createElement("div");
     document.body.append(root);

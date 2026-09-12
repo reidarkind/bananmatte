@@ -50,6 +50,7 @@ describe("game HUD", () => {
     document.body.append(root);
     const { hud } = renderGameShell(root, "tiervenn", () => {});
     expect(hud.querySelector("[data-lives]")).not.toBeNull();
+    expect(hud.querySelector("[data-style]")?.textContent).toBe("Banansanking");
     expect(() =>
       updateHud(hud, { mode: "tiervenn", level: 1, lives: 2, collected: 1, target: 5, score: 10 }),
     ).not.toThrow();

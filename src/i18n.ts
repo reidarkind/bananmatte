@@ -1,4 +1,4 @@
-import type { Locale, ModeId, PlaySelection } from "./types";
+import type { Locale, ModeId, PlaySelection, PlayStyleChoice } from "./types";
 
 const NB: Record<string, string> = {
   "menu.lead": "Fang bananer. Regn etterpå.",
@@ -12,6 +12,11 @@ const NB: Record<string, string> = {
   "quit": "Avslutt",
   "level": "Nivå {n}",
   "settings.title": "Innstillinger",
+  "settings.play": "Spill",
+  "play.sank": "Banansanking",
+  "play.angrep": "Bananangrep",
+  "play.forsvar": "Bananforsvar",
+  "play.mix": "Tilfeldig",
   "settings.max": "Største tall",
   "settings.hundrevenn": "Ta med hundrevenn",
   "settings.mode": "Modus",
@@ -33,8 +38,8 @@ const NB: Record<string, string> = {
   "scores.new": "Ny",
   "about.title": "Om appen",
   "about.p1": "Bananmatte er et matte- og fangstspill for 1. og 2. klasse.",
-  "about.p2": "Du styrer gorillaen nederst. Fang gule bananer. La de brune være.",
-  "about.p3": "Mister du to gule bananer, er det slutt. Tar du mer enn tre brune bananer, er det også slutt. Feil svar viser fasit, og du starter på nytt.",
+  "about.p2": "Tre spill: Banansanking (fang gule, la brune falle), Bananangrep (kast på orangutanger, ikke på gorillaer) og Bananforsvar (unngå brune, fang gule).",
+  "about.p3": "Mister du to gule i sanking, eller gjør to tilsvarende feil i de andre spillene, er det slutt. Mer enn tre råtne-feil er også slutt. Feil svar viser fasit, og du starter på nytt.",
   "about.privacy": "Personvern",
   "about.privacyBody": "Poeng og navn lagres bare på denne telefonen. Ingenting sendes på nett.",
   "game.canvas": "Spillbrett",
@@ -103,6 +108,11 @@ const EN: Record<string, string> = {
   "quit": "Quit",
   "level": "Level {n}",
   "settings.title": "Settings",
+  "settings.play": "Game",
+  "play.sank": "Banana harvest",
+  "play.angrep": "Banana attack",
+  "play.forsvar": "Banana defense",
+  "play.mix": "Random",
   "settings.max": "Largest number",
   "settings.hundrevenn": "Include hundreds friend",
   "settings.mode": "Mode",
@@ -124,8 +134,8 @@ const EN: Record<string, string> = {
   "scores.new": "New",
   "about.title": "About",
   "about.p1": "Bananmatte is a math and catch game for grades 1 and 2.",
-  "about.p2": "You move the gorilla at the bottom. Catch yellow bananas. Let the brown ones fall.",
-  "about.p3": "Miss two yellow bananas and the game ends. Catch more than three brown bananas and it also ends. A wrong answer shows the solution, and you start over.",
+  "about.p2": "Three games: Banana harvest (catch yellow, let brown fall), Banana attack (throw at orangutans, not gorillas) and Banana defense (dodge brown, catch yellow).",
+  "about.p3": "Miss two yellow bananas in harvest, or make two matching mistakes in the other games, and it ends. More than three rotten mistakes also ends it. A wrong answer shows the solution, and you start over.",
   "about.privacy": "Privacy",
   "about.privacyBody": "Scores and names stay on this phone. Nothing is sent online.",
   "game.canvas": "Game board",
@@ -194,4 +204,8 @@ export function t(locale: Locale, key: string, vars: Record<string, string | num
 
 export function modeLabel(locale: Locale, id: ModeId | PlaySelection): string {
   return t(locale, `mode.${id}`);
+}
+
+export function playStyleLabel(locale: Locale, style: PlayStyleChoice): string {
+  return t(locale, `play.${style}`);
 }

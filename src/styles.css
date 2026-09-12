@@ -172,6 +172,14 @@ select {
   color: var(--cream);
   font-weight: 800;
 }
+.hud-goal {
+  margin: 0 0 0.15rem;
+  text-align: center;
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  color: var(--banana);
+  text-shadow: 0 1px 0 #1b140c;
+}
 .hud-row { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
 .rotten-meter {
   display: flex;
