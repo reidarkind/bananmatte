@@ -15,15 +15,17 @@ export function renderGameShell(
   `);
   const hud = root.querySelector("#hud") as HTMLElement;
   hud.replaceChildren(html`
-    <div class="hud-row">
-      <button class="back tiny" data-quit type="button">Avslutt</button>
-      <span data-mode>${MODE_LABELS[mode]}</span>
-      <span data-level>Nivå 1</span>
-    </div>
-    <div class="hud-row">
-      <span data-lives></span>
-      <span data-progress></span>
-      <span data-score>0</span>
+    <div class="hud-stack">
+      <div class="hud-row">
+        <button class="back tiny" data-quit type="button">Avslutt</button>
+        <span data-mode>${MODE_LABELS[mode]}</span>
+        <span data-level>Nivå 1</span>
+      </div>
+      <div class="hud-row">
+        <span data-lives></span>
+        <span data-progress></span>
+        <span data-score>0</span>
+      </div>
     </div>
   `);
   onClick(hud, "[data-quit]", onQuit);
@@ -39,9 +41,14 @@ export function updateHud(
   info: { mode: ModeId; level: number; lives: number; collected: number; target: number; score: number },
 ): void {
   const lives = "🍌".repeat(info.lives) + "✕".repeat(Math.max(0, 2 - info.lives));
-  hud.querySelector("[data-mode]")!.textContent = MODE_LABELS[info.mode];
-  hud.querySelector("[data-level]")!.textContent = `Nivå ${info.level}`;
-  hud.querySelector("[data-lives]")!.textContent = lives;
-  hud.querySelector("[data-progress]")!.textContent = `${info.collected} / ${info.target}`;
-  hud.querySelector("[data-score]")!.textContent = String(info.score);
+  setText(hud, "[data-mode]", MODE_LABELS[info.mode]);
+  setText(hud, "[data-level]", `Nivå ${info.level}`);
+  setText(hud, "[data-lives]", lives);
+  setText(hud, "[data-progress]", `${info.collected} / ${info.target}`);
+  setText(hud, "[data-score]", String(info.score));
+}
+
+function setText(root: ParentNode, selector: string, value: string): void {
+  const node = root.querySelector(selector);
+  if (node) node.textContent = value;
 }

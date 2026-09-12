@@ -28,7 +28,7 @@ export function renderMath(
         <p class="mode-pill">${plan.catchTarget} bananer</p>
         <h2>${plan.prompt}</h2>
         <div class="answer">${buffer || "?"}</div>
-        <div class="pad">
+        <div class="numpad">
           ${["1","2","3","4","5","6","7","8","9","−","0","slett"].map((key) => `<button class="key" data-k="${key}">${key}</button>`).join("")}
           <button class="btn primary wide" data-ok>OK</button>
         </div>

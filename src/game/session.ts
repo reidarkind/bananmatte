@@ -59,13 +59,17 @@ export function createPlaySession(opts: {
   };
 
   const emitHud = () => {
-    opts.onHud({
-      lives: state.lives,
-      score: state.score,
-      collected: state.collected,
-      target: state.target,
-      level,
-    });
+    try {
+      opts.onHud({
+        lives: state.lives,
+        score: state.score,
+        collected: state.collected,
+        target: state.target,
+        level,
+      });
+    } catch {
+      // HUD-feil skal ikke stoppe spilløkken
+    }
   };
 
   const apply = (next: PlayState, sound: "catch" | "miss" | "rotten" | null) => {
