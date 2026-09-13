@@ -393,3 +393,38 @@ input[data-name] {
 .install-page p, .install-page li { font-weight: 600; line-height: 1.45; }
 .install-page ol { padding-left: 1.2em; }
 .install-page li { margin-bottom: 0.55rem; }
+
+@media (min-width: 768px) {
+  html {
+    font-size: clamp(16px, 2.1vw, 22px);
+  }
+
+  .stack, fieldset, .scores, .name-field {
+    width: min(28rem, 100%);
+  }
+
+  .lead, .muted {
+    max-width: 28rem;
+  }
+
+  .screen.pad > * {
+    width: min(28rem, 100%);
+  }
+
+  .screen.pad > .back {
+    margin-left: max(0px, calc((100% - min(28rem, 100%)) / 2));
+  }
+
+  .logo {
+    width: 11rem;
+    height: 11rem;
+  }
+
+  .overlay p, .fasit {
+    max-width: 28rem;
+  }
+
+  .numpad {
+    width: min(26rem, 100%);
+  }
+}

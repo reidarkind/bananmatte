@@ -163,12 +163,20 @@ export function maybeSpawnTarget(
 
 export const ATTACK_MAX_SHOTS = 4;
 
-export function throwAt(world: AttackWorld, fromX: number, fromY: number, toX: number, toY: number, level: number): void {
+export function throwAt(
+  world: AttackWorld,
+  fromX: number,
+  fromY: number,
+  toX: number,
+  toY: number,
+  level: number,
+  speedScale = 1,
+): void {
   if (world.shots.length >= ATTACK_MAX_SHOTS) return;
   const aimed = apeAtPoint(world.targets, toX, toY);
   const aimX = aimed ? aimed.x + aimed.w / 2 : toX;
   const aimY = aimed ? aimed.y + aimed.h * 0.7 : toY;
-  const shot = aimShot(fromX, fromY, aimX, aimY, throwSpeed(level));
+  const shot = aimShot(fromX, fromY, aimX, aimY, throwSpeed(level) * speedScale);
   shot.targetId = aimed?.id;
   world.shots.push(shot);
 }

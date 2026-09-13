@@ -18,6 +18,7 @@ import { bananaInBasketPose, basketRect, gorillaRect, spawnFalling, spawnFalling
 import { attackHitEvent, attackLeaveEvent, attackMissEvent, defendEscapeEvent, defendHitEvent } from "./play-map";
 import { ATTACK_THROWER_KIND, gorillaWearsHelmet, peekPop, resolvePlayStyle, type PlayStyle } from "./play-style";
 import { applyCatchEvent, createPlayState, fallSpeed, spawnRotten, type FallingKind, type PlayState } from "./rules";
+import { PLAY_REF_HEIGHT, PLAY_REF_WIDTH, playSpeedScale } from "./scale";
 import { planTrickReveal } from "./trick";
 
 export interface HudSnapshot {
@@ -120,11 +121,11 @@ export function createPlaySession(opts: {
   };
 
   const tickSankOrDefend = (dt: number, isDefend: boolean) => {
-    gorillaX += keyDir * 280 * dt;
+    gorillaX += keyDir * 280 * dt * playSpeedScale(width, PLAY_REF_WIDTH);
     gorillaX = Math.max(36, Math.min(width - 36, gorillaX));
     const body = gorillaRect(gorillaX, height - 58);
     const basket = basketRect(gorillaX, height - 58);
-    const speed = fallSpeed(level);
+    const speed = fallSpeed(level) * playSpeedScale(height, PLAY_REF_HEIGHT);
 
     spawnAcc += dt;
     const interval = Math.max(0.55, 1.35 - level * 0.06);
@@ -314,7 +315,7 @@ export function createPlaySession(opts: {
   const tapOff = attachTap(opts.canvas, (x, y) => {
     if (style !== "angrep" || paused || state.ended || state.roundComplete) return;
     throwerFacing = x >= gorillaX ? 1 : -1;
-    throwAt(attack, gorillaX, height - 70, x, y, level);
+    throwAt(attack, gorillaX, height - 70, x, y, level, playSpeedScale(height, PLAY_REF_HEIGHT));
   });
   const keysOff = attachKeys((dir) => {
     keyDir = dir;
