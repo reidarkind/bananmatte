@@ -1,7 +1,7 @@
 import { t } from "../i18n";
 import type { Locale } from "../types";
 import { html, onClick } from "./dom";
-import { moreLinks, mountCoffeeButton } from "./more-links";
+import { moreLinks } from "./more-links";
 
 export function renderAbout(root: HTMLElement, back: () => void, locale: Locale = "nb"): void {
   root.replaceChildren(html`
@@ -17,5 +17,4 @@ export function renderAbout(root: HTMLElement, back: () => void, locale: Locale 
     </section>
   `);
   onClick(root, "[data-back]", back);
-  mountCoffeeButton(root);
 }

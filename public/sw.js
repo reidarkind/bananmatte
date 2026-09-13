@@ -1,4 +1,4 @@
-const CACHE = "bananmatte-v29";
+const CACHE = "bananmatte-v30";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -17,6 +17,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
   const isDocument =
     event.request.mode === "navigate" ||
     url.pathname.endsWith("/") ||

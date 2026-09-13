@@ -531,12 +531,17 @@ input[data-name] {
   margin-top: 0.6rem;
 }
 .more-links .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
   text-decoration: none;
   text-align: center;
 }
-.more-links [data-bmc-host] {
-  display: flex;
-  justify-content: center;
+.more-links .btn-ico {
+  font-size: 1.15em;
+  line-height: 1;
 }
 
 @media (min-width: 768px) {
