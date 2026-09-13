@@ -10,8 +10,12 @@ describe("extra languages", () => {
 });
 
 describe("bonus how-to", () => {
-  it("names the bonus game in Bokmål", () => {
+  it("explains the bonus ride in short Bokmål sentences", () => {
     expect(t("nb", "bonus.headline")).toBe("BONUSSPILL!");
+    expect(t("nb", "bonus.how")).toBe("Kjør fram til banken. Styr med fingeren.");
+    expect(t("nb", "bonus.rule.banana")).toBe("Treffer du en banan, svinger du rundt. Det går fint.");
+    expect(t("nb", "bonus.rule.crate")).toBe("Treffer du en banankasse, kræsjer du. Da er bonusturen over.");
+    expect(t("nb", "bonus.rule.book")).toBe("Treffer du en mattebok, må du regne. Riktig svar, så kjører du videre.");
   });
 });
 

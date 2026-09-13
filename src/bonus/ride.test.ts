@@ -49,9 +49,21 @@ describe("bonus ride", () => {
   });
 
   it("starts slower than it finishes", () => {
-    expect(rideSpeed(0, 58)).toBeLessThan(rideSpeed(40, 58));
-    expect(rideSpeed(0, 58)).toBeLessThan(4.2);
-    expect(rideSpeed(40, 58)).toBeGreaterThan(7);
+    const track = createRide(() => 0.5).track;
+    expect(rideSpeed(0, track)).toBeLessThan(rideSpeed(track * 0.7, track));
+    expect(rideSpeed(0, track)).toBeLessThan(3.2);
+  });
+
+  it("drives at least one minute before the bank", () => {
+    const track = createRide(() => 0.5).track;
+    let ride = emptyRide({ phase: "drive", s: 0, track, obstacles: [] });
+    let seconds = 0;
+    while (ride.phase === "drive" && seconds < 180) {
+      ride = stepRide(ride, 0.05, 0);
+      seconds += 0.05;
+    }
+    expect(ride.phase).toBe("bank");
+    expect(seconds).toBeGreaterThanOrEqual(60);
   });
 
   it("keeps a long clear stretch before the bank", () => {

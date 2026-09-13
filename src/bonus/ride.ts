@@ -29,7 +29,7 @@ const HIT_S = 1.15;
 const HOLD_CRASH = 1.5;
 const HOLD_BANK = 2.9;
 const COUNTDOWN = 4;
-const TRACK = 58;
+const TRACK = 330;
 const DEPOSIT_START = 0.35;
 const DEPOSIT_END = 2.2;
 
@@ -75,7 +75,12 @@ export function emptyRide(overrides: Partial<RideState> = {}): RideState {
 }
 
 export function createRide(rng: Rng, track = TRACK): RideState {
-  const kinds: RideKind[] = ["banana", "crate", "book", "banana", "book", "crate"];
+  const kinds: RideKind[] = [
+    "banana", "crate", "book",
+    "banana", "book", "crate",
+    "banana", "book", "banana",
+    "crate", "book", "banana",
+  ];
   return emptyRide({
     track,
     phase: "intro",
@@ -85,7 +90,7 @@ export function createRide(rng: Rng, track = TRACK): RideState {
       id: i + 1,
       kind,
       x: rng() * 1.4 - 0.7,
-      s: 12 + i * 5.4,
+      s: 24 + i * 22,
     })),
   });
 }
