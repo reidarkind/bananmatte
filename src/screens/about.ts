@@ -1,6 +1,7 @@
 import { t } from "../i18n";
 import type { Locale } from "../types";
 import { html, onClick } from "./dom";
+import { moreLinks, mountCoffeeButton } from "./more-links";
 
 export function renderAbout(root: HTMLElement, back: () => void, locale: Locale = "nb"): void {
   root.replaceChildren(html`
@@ -12,7 +13,9 @@ export function renderAbout(root: HTMLElement, back: () => void, locale: Locale 
       <p>${t(locale, "about.p3")}</p>
       <h2>${t(locale, "about.privacy")}</h2>
       <p>${t(locale, "about.privacyBody")}</p>
+      ${moreLinks(locale)}
     </section>
   `);
   onClick(root, "[data-back]", back);
+  mountCoffeeButton(root);
 }

@@ -2,6 +2,7 @@ import { t } from "../i18n";
 import type { Locale } from "../types";
 import { installCopy } from "./install-copy";
 import { html, onClick } from "./dom";
+import { moreLinks, mountCoffeeButton } from "./more-links";
 
 export function renderInstall(root: HTMLElement, back: () => void, locale: Locale = "nb"): void {
   const c = installCopy(locale);
@@ -44,7 +45,9 @@ export function renderInstall(root: HTMLElement, back: () => void, locale: Local
         <h2>${c.origin}</h2>
         <p>${c.originBody}</p>
       </section>
+      ${moreLinks(locale)}
     </article>
   `);
   onClick(root, "[data-back]", back);
+  mountCoffeeButton(root);
 }

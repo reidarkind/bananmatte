@@ -1,4 +1,4 @@
-const CACHE = "bananmatte-v28";
+const CACHE = "bananmatte-v29";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
