@@ -1,4 +1,5 @@
 import { t } from "../i18n";
+import { isStandaloneDisplay } from "../lib/display";
 import type { Locale } from "../types";
 import { html, onClick } from "./dom";
 
@@ -9,7 +10,7 @@ export function renderMenu(root: HTMLElement, actions: {
   settings: () => void;
   about: () => void;
   install: () => void;
-}, locale: Locale = "nb"): void {
+}, locale: Locale = "nb", standalone = isStandaloneDisplay()): void {
   root.replaceChildren(html`
     <section class="screen menu">
       <img class="logo" src="${import.meta.env.BASE_URL}logo.png" alt="${t(locale, "menu.logo")}" width="160" height="160" />
@@ -23,6 +24,7 @@ export function renderMenu(root: HTMLElement, actions: {
         <button class="btn" data-go="install">${t(locale, "menu.install")}</button>
         <button class="btn ghost" data-go="about">${t(locale, "menu.about")}</button>
       </div>
+      ${standalone ? "" : `<button class="install-hint" data-go="install" data-install-hint type="button">${t(locale, "menu.installHint")}</button>`}
     </section>
   `);
   onClick(root, "[data-go]", (button) => {

@@ -59,6 +59,22 @@ body {
 
 .menu h1, .pad h1 { margin: 0.2rem 0; font-size: 2.1rem; color: #081c15; }
 .lead, .muted { text-align: center; max-width: 22rem; }
+.install-hint {
+  margin: 0.15rem 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  font: inherit;
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  color: #081c15;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  max-width: 22rem;
+}
 .logo {
   width: 160px;
   height: 160px;
@@ -553,7 +569,7 @@ input[data-name] {
     width: min(28rem, 100%);
   }
 
-  .lead, .muted {
+  .lead, .muted, .install-hint {
     max-width: 28rem;
   }
 
