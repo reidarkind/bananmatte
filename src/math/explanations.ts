@@ -57,6 +57,19 @@ export function explainAdd(x: number, y: number, locale: Locale = "nb"): string 
   return `Når du legger ${y} til ${x}, får du ${x + y}.`;
 }
 
+export function explainPlaceValue(parts: number[], locale: Locale = "nb"): string {
+  const sum = parts.reduce((total, part) => total + part, 0);
+  const expr = parts.join(" + ");
+  if (!nordic(locale)) {
+    return parts.length === 3
+      ? `${expr} = ${sum}. Add the ones, the tens and the hundreds.`
+      : `${expr} = ${sum}. Add the ones and the tens.`;
+  }
+  return parts.length === 3
+    ? `${expr} = ${sum}. Du legger sammen ener, tiere og hundre.`
+    : `${expr} = ${sum}. Du legger sammen ener og tiere.`;
+}
+
 export function explainSub(x: number, y: number, locale: Locale = "nb"): string {
   if (!nordic(locale)) return `When you take ${y} from ${x}, you get ${x - y}.`;
   return `Når du tar ${y} fra ${x}, får du ${x - y}.`;

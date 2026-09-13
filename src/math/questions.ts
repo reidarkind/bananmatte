@@ -15,7 +15,9 @@ import {
   nFriend,
   roundTo,
 } from "./explanations";
+import { trickyComparePair } from "./compare-pairs";
 import { resolveRoundMode } from "./modes";
+import { planPlaceValue } from "./place-value";
 import { pickOne, randomInt } from "./rng";
 
 function parityOf(n: number): Parity {
@@ -232,9 +234,7 @@ function planRoundMode(
 }
 
 function planCompare(mode: "ulikhet-tegn" | "ulikhet-ord", maxN: number, rng: Rng, locale: Locale): RoundPlan {
-  const x = randomX(maxN, rng);
-  let y = randomX(maxN, rng);
-  if (rng() < 0.22) y = x;
+  const { x, y } = trickyComparePair(maxN, rng);
   const answer = compareOf(x, y);
   return {
     mode,
@@ -254,6 +254,8 @@ export function planMode(mode: ModeId, maxN: number, rng: Rng, locale: Locale = 
   switch (mode) {
     case "addisjon":
       return planAddisjon(maxN, rng, locale);
+    case "plassverdi":
+      return planPlaceValue(maxN, rng, locale);
     case "subtraksjon-positiv":
       return planSubtraksjonPositiv(maxN, rng, locale);
     case "subtraksjon-negativ":

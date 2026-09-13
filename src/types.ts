@@ -41,6 +41,7 @@ export type ModeId =
   | "niervenn"
   | "hundrevenn"
   | "addisjon"
+  | "plassverdi"
   | "subtraksjon-positiv"
   | "subtraksjon-negativ"
   | "multiplikasjon-mini"
@@ -113,6 +114,7 @@ export const ALL_MODES: ModeId[] = [
   "tiervenn",
   "hundrevenn",
   "addisjon",
+  "plassverdi",
   "subtraksjon-positiv",
   "subtraksjon-negativ",
   "multiplikasjon-mini",

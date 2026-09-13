@@ -41,6 +41,13 @@ describe("availableModes", () => {
     expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 1000 })).toContain("avrunding-hundre-opp");
     expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 1000 })).toContain("avrunding-hundre-ned");
   });
+
+  it("offers place value only when maxN is 100 or 1000", () => {
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 10 })).not.toContain("plassverdi");
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 50 })).not.toContain("plassverdi");
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 100 })).toContain("plassverdi");
+    expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 1000 })).toContain("plassverdi");
+  });
 });
 
 describe("sanitizeSettings", () => {
