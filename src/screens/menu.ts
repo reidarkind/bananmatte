@@ -4,6 +4,7 @@ import { html, onClick } from "./dom";
 
 export function renderMenu(root: HTMLElement, actions: {
   play: () => void;
+  bonus: () => void;
   scores: () => void;
   settings: () => void;
   about: () => void;
@@ -16,6 +17,7 @@ export function renderMenu(root: HTMLElement, actions: {
       <p class="lead">${t(locale, "menu.lead")}</p>
       <div class="stack">
         <button class="btn primary" data-go="play">${t(locale, "menu.play")}</button>
+        <button class="btn" data-go="bonus">${t(locale, "menu.bonus")}</button>
         <button class="btn" data-go="scores">${t(locale, "menu.scores")}</button>
         <button class="btn" data-go="settings">${t(locale, "menu.settings")}</button>
         <button class="btn" data-go="install">${t(locale, "menu.install")}</button>
@@ -26,6 +28,7 @@ export function renderMenu(root: HTMLElement, actions: {
   onClick(root, "[data-go]", (button) => {
     const go = button.dataset.go;
     if (go === "play") actions.play();
+    if (go === "bonus") actions.bonus();
     if (go === "scores") actions.scores();
     if (go === "settings") actions.settings();
     if (go === "install") actions.install();

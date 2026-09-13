@@ -26,19 +26,22 @@ describe("parseBonusCheat", () => {
 });
 
 describe("bonus milestones", () => {
-  it("opens a bonus on level 10, 20, 30", () => {
+  it("opens a bonus on the seven journey worlds only", () => {
     expect(isBonusLevel(10)).toBe(true);
     expect(isBonusLevel(20)).toBe(true);
+    expect(isBonusLevel(70)).toBe(true);
     expect(isBonusLevel(9)).toBe(false);
     expect(isBonusLevel(15)).toBe(false);
+    expect(isBonusLevel(80)).toBe(false);
   });
 
   it("picks a vehicle skin by milestone", () => {
     expect(bonusVehicle(10)).toBe("olabil");
     expect(bonusVehicle(20)).toBe("bil");
-    expect(bonusVehicle(30)).toBe("baat");
-    expect(bonusVehicle(40)).toBe("helikopter");
-    expect(bonusVehicle(50)).toBe("lite-fly");
-    expect(bonusVehicle(60)).toBe("stort-fly");
+    expect(bonusVehicle(30)).toBe("vannscooter");
+    expect(bonusVehicle(40)).toBe("baat");
+    expect(bonusVehicle(50)).toBe("helikopter");
+    expect(bonusVehicle(60)).toBe("propellfly");
+    expect(bonusVehicle(70)).toBe("jetfly");
   });
 });

@@ -13,10 +13,13 @@ import { renderInstall } from "./screens/install";
 import { bonusMilestoneFromAnswer } from "./bonus/cheat";
 import { isBonusLevel } from "./bonus/milestones";
 import { renderBonusRide } from "./screens/bonus";
+import { renderBonusWorlds } from "./screens/bonus-worlds";
+import { renderJourneyEnd } from "./screens/journey";
 import { renderMath } from "./screens/math";
 import { renderMenu } from "./screens/menu";
 import { renderSettings } from "./screens/settings";
 import { clearHighscores, loadHighscores, qualifies, saveHighscores, submitHighscore } from "./storage/highscores";
+import { clearUnlocks, loadUnlocks, unlockBonus } from "./storage/unlocks";
 import { loadSettings, saveSettings } from "./storage/settings";
 import { LOCALE_HTML, type Locale, type MaxN, type PlayStyle, type RoundPlan, type Settings } from "./types";
 
@@ -38,6 +41,7 @@ export function startApp(root: HTMLElement): void {
     session = null;
     renderMenu(root, {
       play: startGame,
+      bonus: showBonusWorlds,
       scores: () => showScores(settings.maxN),
       settings: showSettings,
       about: () => renderAbout(root, showMenu, settings.locale),
@@ -87,6 +91,26 @@ export function startApp(root: HTMLElement): void {
     );
   };
 
+  const showBonusWorlds = () => {
+    session?.stop();
+    session = null;
+    renderBonusWorlds(root, loadUnlocks(), {
+      back: showMenu,
+      play: (milestone) => {
+        const rng = createRng(Date.now() % 1_000_000);
+        renderBonusRide(root, {
+          milestone,
+          locale: settings.locale,
+          settings,
+          rng,
+          score: 0,
+          replay: true,
+          onDone: showBonusWorlds,
+        });
+      },
+    }, settings.locale);
+  };
+
   const showSettings = () => {
     renderSettings(root, settings, {
       back: showMenu,
@@ -97,6 +121,7 @@ export function startApp(root: HTMLElement): void {
       },
       resetHighscores: () => {
         clearHighscores();
+        clearUnlocks();
       },
     });
   };
@@ -157,6 +182,7 @@ export function startApp(root: HTMLElement): void {
             });
           };
           if (bonusAt) {
+            unlockBonus(bonusAt);
             shell.overlay.replaceChildren();
             const play = (shell.canvas.closest(".play") as HTMLElement | null) ?? root;
             renderBonusRide(play, {
@@ -166,6 +192,16 @@ export function startApp(root: HTMLElement): void {
               rng,
               score,
               onDone: continueMain,
+              onJourneyEnd: () => {
+                renderJourneyEnd(play, settings.locale, {
+                  settings: () => {
+                    session?.stop();
+                    session = null;
+                    showSettings();
+                  },
+                  keep: continueMain,
+                });
+              },
             });
             return;
           }

@@ -21,10 +21,11 @@ describe("settings highscores", () => {
     expect(start).not.toBeNull();
     start!.click();
     expect(cleared).toBe(false);
+    expect(root.textContent).toContain("Opplåste bonusspill");
 
     root.querySelector<HTMLButtonElement>("[data-reset-confirm]")!.click();
     expect(cleared).toBe(true);
-    expect(root.textContent).toContain("Rekordene er slettet");
+    expect(root.textContent).toContain("Rekordene og opplåste bonusspill er slettet");
     root.remove();
   });
 

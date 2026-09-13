@@ -9,7 +9,9 @@ export function renderBonusRide(
     settings: Settings;
     rng: Rng;
     score?: number;
+    replay?: boolean;
     onDone: () => void;
+    onJourneyEnd?: () => void;
   },
 ): () => void {
   return playBonusRide(host, opts);

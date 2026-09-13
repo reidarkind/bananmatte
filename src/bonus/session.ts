@@ -5,7 +5,7 @@ import { html, onClick } from "../screens/dom";
 import { renderMath } from "../screens/math";
 import type { Locale, Rng, Settings } from "../types";
 import { drawBonusRide } from "./draw";
-import { bonusVehicle } from "./milestones";
+import { bonusVehicle, isJourneyEnd, worldTheme } from "./milestones";
 import { createRide, resolveBook, skipRide, startRide, stepRide, type RideState } from "./ride";
 
 export function playBonusRide(
@@ -16,11 +16,19 @@ export function playBonusRide(
     settings: Settings;
     rng: Rng;
     score?: number;
+    replay?: boolean;
     onDone: () => void;
+    onJourneyEnd?: () => void;
   },
 ): () => void {
   const locale = opts.locale;
   const vehicle = bonusVehicle(opts.milestone);
+  const theme = worldTheme(vehicle);
+  const howKey = theme === "land" ? "bonus.how" : `bonus.how.${theme}`;
+  const bananaKey = theme === "land" ? "bonus.rule.banana" : `bonus.rule.banana.${theme}`;
+  const crateKey = theme === "land" ? "bonus.rule.crate" : `bonus.rule.crate.${theme}`;
+  const bookKey = theme === "land" ? "bonus.rule.book" : `bonus.rule.book.${theme}`;
+  const crashKey = theme === "land" ? "bonus.crash" : `bonus.crash.${theme}`;
   const layer = html`
     <div class="bonus-layer">
       <canvas class="bonus-stage" aria-label="${t(locale, "game.canvas")}"></canvas>
@@ -31,12 +39,12 @@ export function playBonusRide(
       <div class="bonus-intro">
         <section class="bonus-card">
           <h2>${t(locale, "bonus.headline")}</h2>
-          <p class="lead">${t(locale, "bonus.how")}</p>
+          <p class="lead">${t(locale, howKey)}</p>
           <p>${t(locale, `bonus.lead.${vehicle}`)}</p>
           <ul>
-            <li>${t(locale, "bonus.rule.banana")}</li>
-            <li>${t(locale, "bonus.rule.crate")}</li>
-            <li>${t(locale, "bonus.rule.book")}</li>
+            <li>${t(locale, bananaKey)}</li>
+            <li>${t(locale, crateKey)}</li>
+            <li>${t(locale, bookKey)}</li>
           </ul>
           <button class="btn primary" data-start type="button">${t(locale, "bonus.go")}</button>
         </section>
@@ -70,6 +78,10 @@ export function playBonusRide(
     running = false;
     cancelAnimationFrame(raf);
     layer.remove();
+    if (!opts.replay && isJourneyEnd(opts.milestone) && opts.onJourneyEnd) {
+      opts.onJourneyEnd();
+      return;
+    }
     opts.onDone();
   };
 
@@ -131,7 +143,7 @@ export function playBonusRide(
     else if (ride.phase === "bank" || ride.phase === "crash") ride = stepRide(ride, dt, 0);
     if (ride.phase === "math" && mathHost.childElementCount === 0) askBook();
     if (ride.phase === "bank") showToast("bonus.bank");
-    if (ride.phase === "crash") showToast("bonus.crash");
+    if (ride.phase === "crash") showToast(crashKey);
     if (ride.phase === "done") {
       finish();
       return;

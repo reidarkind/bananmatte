@@ -1,6 +1,6 @@
 import { drawBanana, drawGorilla } from "../game/draw";
 import type { FallingItem } from "../game/entities";
-import type { BonusVehicle } from "./milestones";
+import { worldTheme, type BonusVehicle } from "./milestones";
 import { countdownMark, depositCoinT, depositShown, type RideObstacle, type RideState } from "./ride";
 
 interface Scene {
@@ -28,6 +28,21 @@ function project(w: number, h: number, worldX: number, distance: number): { x: n
 }
 
 function scenery(vehicle: BonusVehicle): Scene {
+  if (vehicle === "vannscooter") {
+    return {
+      sky: ["#56cfe1", "#caf0f8"],
+      ground: "#0077b6",
+      groundDark: "#023e8a",
+      road: "#48cae4",
+      roadEdge: "#90e0ef",
+      line: "#ffffff",
+      hill: "#0096c7",
+      hillFar: "#48cae4",
+      sun: "#ffe66d",
+      air: false,
+      water: true,
+    };
+  }
   if (vehicle === "baat") {
     return {
       sky: ["#4ea8de", "#caf0f8"],
@@ -43,12 +58,27 @@ function scenery(vehicle: BonusVehicle): Scene {
       water: true,
     };
   }
-  if (vehicle === "helikopter" || vehicle === "lite-fly" || vehicle === "stort-fly") {
+  if (vehicle === "helikopter") {
     return {
       sky: ["#48cae4", "#caf0f8"],
       ground: "#8ecae6",
       groundDark: "#6096ba",
       road: "#90e0ef",
+      roadEdge: "#fff",
+      line: "#ffffff",
+      hill: "#7eb8d4",
+      hillFar: "#9ec9dc",
+      sun: "#fff3b0",
+      air: true,
+      water: false,
+    };
+  }
+  if (vehicle === "propellfly" || vehicle === "jetfly") {
+    return {
+      sky: vehicle === "jetfly" ? ["#01497c", "#89c2d9"] : ["#4cc9f0", "#caf0f8"],
+      ground: "#8ecae6",
+      groundDark: "#468faf",
+      road: "#ade8f4",
       roadEdge: "#fff",
       line: "#ffffff",
       hill: "#7eb8d4",
@@ -304,16 +334,131 @@ function drawBook(ctx: CanvasRenderingContext2D, size: number): void {
   ctx.restore();
 }
 
-function drawObstacle(ctx: CanvasRenderingContext2D, obs: RideObstacle, playerS: number, w: number, h: number): void {
+function drawSeaBanana(ctx: CanvasRenderingContext2D, size: number): void {
+  drawBanana(ctx, dummyBanana(size, -0.45));
+  ctx.fillStyle = "rgba(224, 108, 45, 0.42)";
+  ctx.beginPath();
+  ctx.ellipse(2, 2, size * 0.28, size * 0.16, -0.5, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawFlyingBanana(ctx: CanvasRenderingContext2D, size: number): void {
+  ctx.fillStyle = "#fff8e7";
+  ctx.beginPath();
+  ctx.ellipse(-size * 0.28, -size * 0.08, size * 0.22, size * 0.08, -0.4, 0, Math.PI * 2);
+  ctx.ellipse(size * 0.3, 0, size * 0.22, size * 0.08, 0.4, 0, Math.PI * 2);
+  ctx.fill();
+  drawBanana(ctx, dummyBanana(size, -0.85));
+}
+
+function drawBuoy(ctx: CanvasRenderingContext2D, size: number): void {
+  ctx.fillStyle = "#e63946";
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.42, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#fff8e7";
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.28, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#e63946";
+  ctx.fillRect(-size * 0.06, -size * 0.62, size * 0.12, size * 0.28);
+  ctx.save();
+  ctx.scale(size / 70, size / 70);
+  drawBanana(ctx, dummyBanana(22, -0.4));
+  ctx.restore();
+}
+
+function drawDiver(ctx: CanvasRenderingContext2D, size: number): void {
+  ctx.fillStyle = "#1d3557";
+  ctx.beginPath();
+  ctx.ellipse(0, size * 0.12, size * 0.22, size * 0.34, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#90e0ef";
+  ctx.beginPath();
+  ctx.arc(0, -size * 0.22, size * 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#1d3557";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = "#1d3557";
+  ctx.font = `bold ${Math.max(11, size * 0.28)}px Nunito, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("?", 0, -size * 0.2);
+  ctx.fillStyle = "#f4d35e";
+  ctx.fillRect(-size * 0.18, size * 0.38, size * 0.14, size * 0.08);
+  ctx.fillRect(size * 0.04, size * 0.38, size * 0.14, size * 0.08);
+}
+
+function drawCrow(ctx: CanvasRenderingContext2D, size: number): void {
+  ctx.fillStyle = "#212529";
+  ctx.beginPath();
+  ctx.ellipse(0, 0, size * 0.32, size * 0.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(size * 0.22, -size * 0.08, size * 0.14, size * 0.12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#f4d35e";
+  ctx.beginPath();
+  ctx.moveTo(size * 0.32, -size * 0.06);
+  ctx.lineTo(size * 0.5, 0);
+  ctx.lineTo(size * 0.32, size * 0.04);
+  ctx.fill();
+  ctx.fillStyle = "#212529";
+  ctx.beginPath();
+  ctx.moveTo(-size * 0.1, -size * 0.06);
+  ctx.quadraticCurveTo(-size * 0.4, -size * 0.28, -size * 0.05, size * 0.02);
+  ctx.fill();
+  ctx.save();
+  ctx.translate(size * 0.38, size * 0.12);
+  ctx.scale(size / 90, size / 90);
+  drawBanana(ctx, dummyBanana(20, 0.4));
+  ctx.restore();
+}
+
+function drawCloud(ctx: CanvasRenderingContext2D, size: number): void {
+  ctx.fillStyle = "#fff8e7";
+  ctx.beginPath();
+  ctx.ellipse(-size * 0.18, 0, size * 0.28, size * 0.2, 0, 0, Math.PI * 2);
+  ctx.ellipse(size * 0.16, 0, size * 0.3, size * 0.22, 0, 0, Math.PI * 2);
+  ctx.ellipse(0, -size * 0.14, size * 0.24, size * 0.18, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#1d3557";
+  ctx.font = `bold ${Math.max(11, size * 0.26)}px Nunito, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("3+?", 0, 0);
+}
+
+function drawObstacle(
+  ctx: CanvasRenderingContext2D,
+  obs: RideObstacle,
+  playerS: number,
+  w: number,
+  h: number,
+  theme: ReturnType<typeof worldTheme>,
+): void {
   const dist = obs.s - playerS;
   if (dist < 0.28 || dist > 28 || obs.resolved) return;
   const p = project(w, h, obs.x, dist);
   ctx.save();
   ctx.translate(p.x, p.y);
   const size = Math.min(150, Math.max(18, p.scale * 0.2));
-  if (obs.kind === "banana") drawBanana(ctx, dummyBanana(size, -0.55));
-  else if (obs.kind === "crate") drawCrate(ctx, size);
-  else drawBook(ctx, size);
+  if (obs.kind === "banana") {
+    if (theme === "water") drawSeaBanana(ctx, size);
+    else if (theme === "air") drawFlyingBanana(ctx, size);
+    else drawBanana(ctx, dummyBanana(size, -0.55));
+  } else if (obs.kind === "crate") {
+    if (theme === "water") drawBuoy(ctx, size);
+    else if (theme === "air") drawCrow(ctx, size);
+    else drawCrate(ctx, size);
+  } else if (theme === "water") {
+    drawDiver(ctx, size);
+  } else if (theme === "air") {
+    drawCloud(ctx, size);
+  } else {
+    drawBook(ctx, size);
+  }
   ctx.restore();
 }
 
@@ -329,6 +474,31 @@ function drawWheel(ctx: CanvasRenderingContext2D, x: number, y: number, r: numbe
 }
 
 function drawVehicle(ctx: CanvasRenderingContext2D, vehicle: BonusVehicle, s: number): void {
+  if (vehicle === "vannscooter") {
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.beginPath();
+    ctx.ellipse(8, 34, 58, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#e63946";
+    ctx.beginPath();
+    ctx.moveTo(-46, 10);
+    ctx.lineTo(52, 6);
+    ctx.lineTo(44, 26);
+    ctx.lineTo(-38, 26);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#1d3557";
+    roundRect(ctx, -8, -8, 22, 20, 5);
+    ctx.fill();
+    ctx.strokeStyle = "#212529";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(4, -8);
+    ctx.lineTo(-10, -22);
+    ctx.lineTo(18, -22);
+    ctx.stroke();
+    return;
+  }
   if (vehicle === "baat") {
     ctx.fillStyle = "rgba(255,255,255,0.35)";
     ctx.beginPath();
@@ -390,8 +560,32 @@ function drawVehicle(ctx: CanvasRenderingContext2D, vehicle: BonusVehicle, s: nu
     ctx.stroke();
     return;
   }
-  if (vehicle === "lite-fly" || vehicle === "stort-fly") {
-    const span = vehicle === "stort-fly" ? 88 : 62;
+  if (vehicle === "jetfly") {
+    ctx.fillStyle = "#adb5bd";
+    ctx.beginPath();
+    ctx.moveTo(-70, 16);
+    ctx.lineTo(8, 4);
+    ctx.lineTo(78, 10);
+    ctx.lineTo(10, 20);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#ced4da";
+    ctx.beginPath();
+    ctx.moveTo(-36, 4);
+    ctx.lineTo(62, -2);
+    ctx.lineTo(68, 10);
+    ctx.lineTo(-28, 18);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#4cc9f0";
+    ctx.fillRect(18, -2, 16, 10);
+    ctx.fillStyle = "#6c757d";
+    ctx.fillRect(-8, 16, 16, 8);
+    ctx.fillRect(22, 16, 16, 8);
+    return;
+  }
+  if (vehicle === "propellfly") {
+    const span = 62;
     ctx.fillStyle = "#adb5bd";
     ctx.beginPath();
     ctx.moveTo(-span, 12);
@@ -668,8 +862,9 @@ export function drawBonusRide(
   drawSides(ctx, w, h, ride.s, colors);
   drawBank(ctx, w, h, ride.track - ride.s, arrived, glow);
 
+  const theme = worldTheme(vehicle);
   const ordered = [...ride.obstacles].sort((a, b) => b.s - a.s);
-  for (const obs of ordered) drawObstacle(ctx, obs, ride.s, w, h);
+  for (const obs of ordered) drawObstacle(ctx, obs, ride.s, w, h, theme);
 
   const apeX = w / 2 + ride.x * w * 0.3;
   const apeY = h - 96;

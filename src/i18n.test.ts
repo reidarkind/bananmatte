@@ -16,6 +16,8 @@ describe("bonus how-to", () => {
     expect(t("nb", "bonus.rule.banana")).toBe("Treffer du en banan, svinger du rundt. Det går fint.");
     expect(t("nb", "bonus.rule.crate")).toBe("Treffer du en banankasse, kræsjer du. Da er bonusturen over.");
     expect(t("nb", "bonus.rule.book")).toBe("Treffer du en mattebok, må du regne. Riktig svar, så kjører du videre.");
+    expect(t("nb", "bonus.worlds.title")).toBe("Opplåste bonusspill");
+    expect(t("nb", "bonus.journey.title")).toBe("Du klarte hele reisen!");
   });
 });
 

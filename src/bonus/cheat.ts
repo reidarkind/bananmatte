@@ -1,4 +1,5 @@
 import type { CompareAnswer, Parity } from "../types";
+import { isBonusLevel } from "./milestones";
 
 export function parseBonusCheat(typed: string, expected: number): number | null {
   if (!typed.startsWith("1337")) return null;
@@ -7,7 +8,7 @@ export function parseBonusCheat(typed: string, expected: number): number | null 
     const suffix = rest.slice(-cut);
     const mid = rest.slice(0, -cut);
     const milestone = Number(suffix);
-    if (milestone >= 10 && milestone % 10 === 0 && String(milestone) === suffix && mid === String(expected)) {
+    if (isBonusLevel(milestone) && String(milestone) === suffix && mid === String(expected)) {
       return milestone;
     }
   }

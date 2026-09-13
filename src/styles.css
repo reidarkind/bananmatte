@@ -370,6 +370,32 @@ select {
 .bonus-card .btn.primary {
   width: 100%;
 }
+.world-list {
+  gap: 0.7rem;
+}
+.world-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 100%;
+  text-align: left;
+}
+.world-btn span {
+  font-size: 0.92rem;
+  font-weight: 700;
+  opacity: 0.85;
+}
+.world-btn.locked {
+  opacity: 0.55;
+  box-shadow: none;
+}
+.bonus-journey {
+  z-index: 8;
+}
+.bonus-journey .stack {
+  width: min(20rem, 100%);
+}
 .btn.tiny {
   padding: 0.35rem 0.7rem;
   font-size: 0.9rem;
