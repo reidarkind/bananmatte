@@ -18,6 +18,7 @@ import { bananaInBasketPose, basketRect, gorillaRect, spawnFalling, spawnFalling
 import { attackHitEvent, attackLeaveEvent, attackMissEvent, defendEscapeEvent, defendHitEvent } from "./play-map";
 import { ATTACK_THROWER_KIND, gorillaWearsHelmet, peekPop, resolvePlayStyle, type PlayStyle } from "./play-style";
 import { applyCatchEvent, createPlayState, fallSpeed, spawnRotten, type FallingKind, type PlayState } from "./rules";
+import { planTrickReveal } from "./trick";
 
 export interface HudSnapshot {
   lives: number;
@@ -132,7 +133,7 @@ export function createPlaySession(opts: {
       const { throws } = stepThrowers(defend, dt);
       for (const tossed of throws) {
         const item = spawnFallingAt(tossed.kind, tossed.value, tossed.x, tossed.y, speed * tossed.fallMul, opts.rng);
-        if (item.kind === "trick") item.trickAt = height * (0.4 + opts.rng() * 0.3);
+        if (item.kind === "trick") item.trickAt = planTrickReveal(item.y, height);
         items.push(item);
       }
     } else if (spawnAcc >= interval && items.length < 5) {
@@ -228,7 +229,7 @@ export function createPlaySession(opts: {
           vy: 0,
           rot: shot.rot,
           spin: 0,
-        });
+        }, now);
       }
       drawApe(ctx, gorillaX, gorillaY, throwerFacing, ATTACK_THROWER_KIND);
       return;
@@ -253,13 +254,13 @@ export function createPlaySession(opts: {
       }
       drawAttackLeaves(ctx, width, height);
       drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "back", gorillaWearsHelmet(style));
-      for (const item of items) drawBanana(ctx, item);
+      for (const item of items) drawBanana(ctx, item, now);
       drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "front");
       return;
     }
 
     drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "back");
-    for (const item of items) drawBanana(ctx, item);
+    for (const item of items) drawBanana(ctx, item, now);
     inBasket.forEach((caught, slot) => {
       const pose = bananaInBasketPose(gorillaX, gorillaY, slot);
       drawBanana(ctx, {
@@ -273,7 +274,7 @@ export function createPlaySession(opts: {
         vy: 0,
         rot: caught.rot * 0.15,
         spin: 0,
-      });
+      }, now);
     });
     drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "front");
   };

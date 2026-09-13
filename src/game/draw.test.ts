@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { APE_BODY, APE_FUR, APE_ORANGUTAN, PAN_HELMET, apeFaceFill, bananaCurves, pointOnCubic } from "./draw";
+import { APE_BODY, APE_CHIMP, APE_FUR, APE_ORANGUTAN, PAN_HELMET, apeFaceFill, bananaCurves, pointOnCubic } from "./draw";
 import { GORILLA, bananaInBasketPose, basketRect } from "./entities";
 
 function distToChord(
@@ -62,6 +62,13 @@ describe("ape colors", () => {
   it("gives orangutans wide cheek flanges and a long dark muzzle", () => {
     expect(APE_ORANGUTAN.flangeRx).toBeGreaterThan(APE_ORANGUTAN.faceRx * 2);
     expect(APE_ORANGUTAN.faceRy).toBeGreaterThan(APE_ORANGUTAN.faceRx);
+  });
+
+  it("gives chimpanzees a sly squint and a lopsided smirk", () => {
+    expect(APE_CHIMP.squintRy).toBeLessThan(APE_CHIMP.openRy);
+    expect(APE_CHIMP.lookX).toBeGreaterThan(0.8);
+    expect(APE_CHIMP.smirkLift).toBeGreaterThan(1.5);
+    expect(APE_CHIMP.browTilt).toBeGreaterThan(0.4);
   });
 
   it("keeps a saucepan helmet ready for the defense gorilla", () => {

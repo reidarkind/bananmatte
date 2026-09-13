@@ -113,7 +113,13 @@ export function renderGameOver(
       step = "name";
       paint();
     });
-    onClick(root, "[data-cancel]", actions.cancel);
+    onClick(root, "[data-cancel]", () => {
+      if (info.ackFasit) {
+        actions.menu();
+        return;
+      }
+      actions.cancel();
+    });
     onClick(root, "[data-again]", actions.again);
     onClick(root, "[data-menu]", actions.menu);
   };

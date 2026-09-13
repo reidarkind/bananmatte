@@ -120,6 +120,34 @@ describe("game over name", () => {
     root.remove();
   });
 
+  it("goes to the start menu when the name prompt is cancelled after the answer key", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    let cancelled = false;
+    let menu = false;
+    renderGameOver(
+      root,
+      { title: "Feil svar", detail: "3 + 2 = 5", score: 10, level: 2, askName: true, ackFasit: true },
+      {
+        submit: () => {},
+        afterSave: () => {},
+        cancel: () => {
+          cancelled = true;
+        },
+        again: () => {},
+        menu: () => {
+          menu = true;
+        },
+      },
+    );
+    root.querySelector<HTMLButtonElement>("[data-gotit]")!.click();
+    root.querySelector<HTMLButtonElement>("[data-cancel]")!.click();
+    expect(root.querySelector(".fasit")).toBeNull();
+    expect(cancelled).toBe(false);
+    expect(menu).toBe(true);
+    root.remove();
+  });
+
   it("uses English save label when locale is en", () => {
     const root = document.createElement("div");
     document.body.append(root);

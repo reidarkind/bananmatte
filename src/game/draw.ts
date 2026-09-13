@@ -1,6 +1,7 @@
 import { backgroundFor, type Decor } from "./backgrounds";
 import { GORILLA, type FallingItem } from "./entities";
 import { apeCountForValue, gangOffsets, shouldShowApeValue } from "./play-style";
+import { trickBananaPhase, trickLooksRotten } from "./trick";
 
 export function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, level: number): void {
   const bg = backgroundFor(level);
@@ -170,12 +171,15 @@ function drawOneBanana(ctx: CanvasRenderingContext2D, rotten: boolean): void {
   ctx.fill();
 }
 
-export function drawBanana(ctx: CanvasRenderingContext2D, item: FallingItem): void {
+export function drawBanana(ctx: CanvasRenderingContext2D, item: FallingItem, now = 0): void {
   ctx.save();
   ctx.translate(item.x + item.w / 2, item.y + item.h / 2);
   ctx.rotate(item.rot);
   ctx.scale(item.w / 40, item.h / 40);
-  const rottenLook = item.kind === "rotten" || (item.kind === "trick" && item.y >= (item.trickAt ?? Number.POSITIVE_INFINITY));
+  if (trickBananaPhase(item) === "blink") {
+    ctx.globalAlpha = 0.5 + 0.5 * (0.5 + 0.5 * Math.sin(now / 40));
+  }
+  const rottenLook = item.kind === "rotten" || trickLooksRotten(item, now);
   const bunch = item.value > 1 ? 3 : 1;
   for (let i = bunch - 1; i >= 0; i -= 1) {
     ctx.save();
@@ -211,6 +215,14 @@ export const APE_ORANGUTAN = {
   flangeRy: 16.5,
   faceRx: 6.4,
   faceRy: 10.2,
+};
+
+export const APE_CHIMP = {
+  lookX: 1.5,
+  squintRy: 1.6,
+  openRy: 3.3,
+  smirkLift: 2.8,
+  browTilt: 0.9,
 };
 
 export const PAN_HELMET = { cyOffset: -18, rimRx: 17, bowlRy: 10 };
@@ -620,43 +632,81 @@ function drawHeldBanana(ctx: CanvasRenderingContext2D, rotten: boolean): void {
 function drawChimpHead(ctx: CanvasRenderingContext2D): void {
   const { cx, cy, r } = GORILLA.head;
   const fur = APE_FUR.chimp;
+  const { lookX, squintRy, openRy, smirkLift, browTilt } = APE_CHIMP;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-0.14);
+  ctx.translate(-cx, -cy);
+
   ctx.fillStyle = fur;
   ctx.beginPath();
-  ctx.arc(cx, cy, r - 1, 0, Math.PI * 2);
+  ctx.ellipse(cx, cy - 1, r - 2, r - 0.5, 0, 0, Math.PI * 2);
   ctx.fill();
+  ctx.fillStyle = APE_FUR.chimpLight;
   ctx.beginPath();
-  ctx.ellipse(cx - 16, cy - 1, 7.5, 9, -0.2, 0, Math.PI * 2);
-  ctx.ellipse(cx + 16, cy - 1, 7.5, 9, 0.2, 0, Math.PI * 2);
+  ctx.moveTo(cx + 1, cy - r + 3);
+  ctx.quadraticCurveTo(cx + 11, cy - r - 9, cx + 16, cy - r + 2);
+  ctx.quadraticCurveTo(cx + 8, cy - r + 4, cx + 1, cy - r + 3);
   ctx.fill();
-  ctx.fillStyle = "#d4a07a";
+
+  ctx.fillStyle = fur;
   ctx.beginPath();
-  ctx.ellipse(cx - 16, cy - 1, 4.2, 5.5, -0.2, 0, Math.PI * 2);
-  ctx.ellipse(cx + 16, cy - 1, 4.2, 5.5, 0.2, 0, Math.PI * 2);
+  ctx.ellipse(cx - 17, cy + 1, 8, 10.2, -0.28, 0, Math.PI * 2);
+  ctx.ellipse(cx + 17, cy + 1, 8, 10.2, 0.28, 0, Math.PI * 2);
   ctx.fill();
+  ctx.fillStyle = "#c48a68";
+  ctx.beginPath();
+  ctx.ellipse(cx - 17, cy + 1, 4.6, 6.4, -0.28, 0, Math.PI * 2);
+  ctx.ellipse(cx + 17, cy + 1, 4.6, 6.4, 0.28, 0, Math.PI * 2);
+  ctx.fill();
+
   ctx.fillStyle = "#e8c4a0";
   ctx.beginPath();
-  ctx.ellipse(cx, cy + 3, 11, 12, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 0.6, cy + 4, 11.6, 12.6, 0.04, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#fff8e8";
+  ctx.beginPath();
+  ctx.ellipse(cx - 4.8, cy - 1.5, 3.5, openRy, -0.18, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(cx + 4.7, cy - 0.8, 3.1, squintRy, 0.28, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#1a120c";
+  ctx.beginPath();
+  ctx.ellipse(cx - 4.8 + lookX, cy - 1.3, 1.55, 1.75, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 4.7 + lookX * 0.55, cy - 0.6, 1.15, 1.25, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = "#fff";
   ctx.beginPath();
-  ctx.ellipse(cx - 4.6, cy - 2, 3.2, 3.6, 0, 0, Math.PI * 2);
-  ctx.ellipse(cx + 4.6, cy - 2, 3.2, 3.6, 0, 0, Math.PI * 2);
+  ctx.arc(cx - 4.3 + lookX, cy - 1.9, 0.55, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#1a120c";
+
+  ctx.strokeStyle = "#3a2418";
+  ctx.lineWidth = 2.1;
+  ctx.lineCap = "round";
   ctx.beginPath();
-  ctx.arc(cx - 4.4, cy - 1.6, 1.6, 0, Math.PI * 2);
-  ctx.arc(cx + 4.4, cy - 1.6, 1.6, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.moveTo(cx - 8.4, cy - 5.4);
+  ctx.quadraticCurveTo(cx - 5, cy - 7.6 - browTilt, cx - 1.5, cy - 5.5);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(cx + 1.6, cy - 4);
+  ctx.quadraticCurveTo(cx + 5.2, cy - 4.4, cx + 8.6, cy - 3.2);
+  ctx.stroke();
+
   ctx.fillStyle = "#4a2818";
   ctx.beginPath();
-  ctx.ellipse(cx, cy + 8, 5.5, 4.2, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 0.8, cy + 8.6, 5.8, 4.4, 0.1, 0, Math.PI * 2);
   ctx.fill();
   ctx.strokeStyle = "#1a120c";
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1.7;
   ctx.beginPath();
-  ctx.moveTo(cx - 3.4, cy + 11);
-  ctx.quadraticCurveTo(cx, cy + 13.5, cx + 3.4, cy + 11);
+  ctx.moveTo(cx - 3.8, cy + 11.4);
+  ctx.quadraticCurveTo(cx + 1, cy + 12.4, cx + 4.6, cy + 11.2 - smirkLift);
   ctx.stroke();
+  ctx.restore();
 }
 
 export function drawApe(

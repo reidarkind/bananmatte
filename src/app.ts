@@ -193,7 +193,7 @@ export function startApp(root: HTMLElement): void {
           afterSave: () => {
             showScores(settings.maxN, savedHighlight?.index === -1 ? undefined : savedHighlight);
           },
-          cancel: () => showOver(false),
+          cancel: () => (ackFasit ? showMenu() : showOver(false)),
           again: startGame,
           menu: showMenu,
         },
