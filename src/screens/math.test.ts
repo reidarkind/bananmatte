@@ -53,4 +53,28 @@ describe("math overlay", () => {
     expect(raw).toBe("1337210");
     root.remove();
   });
+
+  it("accepts a bonus cheat typed on the keyboard", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    let raw = "";
+    const plan: RoundPlan = {
+      mode: "tiervenn",
+      catchTarget: 7,
+      prompt: "Hva er tiervennen til",
+      expression: "7",
+      kind: "number",
+      answer: 3,
+      explanation: "7 + 3 = 10",
+    };
+    renderMath(root, plan, (_value, typed) => {
+      raw = typed ?? "";
+    });
+    for (const key of "1337310") {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key }));
+    }
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+    expect(raw).toBe("1337310");
+    root.remove();
+  });
 });

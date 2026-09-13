@@ -322,6 +322,54 @@ select {
   color: var(--cream);
   font-weight: 800;
 }
+.bonus-intro {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(27, 67, 50, 0.48);
+}
+.bonus-intro[hidden] {
+  display: none;
+}
+.bonus-card {
+  width: min(22rem, 100%);
+  background: var(--cream);
+  color: var(--ink);
+  border-radius: 28px;
+  padding: 1.15rem 1.15rem 1.05rem;
+  box-shadow: 0 10px 0 #1b4332;
+  text-align: center;
+}
+.bonus-card h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.85rem;
+  letter-spacing: 0.02em;
+  color: #c2780a;
+}
+.bonus-card .lead {
+  margin: 0 0 0.75rem;
+  font-weight: 800;
+}
+.bonus-card ul {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.bonus-card li {
+  background: #fff3b0;
+  border-radius: 16px;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 0.45rem;
+  font-weight: 700;
+}
+.bonus-card .btn.primary {
+  width: 100%;
+}
 .btn.tiny {
   padding: 0.35rem 0.7rem;
   font-size: 0.9rem;

@@ -10,7 +10,7 @@ import { renderGameOver } from "./screens/gameover";
 import { renderGameShell, updateHud } from "./screens/game";
 import { renderHighscores } from "./screens/highscore";
 import { renderInstall } from "./screens/install";
-import { parseBonusCheat } from "./bonus/cheat";
+import { bonusMilestoneFromAnswer } from "./bonus/cheat";
 import { isBonusLevel } from "./bonus/milestones";
 import { renderBonusRide } from "./screens/bonus";
 import { renderMath } from "./screens/math";
@@ -132,7 +132,7 @@ export function startApp(root: HTMLElement): void {
         score = state.score;
         if (!plan) return;
         renderMath(shell.overlay, plan, (answer, raw) => {
-          const cheat = typeof plan!.answer === "number" && raw ? parseBonusCheat(raw, plan!.answer) : null;
+          const cheat = bonusMilestoneFromAnswer(plan!.answer, answer, raw);
           const ok = cheat !== null || answersMatch(plan!.answer, answer);
           if (!ok) {
             sfx.fail(settings.sound);

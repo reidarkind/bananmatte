@@ -9,6 +9,12 @@ describe("extra languages", () => {
   });
 });
 
+describe("bonus how-to", () => {
+  it("names the bonus game in Bokmål", () => {
+    expect(t("nb", "bonus.headline")).toBe("BONUSSPILL!");
+  });
+});
+
 describe("menu lead", () => {
   it("talks about ape tricks, not only catching bananas", () => {
     expect(t("nb", "menu.lead")).toBe("Gjør apestreker. Regn etterpå.");

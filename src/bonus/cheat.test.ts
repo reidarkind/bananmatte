@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseBonusCheat } from "./cheat";
+import { bonusMilestoneFromAnswer, parseBonusCheat } from "./cheat";
 import { bonusVehicle, isBonusLevel } from "./milestones";
 
 describe("parseBonusCheat", () => {
@@ -7,6 +7,7 @@ describe("parseBonusCheat", () => {
     expect(parseBonusCheat("13372310", 23)).toBe(10);
     expect(parseBonusCheat("13372320", 23)).toBe(20);
     expect(parseBonusCheat("1337210", 2)).toBe(10);
+    expect(parseBonusCheat("1337310", 3)).toBe(10);
     expect(parseBonusCheat("1337-510", -5)).toBe(10);
   });
 
@@ -14,6 +15,13 @@ describe("parseBonusCheat", () => {
     expect(parseBonusCheat("13372310", 5)).toBeNull();
     expect(parseBonusCheat("23", 23)).toBeNull();
     expect(parseBonusCheat("133723", 23)).toBeNull();
+  });
+
+  it("reads the cheat from the submitted number even without the raw buffer", () => {
+    expect(bonusMilestoneFromAnswer(3, 1337310)).toBe(10);
+    expect(bonusMilestoneFromAnswer(3, 1337310, "1337310")).toBe(10);
+    expect(bonusMilestoneFromAnswer(7, 1337310)).toBeNull();
+    expect(bonusMilestoneFromAnswer(3, 3)).toBeNull();
   });
 });
 

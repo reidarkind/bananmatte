@@ -50,6 +50,32 @@ export function renderMath(
   }
 
   let buffer = "";
+  const submit = () => {
+    if (!buffer || buffer === "-") return;
+    window.removeEventListener("keydown", onKey);
+    onAnswer(Number(buffer), buffer);
+  };
+  const onKey = (event: KeyboardEvent) => {
+    if (!root.isConnected) {
+      window.removeEventListener("keydown", onKey);
+      return;
+    }
+    if (event.key >= "0" && event.key <= "9") {
+      buffer += event.key;
+      paint();
+    } else if (event.key === "Backspace") {
+      event.preventDefault();
+      buffer = buffer.slice(0, -1);
+      paint();
+    } else if (event.key === "-" || event.key === "−") {
+      buffer = buffer.startsWith("-") ? buffer.slice(1) : `-${buffer.replace("-", "")}`;
+      paint();
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      submit();
+    }
+  };
+  window.addEventListener("keydown", onKey);
   const paint = () => {
     root.replaceChildren(html`
       <section class="overlay">
@@ -69,10 +95,7 @@ export function renderMath(
       else buffer += key;
       paint();
     });
-    onClick(root, "[data-ok]", () => {
-      if (!buffer || buffer === "-") return;
-      onAnswer(Number(buffer), buffer);
-    });
+    onClick(root, "[data-ok]", submit);
   };
   paint();
 }

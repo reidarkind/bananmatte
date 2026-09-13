@@ -1,7 +1,7 @@
 import type { Rng } from "../types";
 
 export type RideKind = "banana" | "crate" | "book";
-export type RidePhase = "drive" | "math" | "bank" | "crash" | "done";
+export type RidePhase = "intro" | "countdown" | "drive" | "math" | "bank" | "crash" | "done";
 
 export interface RideObstacle {
   id: number;
@@ -18,67 +18,122 @@ export interface RideState {
   track: number;
   phase: RidePhase;
   hold: number;
+  spin: number;
+  spinLeft: number;
   obstacles: RideObstacle[];
   hitId?: number;
 }
 
 const HIT_X = 0.4;
 const HIT_S = 1.15;
-const HOLD = 1.35;
+const HOLD = 2.2;
+const COUNTDOWN = 4;
+const TRACK = 58;
+
+export function rideSpeed(s: number, track: number): number {
+  const t = Math.min(1, Math.max(0, s / (track * 0.72)));
+  return 3.1 + 6.6 * t * t;
+}
+
+export function countdownMark(hold: number): 3 | 2 | 1 | "go" | null {
+  if (hold < 1) return 3;
+  if (hold < 2) return 2;
+  if (hold < 3) return 1;
+  if (hold < COUNTDOWN) return "go";
+  return null;
+}
 
 export function emptyRide(overrides: Partial<RideState> = {}): RideState {
   return {
     x: 0,
     s: 0,
-    speed: 7,
-    track: 36,
+    speed: 3.1,
+    track: TRACK,
     phase: "drive",
     hold: 0,
+    spin: 0,
+    spinLeft: 0,
     obstacles: [],
     ...overrides,
   };
 }
 
-export function createRide(rng: Rng, track = 36): RideState {
+export function createRide(rng: Rng, track = TRACK): RideState {
   const kinds: RideKind[] = ["banana", "crate", "book", "banana", "book", "crate"];
   return emptyRide({
     track,
+    phase: "intro",
+    hold: 0,
+    speed: rideSpeed(0, track),
     obstacles: kinds.map((kind, i) => ({
       id: i + 1,
       kind,
       x: rng() * 1.4 - 0.7,
-      s: 8 + i * 4.5,
+      s: 12 + i * 5.4,
     })),
   });
 }
 
+export function startRide(state: RideState): RideState {
+  if (state.phase !== "intro") return state;
+  return { ...state, phase: "countdown", hold: 0 };
+}
+
+function twist(state: RideState, dt: number): { spin: number; spinLeft: number } {
+  let { spin, spinLeft } = state;
+  if (spinLeft !== 0) {
+    const step = Math.sign(spinLeft) * 12 * dt;
+    if (Math.abs(step) >= Math.abs(spinLeft)) {
+      spin += spinLeft;
+      spinLeft = 0;
+    } else {
+      spin += step;
+      spinLeft -= step;
+    }
+    return { spin, spinLeft };
+  }
+  return { spin: spin * Math.max(0, 1 - 5 * dt), spinLeft: 0 };
+}
+
 export function stepRide(state: RideState, dt: number, steer: number): RideState {
-  if (state.phase === "done" || state.phase === "math") return state;
+  if (state.phase === "done" || state.phase === "math" || state.phase === "intro") return state;
+  if (state.phase === "countdown") {
+    const hold = state.hold + dt;
+    if (hold < COUNTDOWN) return { ...state, hold };
+    return stepRide({ ...state, phase: "drive", hold: 0, speed: rideSpeed(0, state.track) }, hold - COUNTDOWN, steer);
+  }
   if (state.phase === "bank" || state.phase === "crash") {
     const hold = state.hold + dt;
     return { ...state, hold, phase: hold >= HOLD ? "done" : state.phase };
   }
 
-  const x = Math.max(-1, Math.min(1, state.x + steer * 1.85 * dt));
-  const s = state.s + state.speed * dt;
+  const spun = twist(state, dt);
+  let x = Math.max(-1, Math.min(1, state.x + steer * 1.85 * dt));
+  const speed = rideSpeed(state.s, state.track);
+  const s = state.s + speed * dt;
   const obstacles = state.obstacles.map((obs) => ({ ...obs }));
+  let spin = spun.spin;
+  let spinLeft = spun.spinLeft;
 
   for (const obs of obstacles) {
     if (obs.resolved) continue;
     if (s < obs.s || s >= obs.s + HIT_S || Math.abs(x - obs.x) >= HIT_X) continue;
     if (obs.kind === "banana") {
       obs.resolved = true;
+      const dir = obs.x >= x ? 1 : -1;
+      spinLeft = dir * Math.PI * 2;
+      x = Math.max(-1, Math.min(1, x + dir * 0.12));
     } else if (obs.kind === "crate") {
-      return { ...state, x, s, obstacles, phase: "crash", hold: 0, hitId: obs.id };
+      return { ...state, x, s, speed, spin, spinLeft: 0, obstacles, phase: "crash", hold: 0, hitId: obs.id };
     } else {
-      return { ...state, x, s, obstacles, phase: "math", hold: 0, hitId: obs.id };
+      return { ...state, x, s, speed, spin, spinLeft: 0, obstacles, phase: "math", hold: 0, hitId: obs.id };
     }
   }
 
   if (s >= state.track) {
-    return { ...state, x, s: state.track, obstacles, phase: "bank", hold: 0 };
+    return { ...state, x, s: state.track, speed, spin: 0, spinLeft: 0, obstacles, phase: "bank", hold: 0 };
   }
-  return { ...state, x, s, obstacles };
+  return { ...state, x, s, speed, spin, spinLeft, obstacles };
 }
 
 export function resolveBook(state: RideState, ok: boolean): RideState {
