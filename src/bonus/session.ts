@@ -15,6 +15,7 @@ export function playBonusRide(
     locale: Locale;
     settings: Settings;
     rng: Rng;
+    score?: number;
     onDone: () => void;
   },
 ): () => void {
@@ -117,7 +118,10 @@ export function playBonusRide(
   const paint = () => {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
-    drawBonusRide(ctx, w, h, ride, vehicle, t(locale, "bonus.go"));
+    drawBonusRide(ctx, w, h, ride, vehicle, t(locale, "bonus.go"), {
+      score: opts.score ?? 0,
+      depositLabel: t(locale, "bonus.deposit"),
+    });
   };
 
   const tick = (now: number) => {

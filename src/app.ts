@@ -164,6 +164,7 @@ export function startApp(root: HTMLElement): void {
               locale: settings.locale,
               settings,
               rng,
+              score,
               onDone: continueMain,
             });
             return;

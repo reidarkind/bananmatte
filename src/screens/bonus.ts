@@ -8,6 +8,7 @@ export function renderBonusRide(
     locale: Locale;
     settings: Settings;
     rng: Rng;
+    score?: number;
     onDone: () => void;
   },
 ): () => void {

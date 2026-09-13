@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countdownMark, createRide, emptyRide, resolveBook, rideSpeed, skipRide, startRide, stepRide } from "./ride";
+import { countdownMark, createRide, depositShown, emptyRide, resolveBook, rideSpeed, skipRide, startRide, stepRide } from "./ride";
 
 describe("bonus ride", () => {
   it("splats a banana, keeps driving, and starts a spin", () => {
@@ -64,5 +64,15 @@ describe("bonus ride", () => {
     const bank = stepRide(emptyRide({ s: 35.5, track: 36, speed: 7 }), 0.2, 0);
     expect(bank.phase).toBe("bank");
     expect(skipRide(bank).phase).toBe("done");
+  });
+
+  it("fills theatre points into the bank before the ride ends", () => {
+    expect(depositShown(0, 50)).toBe(0);
+    expect(depositShown(1.2, 50)).toBeGreaterThan(10);
+    expect(depositShown(1.2, 50)).toBeLessThan(50);
+    expect(depositShown(2.3, 50)).toBe(50);
+    const bank = stepRide(emptyRide({ s: 35.5, track: 36 }), 0.2, 0);
+    expect(stepRide(bank, 1.6, 0).phase).toBe("bank");
+    expect(stepRide(bank, 3, 0).phase).toBe("done");
   });
 });

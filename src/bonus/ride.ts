@@ -26,13 +26,29 @@ export interface RideState {
 
 const HIT_X = 0.4;
 const HIT_S = 1.15;
-const HOLD = 2.2;
+const HOLD_CRASH = 1.5;
+const HOLD_BANK = 2.9;
 const COUNTDOWN = 4;
 const TRACK = 58;
+const DEPOSIT_START = 0.35;
+const DEPOSIT_END = 2.2;
 
 export function rideSpeed(s: number, track: number): number {
   const t = Math.min(1, Math.max(0, s / (track * 0.72)));
   return 3.1 + 6.6 * t * t;
+}
+
+export function depositShown(hold: number, score: number): number {
+  const safe = Math.max(0, Math.round(score));
+  if (hold <= DEPOSIT_START) return 0;
+  const t = Math.min(1, (hold - DEPOSIT_START) / (DEPOSIT_END - DEPOSIT_START));
+  const eased = t * t * (3 - 2 * t);
+  return Math.round(safe * eased);
+}
+
+export function depositCoinT(hold: number, index: number): number {
+  const start = DEPOSIT_START + index * 0.11;
+  return Math.min(1, Math.max(0, (hold - start) / 0.55));
 }
 
 export function countdownMark(hold: number): 3 | 2 | 1 | "go" | null {
@@ -104,7 +120,8 @@ export function stepRide(state: RideState, dt: number, steer: number): RideState
   }
   if (state.phase === "bank" || state.phase === "crash") {
     const hold = state.hold + dt;
-    return { ...state, hold, phase: hold >= HOLD ? "done" : state.phase };
+    const limit = state.phase === "bank" ? HOLD_BANK : HOLD_CRASH;
+    return { ...state, hold, phase: hold >= limit ? "done" : state.phase };
   }
 
   const spun = twist(state, dt);

@@ -1,7 +1,7 @@
 import { drawBanana, drawGorilla } from "../game/draw";
 import type { FallingItem } from "../game/entities";
 import type { BonusVehicle } from "./milestones";
-import { countdownMark, type RideObstacle, type RideState } from "./ride";
+import { countdownMark, depositCoinT, depositShown, type RideObstacle, type RideState } from "./ride";
 
 interface Scene {
   sky: [string, string];
@@ -453,10 +453,14 @@ function drawVehicle(ctx: CanvasRenderingContext2D, vehicle: BonusVehicle, s: nu
   drawWheel(ctx, 28, 28, 10);
 }
 
-function drawBank(ctx: CanvasRenderingContext2D, w: number, h: number, dist: number, arrived: boolean): void {
+function bankAnchor(w: number, h: number, dist: number, arrived: boolean): { x: number; y: number; scale: number } {
+  const visual = arrived ? 1.22 : 1.35 + Math.max(0, dist) * 0.38;
+  return project(w, h, 0, visual);
+}
+
+function drawBank(ctx: CanvasRenderingContext2D, w: number, h: number, dist: number, arrived: boolean, glow = 0): void {
   if (dist > 10 && !arrived) return;
-  const visual = 1.35 + Math.max(0, dist) * 0.38;
-  const bank = project(w, h, 0, visual);
+  const bank = bankAnchor(w, h, dist, arrived);
   const unit = bank.scale;
   const x = bank.x;
   const y = bank.y;
@@ -530,6 +534,87 @@ function drawBank(ctx: CanvasRenderingContext2D, w: number, h: number, dist: num
   ctx.lineTo(unit * 0.5, -unit * 0.78);
   ctx.lineTo(unit * 0.365, -unit * 0.72);
   ctx.fill();
+
+  if (glow > 0) {
+    ctx.fillStyle = `rgba(255, 243, 176, ${0.18 + glow * 0.35})`;
+    ctx.beginPath();
+    ctx.ellipse(0, -unit * 0.18, unit * 0.16 + glow * 8, unit * 0.2 + glow * 6, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function quadPoint(a: { x: number; y: number }, b: { x: number; y: number }, c: { x: number; y: number }, t: number): { x: number; y: number } {
+  const u = 1 - t;
+  return {
+    x: u * u * a.x + 2 * u * t * b.x + t * t * c.x,
+    y: u * u * a.y + 2 * u * t * b.y + t * t * c.y,
+  };
+}
+
+function drawDeposit(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  ride: RideState,
+  apeX: number,
+  apeY: number,
+  score: number,
+  label: string,
+): void {
+  if (ride.phase !== "bank") return;
+  const door = bankAnchor(w, h, 0, true);
+  const from = { x: apeX, y: apeY };
+  const to = { x: door.x, y: door.y - door.scale * 0.18 };
+  let piled = 0;
+  for (let i = 0; i < 7; i += 1) {
+    const t = depositCoinT(ride.hold, i);
+    if (t <= 0) continue;
+    if (t >= 1) {
+      piled += 1;
+      continue;
+    }
+    const mid = {
+      x: (from.x + to.x) / 2 + (i - 3) * 22,
+      y: Math.min(from.y, to.y) - 110 - i * 6,
+    };
+    const p = quadPoint(from, mid, to, t);
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.globalAlpha = 1 - t * 0.15;
+    drawBanana(ctx, dummyBanana(36, -0.4 + i * 0.08));
+    ctx.restore();
+  }
+  for (let i = 0; i < piled; i += 1) {
+    ctx.save();
+    ctx.translate(to.x + (i % 3) * 10 - 10, to.y + 10 + Math.floor(i / 3) * 8);
+    ctx.scale(0.7, 0.7);
+    drawBanana(ctx, dummyBanana(28, -0.3));
+    ctx.restore();
+  }
+
+  const shown = depositShown(ride.hold, score);
+  const pop = 1 + Math.min(0.08, shown / Math.max(1, score) * 0.08);
+  ctx.save();
+  ctx.translate(w / 2, h * 0.16);
+  ctx.scale(pop, pop);
+  ctx.fillStyle = "rgba(27, 20, 12, 0.18)";
+  roundRect(ctx, -86, 6, 172, 78, 18);
+  ctx.fill();
+  ctx.fillStyle = "#fff8e7";
+  roundRect(ctx, -90, 0, 180, 78, 18);
+  ctx.fill();
+  ctx.strokeStyle = "#c2780a";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.fillStyle = "#1b4332";
+  ctx.font = "800 16px Nunito, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(label, 0, 22);
+  ctx.fillStyle = "#c2780a";
+  ctx.font = "900 34px Nunito, sans-serif";
+  ctx.fillText(String(shown), 0, 52);
   ctx.restore();
 }
 
@@ -572,13 +657,16 @@ export function drawBonusRide(
   ride: RideState,
   vehicle: BonusVehicle,
   goLabel = "Start!",
+  extras: { score?: number; depositLabel?: string } = {},
 ): void {
   const colors = scenery(vehicle);
+  const arrived = ride.phase === "bank";
+  const glow = arrived ? Math.min(1, ride.hold / 1.4) : 0;
   drawSky(ctx, w, h, ride.s, colors);
   drawHills(ctx, w, h, colors);
   drawRoad(ctx, w, h, ride.s, colors);
   drawSides(ctx, w, h, ride.s, colors);
-  drawBank(ctx, w, h, ride.track - ride.s, ride.phase === "bank");
+  drawBank(ctx, w, h, ride.track - ride.s, arrived, glow);
 
   const ordered = [...ride.obstacles].sort((a, b) => b.s - a.s);
   for (const obs of ordered) drawObstacle(ctx, obs, ride.s, w, h);
@@ -598,5 +686,6 @@ export function drawBonusRide(
   drawVehicle(ctx, vehicle, ride.s);
   drawGorilla(ctx, 0, 0, 1, "back");
   ctx.restore();
+  drawDeposit(ctx, w, h, ride, apeX, apeY, extras.score ?? 0, extras.depositLabel ?? "Poeng i banken");
   drawCountdown(ctx, w, h, ride, goLabel);
 }
