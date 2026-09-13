@@ -10,6 +10,7 @@ import { renderGameOver } from "./screens/gameover";
 import { renderGameShell, updateHud } from "./screens/game";
 import { renderHighscores } from "./screens/highscore";
 import { renderInstall } from "./screens/install";
+import { renderLanguage } from "./screens/language";
 import { bonusMilestoneFromAnswer } from "./bonus/cheat";
 import { isBonusLevel } from "./bonus/milestones";
 import { renderBonusRide } from "./screens/bonus";
@@ -20,7 +21,7 @@ import { renderMenu } from "./screens/menu";
 import { renderSettings } from "./screens/settings";
 import { clearHighscores, loadHighscores, qualifies, saveHighscores, submitHighscore } from "./storage/highscores";
 import { clearUnlocks, loadUnlocks, unlockBonus } from "./storage/unlocks";
-import { loadSettings, saveSettings } from "./storage/settings";
+import { clearChosenLocale, hasChosenLocale, loadSettings, saveSettings } from "./storage/settings";
 import { LOCALE_HTML, type Locale, type MaxN, type PlayStyle, type RoundPlan, type Settings } from "./types";
 
 function applyDocumentLocale(locale: Locale): void {
@@ -69,12 +70,31 @@ export function startApp(root: HTMLElement): void {
     showMenu();
   };
 
-  const syncRoute = () => {
+  const afterLanguage = () => {
     if (isInstallRoute(window.location.pathname, window.location.hash)) {
       showInstall();
     } else {
       showMenu();
     }
+  };
+
+  const showLanguage = () => {
+    session?.stop();
+    session = null;
+    renderLanguage(root, settings.locale, (locale) => {
+      settings = { ...settings, locale };
+      saveSettings(settings);
+      applyDocumentLocale(locale);
+      afterLanguage();
+    });
+  };
+
+  const syncRoute = () => {
+    if (!hasChosenLocale()) {
+      showLanguage();
+      return;
+    }
+    afterLanguage();
   };
 
   const showScores = (maxN: MaxN, highlight?: { maxN: MaxN; index: number }) => {
@@ -122,6 +142,10 @@ export function startApp(root: HTMLElement): void {
       resetHighscores: () => {
         clearHighscores();
         clearUnlocks();
+        clearChosenLocale();
+        settings = loadSettings();
+        applyDocumentLocale(settings.locale);
+        showLanguage();
       },
     });
   };

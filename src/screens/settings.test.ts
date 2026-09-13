@@ -18,14 +18,14 @@ describe("settings highscores", () => {
     });
 
     const start = root.querySelector<HTMLButtonElement>("[data-reset-scores]");
-    expect(start).not.toBeNull();
+    expect(start?.textContent).toBe("Nullstill");
     start!.click();
     expect(cleared).toBe(false);
-    expect(root.textContent).toContain("Opplåste bonusspill");
+    expect(root.textContent).toContain("Rekorder, opplåste bonusspill og språk");
 
     root.querySelector<HTMLButtonElement>("[data-reset-confirm]")!.click();
     expect(cleared).toBe(true);
-    expect(root.textContent).toContain("Rekordene og opplåste bonusspill er slettet");
+    expect(root.textContent).toContain("Rekorder, bonusspill og språk er nullstilt");
     root.remove();
   });
 

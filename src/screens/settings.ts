@@ -140,6 +140,7 @@ export function renderSettings(
     });
     onClick(root, "[data-reset-confirm]", () => {
       actions.resetHighscores();
+      if (!root.querySelector("[data-reset-confirm]")) return;
       resetStep = "done";
       paint();
     });

@@ -34,8 +34,12 @@ export const LOCALE_HTML: Record<Locale, string> = {
   da: "da",
 };
 
+export function tryParseLocale(value: unknown): Locale | null {
+  return LOCALES.includes(value as Locale) ? (value as Locale) : null;
+}
+
 export function parseLocale(value: unknown): Locale {
-  return LOCALES.includes(value as Locale) ? (value as Locale) : "nb";
+  return tryParseLocale(value) ?? "nb";
 }
 
 export type PlayStyle = "sank" | "angrep" | "forsvar";

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS } from "../types";
 import { memoryStore } from "./adapter";
-import { loadSettings, saveSettings, SETTINGS_KEY } from "./settings";
+import { clearChosenLocale, hasChosenLocale, loadSettings, saveSettings, SETTINGS_KEY } from "./settings";
 
 describe("settings storage", () => {
   it("returns defaults for empty store", () => {
@@ -42,5 +42,23 @@ describe("settings storage", () => {
     const store = memoryStore();
     saveSettings({ ...DEFAULT_SETTINGS, maxN: 20, modeFilter: "klasse1" }, store);
     expect(loadSettings(store)).toMatchObject({ maxN: 20, modeFilter: "klasse1" });
+  });
+
+  it("treats an empty store as no chosen language and suggests the phone locale", () => {
+    const store = memoryStore();
+    expect(hasChosenLocale(store)).toBe(false);
+    expect(loadSettings(store, ["sv-SE"]).locale).toBe("sv");
+    expect(loadSettings(store, ["fr-FR"]).locale).toBe("en");
+  });
+
+  it("forgets the chosen language on reset and keeps other settings", () => {
+    const store = memoryStore();
+    saveSettings({ ...DEFAULT_SETTINGS, locale: "de", maxN: 20, sound: false }, store);
+    expect(hasChosenLocale(store)).toBe(true);
+    clearChosenLocale(store);
+    expect(hasChosenLocale(store)).toBe(false);
+    expect(loadSettings(store, ["en-GB"]).locale).toBe("en");
+    expect(loadSettings(store, ["en-GB"]).maxN).toBe(20);
+    expect(loadSettings(store, ["en-GB"]).sound).toBe(false);
   });
 });
