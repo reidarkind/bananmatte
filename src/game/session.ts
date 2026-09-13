@@ -12,11 +12,11 @@ import {
 import { createDecor, type Decor } from "./backgrounds";
 import { intersects } from "./collision";
 import { bananaKindForThrower, createDefendWorld, maybeSpawnThrower, stepThrowers, type DefendWorld } from "./defend";
-import { drawApe, drawApeGang, drawAttackGrove, drawAttackLeaves, drawBackground, drawBanana, drawDecor, drawGorilla } from "./draw";
+import { drawApe, drawApeGang, drawAttackGrove, drawAttackLeaves, drawBackground, drawBanana, drawDecor, drawGorilla, drawValueBadge } from "./draw";
 import { attachKeys, attachPointer, attachTap } from "./input";
 import { bananaInBasketPose, basketRect, gorillaRect, spawnFalling, spawnFallingAt, type FallingItem } from "./entities";
 import { attackHitEvent, attackLeaveEvent, attackMissEvent, defendEscapeEvent, defendHitEvent } from "./play-map";
-import { ATTACK_THROWER_KIND, peekPop, resolvePlayStyle, type PlayStyle } from "./play-style";
+import { ATTACK_THROWER_KIND, gorillaWearsHelmet, peekPop, resolvePlayStyle, type PlayStyle } from "./play-style";
 import { applyCatchEvent, createPlayState, fallSpeed, spawnRotten, type FallingKind, type PlayState } from "./rules";
 
 export interface HudSnapshot {
@@ -131,7 +131,7 @@ export function createPlaySession(opts: {
       maybeSpawnThrower(defend, width, Math.max(1, state.target - state.collected), opts.settings.maxN, level, dt, opts.rng, height);
       const { throws } = stepThrowers(defend, dt);
       for (const tossed of throws) {
-        items.push(spawnFallingAt(tossed.kind, tossed.value, tossed.x, tossed.y, speed, opts.rng));
+        items.push(spawnFallingAt(tossed.kind, tossed.value, tossed.x, tossed.y, speed * tossed.fallMul, opts.rng));
       }
     } else if (spawnAcc >= interval && items.length < 5) {
       spawnAcc = 0;
@@ -236,18 +236,21 @@ export function createPlaySession(opts: {
       drawAttackGrove(ctx, width, height);
       for (const target of defend.targets) {
         const popY = (1 - peekPop(target.age, target.life)) * 42;
+        const cx = target.x + target.w / 2;
+        const cy = target.y + target.h * 0.7 + popY;
         drawApe(
           ctx,
-          target.x + target.w / 2,
-          target.y + target.h * 0.7 + popY,
+          cx,
+          cy,
           1,
           target.kind,
           target.kind === "gorilla" ? 0.72 : 0.62,
           target.thrown ? undefined : bananaKindForThrower(target.kind),
         );
+        if (target.value > 1) drawValueBadge(ctx, cx + 22, cy - 30, target.value);
       }
       drawAttackLeaves(ctx, width, height);
-      drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "back");
+      drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "back", gorillaWearsHelmet(style));
       for (const item of items) drawBanana(ctx, item);
       drawGorilla(ctx, gorillaX, gorillaY, keyDir || 1, "front");
       return;

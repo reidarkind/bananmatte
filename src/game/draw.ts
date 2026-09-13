@@ -175,7 +175,7 @@ export function drawBanana(ctx: CanvasRenderingContext2D, item: FallingItem): vo
   ctx.translate(item.x + item.w / 2, item.y + item.h / 2);
   ctx.rotate(item.rot);
   ctx.scale(item.w / 40, item.h / 40);
-  const bunch = item.kind === "banana" && item.value > 1 ? 3 : 1;
+  const bunch = item.value > 1 ? 3 : 1;
   for (let i = bunch - 1; i >= 0; i -= 1) {
     ctx.save();
     ctx.translate(i * 3.2 - (bunch - 1) * 1.4, i * 2.6);
@@ -183,7 +183,7 @@ export function drawBanana(ctx: CanvasRenderingContext2D, item: FallingItem): vo
     drawOneBanana(ctx, item.kind === "rotten");
     ctx.restore();
   }
-  if (item.kind === "banana" && item.value > 1) {
+  if (item.value > 1) {
     ctx.fillStyle = "#1b4332";
     ctx.font = "bold 13px Nunito, sans-serif";
     ctx.textAlign = "center";
@@ -441,13 +441,14 @@ export function drawGorilla(
   y: number,
   facing: number,
   layer: "back" | "front" = "back",
+  helmet = false,
 ): void {
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(facing < 0 ? -1 : 1, 1);
   if (layer === "back") {
     drawGorillaBody(ctx);
-    drawPanHelmet(ctx);
+    if (helmet) drawPanHelmet(ctx);
     drawBasketBack(ctx);
   } else {
     drawBasketFront(ctx);

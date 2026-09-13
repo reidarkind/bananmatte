@@ -36,7 +36,15 @@ export function throwSpeed(level: number): number {
 }
 
 export function defendSpawnInterval(level: number): number {
-  return Math.max(0.42, 1.2 - level * 0.07);
+  return Math.max(0.16, 0.36 - level * 0.025);
+}
+
+export function defendMaxThrowers(level: number): number {
+  return Math.min(6, 3 + Math.floor((level - 1) / 2));
+}
+
+export function gorillaWearsHelmet(style: PlayStyle): boolean {
+  return style === "forsvar";
 }
 
 export const ATTACK_THROWER_KIND = "gorilla" as const;

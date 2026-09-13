@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createRng } from "../math/rng";
-import { ATTACK_THROWER_KIND, apeCountForValue, gangOffsets, peekPop, peekTime, resolvePlayStyle, shouldShowApeValue } from "./play-style";
+import { ATTACK_THROWER_KIND, apeCountForValue, defendMaxThrowers, defendSpawnInterval, gangOffsets, gorillaWearsHelmet, peekPop, peekTime, resolvePlayStyle, shouldShowApeValue } from "./play-style";
 
 describe("resolvePlayStyle", () => {
   it("keeps a fixed style", () => {
@@ -42,6 +42,18 @@ describe("level helpers", () => {
     expect(huddle[2]!.y).toBeGreaterThan(huddle[0]!.y);
     expect(Math.abs(huddle[0]!.x - huddle[1]!.x)).toBeGreaterThan(60);
     expect(huddle[0]!.facing).not.toBe(huddle[1]!.facing);
+  });
+
+  it("packs several defense throwers on screen at once", () => {
+    expect(defendMaxThrowers(1)).toBeGreaterThanOrEqual(3);
+    expect(defendMaxThrowers(5)).toBeGreaterThan(defendMaxThrowers(1));
+    expect(defendSpawnInterval(1)).toBeLessThan(0.45);
+  });
+
+  it("puts the saucepan helmet only on the defense gorilla", () => {
+    expect(gorillaWearsHelmet("forsvar")).toBe(true);
+    expect(gorillaWearsHelmet("sank")).toBe(false);
+    expect(gorillaWearsHelmet("angrep")).toBe(false);
   });
 
   it("lets peeking apes rise in and sink away", () => {

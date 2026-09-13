@@ -64,7 +64,7 @@ describe("ape colors", () => {
     expect(APE_ORANGUTAN.faceRy).toBeGreaterThan(APE_ORANGUTAN.faceRx);
   });
 
-  it("sits a saucepan helmet on the catcher gorilla", () => {
+  it("keeps a saucepan helmet ready for the defense gorilla", () => {
     expect(PAN_HELMET.cyOffset).toBeLessThan(0);
     expect(PAN_HELMET.rimRx).toBeGreaterThan(12);
     expect(PAN_HELMET.bowlRy).toBeGreaterThan(7);
