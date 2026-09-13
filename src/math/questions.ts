@@ -17,6 +17,7 @@ import {
 } from "./explanations";
 import { trickyComparePair } from "./compare-pairs";
 import { resolveRoundMode } from "./modes";
+import { planBytteplass, planDobbeltHalv, planHoppetelling, planKlokke, planLikhet, planManglendeTall, planTiMerMindre } from "./grade-modes";
 import { planPlaceValue } from "./place-value";
 import { pickOne, randomInt } from "./rng";
 
@@ -288,6 +289,20 @@ export function planMode(mode: ModeId, maxN: number, rng: Rng, locale: Locale = 
     case "ulikhet-tegn":
     case "ulikhet-ord":
       return planCompare(mode, maxN, rng, locale);
+    case "manglende-tall":
+      return planManglendeTall(maxN, rng, locale);
+    case "bytteplass":
+      return planBytteplass(maxN, rng, locale);
+    case "likhet":
+      return planLikhet(maxN, rng, locale);
+    case "ti-mer-mindre":
+      return planTiMerMindre(maxN, rng, locale);
+    case "hoppetelling":
+      return planHoppetelling(maxN, rng, locale);
+    case "dobbelt-halv":
+      return planDobbeltHalv(maxN, rng, locale);
+    case "klokke":
+      return planKlokke(maxN, rng, locale);
     default:
       return planAddisjon(maxN, rng, locale);
   }

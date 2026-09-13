@@ -79,4 +79,22 @@ describe("settings highscores", () => {
     expect(root.querySelector("h1")?.textContent).toBe("Settings");
     root.remove();
   });
+
+  it("offers maxN 20 and a 1st-grade filter that hides challenge modes", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    renderSettings(root, { ...DEFAULT_SETTINGS, selectedModes: [...DEFAULT_SETTINGS.selectedModes] }, {
+      back: () => {},
+      save: () => {},
+      resetHighscores: () => {},
+    });
+    expect(root.querySelector('[data-max="20"]')).not.toBeNull();
+    expect(root.textContent).toContain("1. klasse");
+    root.querySelector<HTMLButtonElement>('[data-filter="klasse1"]')!.click();
+    const options = [...root.querySelectorAll<HTMLOptionElement>("[data-mode] option")].map((option) => option.value);
+    expect(options).toContain("manglende-tall");
+    expect(options).not.toContain("subtraksjon-negativ");
+    expect(options).not.toContain("likhet");
+    root.remove();
+  });
 });

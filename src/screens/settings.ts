@@ -1,9 +1,9 @@
 import { modeLabel, t } from "../i18n";
-import { availableModes, isHundrevennAvailable, sanitizeSettings } from "../math/modes";
-import { LOCALES, LOCALE_NAMES, type Locale, type MaxN, type ModeId, type PlaySelection, type PlayStyleChoice, type Settings } from "../types";
+import { isHundrevennAvailable, sanitizeSettings, visibleModes } from "../math/modes";
+import { ALL_MAX_N, LOCALES, LOCALE_NAMES, MODE_FILTERS, type Locale, type ModeFilter, type ModeId, type PlaySelection, type PlayStyleChoice, type Settings } from "../types";
 import { html, onClick } from "./dom";
 
-const MAX_OPTIONS: MaxN[] = [10, 50, 100, 1000];
+const MAX_OPTIONS = ALL_MAX_N;
 const PLAY_CHOICES: PlayStyleChoice[] = ["sank", "angrep", "forsvar", "mix"];
 
 export function renderSettings(
@@ -20,7 +20,7 @@ export function renderSettings(
 
   const paint = () => {
     const locale = next.locale;
-    const available = availableModes(next);
+    const available = visibleModes(next);
     const modeChoices = (["mix", "selected", ...available] as const);
     const modeOptions = modeChoices
       .map((id) => `<option value="${id}" ${next.playSelection === id ? "selected" : ""}>${modeLabel(locale, id)}</option>`)
@@ -50,6 +50,11 @@ export function renderSettings(
             <input type="checkbox" data-hundrevenn ${next.hundrevennEnabled ? "checked" : ""} />
             ${t(locale, "settings.hundrevenn")}
           </label>` : ""}
+        <label>${t(locale, "settings.filter")}
+          <div class="tabs">
+            ${MODE_FILTERS.map((id) => `<button class="tab ${id === next.modeFilter ? "on" : ""}" data-filter="${id}">${t(locale, `settings.filter.${id}`)}</button>`).join("")}
+          </div>
+        </label>
         <label>${t(locale, "settings.mode")}
           <select data-mode>${modeOptions}</select>
         </label>
@@ -89,7 +94,12 @@ export function renderSettings(
       paint();
     });
     onClick(root, "[data-max]", (button) => {
-      next.maxN = Number(button.dataset.max) as MaxN;
+      next.maxN = Number(button.dataset.max) as Settings["maxN"];
+      Object.assign(next, sanitizeSettings(next));
+      paint();
+    });
+    onClick(root, "[data-filter]", (button) => {
+      next.modeFilter = button.dataset.filter as ModeFilter;
       Object.assign(next, sanitizeSettings(next));
       paint();
     });

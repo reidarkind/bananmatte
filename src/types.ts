@@ -1,4 +1,14 @@
-export type MaxN = 10 | 50 | 100 | 1000;
+export type MaxN = 10 | 20 | 50 | 100 | 1000;
+
+export const ALL_MAX_N: MaxN[] = [10, 20, 50, 100, 1000];
+
+export type ModeFilter = "alle" | "klasse1" | "klasse2" | "utfordring";
+
+export const MODE_FILTERS: ModeFilter[] = ["alle", "klasse1", "klasse2", "utfordring"];
+
+export function parseModeFilter(value: unknown): ModeFilter {
+  return MODE_FILTERS.includes(value as ModeFilter) ? (value as ModeFilter) : "alle";
+}
 
 export type Locale = "nb" | "en" | "es" | "de" | "pt" | "sv" | "da";
 
@@ -58,7 +68,14 @@ export type ModeId =
   | "avrunding-hundre-ned"
   | "avrunding-hundre"
   | "ulikhet-tegn"
-  | "ulikhet-ord";
+  | "ulikhet-ord"
+  | "manglende-tall"
+  | "bytteplass"
+  | "likhet"
+  | "ti-mer-mindre"
+  | "hoppetelling"
+  | "dobbelt-halv"
+  | "klokke";
 
 export type PlaySelection = ModeId | "mix" | "selected";
 
@@ -78,6 +95,7 @@ export interface Settings {
   sound: boolean;
   locale: Locale;
   playStyle: PlayStyleChoice;
+  modeFilter: ModeFilter;
 }
 
 export interface HighscoreEntry {
@@ -132,6 +150,13 @@ export const ALL_MODES: ModeId[] = [
   "avrunding-hundre",
   "ulikhet-tegn",
   "ulikhet-ord",
+  "manglende-tall",
+  "bytteplass",
+  "likhet",
+  "ti-mer-mindre",
+  "hoppetelling",
+  "dobbelt-halv",
+  "klokke",
 ];
 
 export const FRIEND_BASE: Partial<Record<ModeId, number>> = {
@@ -152,4 +177,5 @@ export const DEFAULT_SETTINGS: Settings = {
   sound: true,
   locale: "nb",
   playStyle: "sank",
+  modeFilter: "alle",
 };

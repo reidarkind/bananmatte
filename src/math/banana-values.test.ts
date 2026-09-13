@@ -7,6 +7,10 @@ describe("bananaOptions", () => {
     expect(bananaOptions(10)).toEqual([1]);
   });
 
+  it("adds fives for max 20", () => {
+    expect(bananaOptions(20)).toEqual([1, 5]);
+  });
+
   it("adds fives for max 50", () => {
     expect(bananaOptions(50)).toEqual([1, 5]);
   });

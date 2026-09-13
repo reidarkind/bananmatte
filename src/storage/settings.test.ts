@@ -37,4 +37,10 @@ describe("settings storage", () => {
     saveSettings({ ...DEFAULT_SETTINGS, locale: "es" }, store);
     expect(loadSettings(store).locale).toBe("es");
   });
+
+  it("roundtrips maxN 20 and a grade filter", () => {
+    const store = memoryStore();
+    saveSettings({ ...DEFAULT_SETTINGS, maxN: 20, modeFilter: "klasse1" }, store);
+    expect(loadSettings(store)).toMatchObject({ maxN: 20, modeFilter: "klasse1" });
+  });
 });

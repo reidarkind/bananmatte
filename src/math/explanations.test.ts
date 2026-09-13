@@ -1,13 +1,19 @@
 import { describe, expect, it } from "vitest";
 import {
   explainAdd,
+  explainClock,
   explainDiv,
+  explainDoubleHalf,
   explainHundrevenn,
+  explainLikhet,
+  explainManglendeTall,
   explainMul,
   explainParity,
   explainParityDiff,
   explainParitySum,
+  explainSkipCount,
   explainSub,
+  explainTenMoreLess,
   explainTiervenn,
 } from "./explanations";
 
@@ -42,5 +48,11 @@ describe("wrong-answer explanations", () => {
     expect(explainSub(9, 3)).toBe("Når du tar 3 fra 9, får du 6.");
     expect(explainMul(4, 3)).toBe("4 · 3 betyr 3 ganger 4. Det blir 12.");
     expect(explainDiv(12, 3, 4)).toBe("3 får plass 4 ganger i 12, fordi 3 · 4 = 12.");
+    expect(explainManglendeTall(4, 6, 10)).toContain("4 + 6 = 10");
+    expect(explainLikhet(3, 4, 5, 2)).toContain("3 + 4 = 5 + 2");
+    expect(explainTenMoreLess(34, 10)).toContain("44");
+    expect(explainSkipCount([4, 6, 8], 10)).toContain("10");
+    expect(explainDoubleHalf(7, 14)).toContain("14");
+    expect(explainClock(7, 30, "half")).toContain("30");
   });
 });

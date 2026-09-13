@@ -1,9 +1,9 @@
 import { t } from "../i18n";
 import type { HighscoreBoard } from "../storage/highscores";
-import type { Locale, MaxN } from "../types";
+import { ALL_MAX_N, type Locale, type MaxN } from "../types";
 import { escapeHtml, html, onClick } from "./dom";
 
-const TABS: MaxN[] = [10, 50, 100, 1000];
+const TABS = ALL_MAX_N;
 
 export function renderHighscores(
   root: HTMLElement,

@@ -1,12 +1,12 @@
 import { parsePlayStyle } from "../game/play-style";
 import { sanitizeSettings } from "../math/modes";
-import { DEFAULT_SETTINGS, parseLocale, type Settings } from "../types";
+import { DEFAULT_SETTINGS, parseLocale, parseModeFilter, type Settings } from "../types";
 import { browserStore, type KeyValueStore } from "./adapter";
 
 export const SETTINGS_KEY = "bananmatte.settings.v1";
 
 function isMaxN(value: unknown): value is Settings["maxN"] {
-  return value === 10 || value === 50 || value === 100 || value === 1000;
+  return value === 10 || value === 20 || value === 50 || value === 100 || value === 1000;
 }
 
 export function parseSettings(raw: string | null): Settings {
@@ -23,6 +23,7 @@ export function parseSettings(raw: string | null): Settings {
       sound: parsed.sound ?? true,
       locale: parseLocale(parsed.locale),
       playStyle: parsePlayStyle(parsed.playStyle),
+      modeFilter: parseModeFilter(parsed.modeFilter),
     });
   } catch {
     return { ...DEFAULT_SETTINGS, selectedModes: [...DEFAULT_SETTINGS.selectedModes] };

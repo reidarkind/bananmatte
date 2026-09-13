@@ -8,7 +8,7 @@ export const PLAYER_NAME_MAX = 20;
 export type HighscoreBoard = Record<string, HighscoreEntry[]>;
 
 export function emptyBoard(): HighscoreBoard {
-  return { "10": [], "50": [], "100": [], "1000": [] };
+  return { "10": [], "20": [], "50": [], "100": [], "1000": [] };
 }
 
 export function parseBoard(raw: string | null): HighscoreBoard {

@@ -37,4 +37,14 @@ describe("highscore list", () => {
     expect(rows[1]?.textContent).toContain("Ny");
     root.remove();
   });
+
+  it("offers a tab for maxN 20", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    renderHighscores(root, emptyBoard(), 20, { back: () => {}, change: () => {} });
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>("[data-n]")].map((tab) => tab.dataset.n);
+    expect(tabs).toEqual(["10", "20", "50", "100", "1000"]);
+    expect(root.querySelector('[data-n="20"]')?.classList.contains("on")).toBe(true);
+    root.remove();
+  });
 });

@@ -19,6 +19,10 @@ describe("highscores", () => {
     expect(isBlankPlayerName("Kari")).toBe(false);
   });
 
+  it("has a list for maxN 20", () => {
+    expect(emptyBoard()).toMatchObject({ "20": [] });
+  });
+
   it("stores the typed name on submit", () => {
     const board = submitHighscore(emptyBoard(), 10, {
       name: "  Kari Nordmann  ",

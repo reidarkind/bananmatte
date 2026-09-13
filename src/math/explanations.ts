@@ -147,6 +147,63 @@ export function roundTo(n: number, base: number, dir: "up" | "down" | "nearest")
   return Math.round(n / base) * base;
 }
 
+export function explainManglendeTall(known: number, missing: number, sum: number, locale: Locale = "nb"): string {
+  if (!nordic(locale)) return `${known} + ${missing} = ${sum}. The missing number is ${missing}.`;
+  return `${known} + ${missing} = ${sum}. Tallet som mangler er ${missing}.`;
+}
+
+export function explainLikhet(a: number, b: number, missing: number, c: number, locale: Locale = "nb"): string {
+  if (!nordic(locale)) return `${a} + ${b} = ${missing} + ${c}. Both sides are ${a + b}.`;
+  return `${a} + ${b} = ${missing} + ${c}. Begge sider blir ${a + b}.`;
+}
+
+export function explainTenMoreLess(n: number, delta: number, locale: Locale = "nb"): string {
+  if (delta >= 0) {
+    return !nordic(locale)
+      ? `${n} + 10 = ${n + 10}. 10 more than ${n} is ${n + 10}.`
+      : `${n} + 10 = ${n + 10}. Ti mer enn ${n} er ${n + 10}.`;
+  }
+  return !nordic(locale)
+    ? `${n} − 10 = ${n - 10}. 10 less than ${n} is ${n - 10}.`
+    : `${n} − 10 = ${n - 10}. Ti mindre enn ${n} er ${n - 10}.`;
+}
+
+export function explainSkipCount(shown: number[], next: number, locale: Locale = "nb"): string {
+  const step = shown[1]! - shown[0]!;
+  const seq = `${shown.join(", ")}, ${next}`;
+  if (!nordic(locale)) return `${seq}. You jump ${Math.abs(step)} each time.`;
+  return `${seq}. Du hopper ${Math.abs(step)} hver gang.`;
+}
+
+export function explainDoubleHalf(x: number, answer: number, locale: Locale = "nb"): string {
+  if (answer === x * 2) {
+    return !nordic(locale) ? `Double ${x} is ${answer}.` : `Det dobbelte av ${x} er ${answer}.`;
+  }
+  return !nordic(locale) ? `Half of ${x} is ${answer}.` : `Halvparten av ${x} er ${answer}.`;
+}
+
+export function explainClock(
+  hour: number,
+  answer: number,
+  kind: "hour" | "next" | "half",
+  locale: Locale = "nb",
+): string {
+  const clock = `${String(hour).padStart(2, "0")}:${kind === "half" ? "30" : "00"}`;
+  if (kind === "half") {
+    return !nordic(locale)
+      ? `The clock shows ${clock}. That is 30 minutes past ${hour}.`
+      : `Klokka er ${clock}. Det er 30 minutter over ${hour}.`;
+  }
+  if (kind === "next") {
+    return !nordic(locale)
+      ? `One hour after ${hour} is ${answer}.`
+      : `Én time etter ${hour} er ${answer}.`;
+  }
+  return !nordic(locale)
+    ? `The clock shows ${clock}. The hour is ${hour}.`
+    : `Klokka er ${clock}. Timen er ${hour}.`;
+}
+
 export function compareOf(x: number, y: number): CompareAnswer {
   if (x > y) return "gt";
   if (x < y) return "lt";

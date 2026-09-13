@@ -103,6 +103,12 @@ describe("planMode", () => {
     expect(down.answer).toBe(roundTo(down.catchTarget, 10, "down"));
   });
 
+  it("plans a missing-number equation", () => {
+    const plan = planMode("manglende-tall", 10, createRng(2));
+    expect(plan.mode).toBe("manglende-tall");
+    expect(plan.expression).toMatch(/□/);
+  });
+
   it("compares with signs", () => {
     const plan = planMode("ulikhet-tegn", 20, createRng(5));
     expect(plan.kind).toBe("compare");
