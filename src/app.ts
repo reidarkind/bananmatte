@@ -10,6 +10,9 @@ import { renderGameOver } from "./screens/gameover";
 import { renderGameShell, updateHud } from "./screens/game";
 import { renderHighscores } from "./screens/highscore";
 import { renderInstall } from "./screens/install";
+import { parseBonusCheat } from "./bonus/cheat";
+import { isBonusLevel } from "./bonus/milestones";
+import { renderBonusRide } from "./screens/bonus";
 import { renderMath } from "./screens/math";
 import { renderMenu } from "./screens/menu";
 import { renderSettings } from "./screens/settings";
@@ -128,10 +131,18 @@ export function startApp(root: HTMLElement): void {
       onRoundComplete: (state) => {
         score = state.score;
         if (!plan) return;
-        renderMath(shell.overlay, plan, (answer) => {
-          if (answersMatch(plan!.answer, answer)) {
-            sfx.ok(settings.sound);
-            score = applyScore(score, mathBonus(level));
+        renderMath(shell.overlay, plan, (answer, raw) => {
+          const cheat = typeof plan!.answer === "number" && raw ? parseBonusCheat(raw, plan!.answer) : null;
+          const ok = cheat !== null || answersMatch(plan!.answer, answer);
+          if (!ok) {
+            sfx.fail(settings.sound);
+            endGame(t(settings.locale, "over.wrong"), plan!.explanation, score, level, true);
+            return;
+          }
+          sfx.ok(settings.sound);
+          score = applyScore(score, mathBonus(level));
+          const bonusAt = cheat ?? (isBonusLevel(level) ? level : null);
+          const continueMain = () => {
             level += 1;
             plan = planRound(settings, rng, plan!.mode);
             shell.overlay.replaceChildren();
@@ -144,10 +155,20 @@ export function startApp(root: HTMLElement): void {
               rottenCaught: state.rottenCaught,
               playStyle: session?.getPlayStyle(),
             });
-          } else {
-            sfx.fail(settings.sound);
-            endGame(t(settings.locale, "over.wrong"), plan!.explanation, score, level, true);
+          };
+          if (bonusAt) {
+            shell.overlay.replaceChildren();
+            const play = (shell.canvas.closest(".play") as HTMLElement | null) ?? root;
+            renderBonusRide(play, {
+              milestone: bonusAt,
+              locale: settings.locale,
+              settings,
+              rng,
+              onDone: continueMain,
+            });
+            return;
           }
+          continueMain();
         }, settings.locale);
       },
       onGameOver: (state) => {

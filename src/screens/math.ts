@@ -12,13 +12,15 @@ function mathPrompt(plan: RoundPlan): string {
 export function renderMath(
   root: HTMLElement,
   plan: RoundPlan,
-  onAnswer: (value: number | Parity | CompareAnswer) => void,
+  onAnswer: (value: number | Parity | CompareAnswer, raw?: string) => void,
   locale: Locale = "nb",
+  options?: { hideCatch?: boolean },
 ): void {
+  const pill = options?.hideCatch ? "" : `<p class="mode-pill">${t(locale, "math.bananas", { n: plan.catchTarget })}</p>`;
   if (plan.kind === "parity") {
     root.replaceChildren(html`
       <section class="overlay">
-        <p class="mode-pill">${t(locale, "math.bananas", { n: plan.catchTarget })}</p>
+        ${pill}
         ${mathPrompt(plan)}
         <div class="stack">
           <button class="btn" data-p="partall">${t(locale, "math.even")}</button>
@@ -34,7 +36,7 @@ export function renderMath(
     const words = plan.mode === "ulikhet-ord";
     root.replaceChildren(html`
       <section class="overlay">
-        <p class="mode-pill">${t(locale, "math.bananas", { n: plan.catchTarget })}</p>
+        ${pill}
         ${mathPrompt(plan)}
         <div class="stack">
           <button class="btn" data-c="gt">${t(locale, words ? "math.gtWord" : "math.gt")}</button>
@@ -51,7 +53,7 @@ export function renderMath(
   const paint = () => {
     root.replaceChildren(html`
       <section class="overlay">
-        <p class="mode-pill">${t(locale, "math.bananas", { n: plan.catchTarget })}</p>
+        ${pill}
         ${mathPrompt(plan)}
         <div class="answer">${buffer || "?"}</div>
         <div class="numpad">
@@ -69,7 +71,7 @@ export function renderMath(
     });
     onClick(root, "[data-ok]", () => {
       if (!buffer || buffer === "-") return;
-      onAnswer(Number(buffer));
+      onAnswer(Number(buffer), buffer);
     });
   };
   paint();

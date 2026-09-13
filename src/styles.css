@@ -271,6 +271,62 @@ select {
   pointer-events: auto;
 }
 
+.bonus-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+.bonus-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+}
+.bonus-bar {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  z-index: 6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--cream);
+  text-shadow: 0 1px 0 #1b140c;
+}
+.bonus-title {
+  margin: 0;
+  font-weight: 800;
+}
+.bonus-math {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+}
+.bonus-math:empty {
+  pointer-events: none;
+}
+.bonus-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 1.2rem;
+  transform: translateX(-50%);
+  z-index: 6;
+  margin: 0;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(27, 20, 12, 0.7);
+  color: var(--cream);
+  font-weight: 800;
+}
+.btn.tiny {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.9rem;
+}
+
 .overlay {
   position: absolute;
   inset: 0;

@@ -29,4 +29,28 @@ describe("math overlay", () => {
     expect(given).toBe("gt");
     root.remove();
   });
+
+  it("sends the raw number buffer so a bonus cheat can be read", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    let raw = "";
+    const plan: RoundPlan = {
+      mode: "addisjon",
+      catchTarget: 2,
+      prompt: "Hva er",
+      expression: "1 + 1",
+      kind: "number",
+      answer: 2,
+      explanation: "1 + 1 = 2",
+    };
+    renderMath(root, plan, (_value, typed) => {
+      raw = typed ?? "";
+    });
+    for (const digit of "1337210") {
+      root.querySelector<HTMLButtonElement>(`[data-k="${digit}"]`)!.click();
+    }
+    root.querySelector<HTMLButtonElement>("[data-ok]")!.click();
+    expect(raw).toBe("1337210");
+    root.remove();
+  });
 });
