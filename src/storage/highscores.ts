@@ -41,6 +41,10 @@ export function clearHighscores(store: KeyValueStore = browserStore()): Highscor
   return board;
 }
 
+export function isBlankPlayerName(name: string): boolean {
+  return name.replace(/[\u0000-\u001F\u007F]/g, "").replace(/\s+/g, " ").trim() === "";
+}
+
 export function normalizePlayerName(name: string): string {
   const cleaned = name
     .replace(/[\u0000-\u001F\u007F]/g, "")

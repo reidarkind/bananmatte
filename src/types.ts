@@ -1,6 +1,32 @@
 export type MaxN = 10 | 50 | 100 | 1000;
 
-export type Locale = "nb" | "en";
+export type Locale = "nb" | "en" | "es" | "de" | "pt" | "sv" | "da";
+
+export const LOCALES: Locale[] = ["nb", "en", "es", "de", "pt", "sv", "da"];
+
+export const LOCALE_NAMES: Record<Locale, string> = {
+  nb: "Norsk",
+  en: "English",
+  es: "Español",
+  de: "Deutsch",
+  pt: "Português",
+  sv: "Svenska",
+  da: "Dansk",
+};
+
+export const LOCALE_HTML: Record<Locale, string> = {
+  nb: "no",
+  en: "en",
+  es: "es",
+  de: "de",
+  pt: "pt",
+  sv: "sv",
+  da: "da",
+};
+
+export function parseLocale(value: unknown): Locale {
+  return LOCALES.includes(value as Locale) ? (value as Locale) : "nb";
+}
 
 export type PlayStyle = "sank" | "angrep" | "forsvar";
 
@@ -64,6 +90,7 @@ export interface RoundPlan {
   mode: ModeId;
   catchTarget: number;
   prompt: string;
+  expression?: string;
   kind: AnswerKind;
   answer: number | Parity | CompareAnswer;
   explanation: string;

@@ -72,7 +72,10 @@ describe("settings highscores", () => {
       save: () => {},
       resetHighscores: () => {},
     });
-    root.querySelector<HTMLButtonElement>('[data-lang="en"]')!.click();
+    const lang = root.querySelector<HTMLSelectElement>("[data-lang]");
+    expect(lang?.querySelectorAll("option")).toHaveLength(7);
+    lang!.value = "en";
+    lang!.dispatchEvent(new Event("change"));
     expect(root.querySelector("h1")?.textContent).toBe("Settings");
     root.remove();
   });

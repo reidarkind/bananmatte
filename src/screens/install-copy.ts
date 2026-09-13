@@ -52,6 +52,6 @@ export const INSTALL_COPY_EN = {
   androidNote: "After install, open the app from the icon, not from a regular tab.",
 } as const;
 
-export function installCopy(locale: "nb" | "en"): typeof INSTALL_COPY | typeof INSTALL_COPY_EN {
-  return locale === "en" ? INSTALL_COPY_EN : INSTALL_COPY;
+export function installCopy(locale: string): typeof INSTALL_COPY | typeof INSTALL_COPY_EN {
+  return locale === "nb" ? INSTALL_COPY : INSTALL_COPY_EN;
 }

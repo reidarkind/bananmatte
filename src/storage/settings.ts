@@ -1,6 +1,6 @@
 import { parsePlayStyle } from "../game/play-style";
 import { sanitizeSettings } from "../math/modes";
-import { DEFAULT_SETTINGS, type Settings } from "../types";
+import { DEFAULT_SETTINGS, parseLocale, type Settings } from "../types";
 import { browserStore, type KeyValueStore } from "./adapter";
 
 export const SETTINGS_KEY = "bananmatte.settings.v1";
@@ -21,7 +21,7 @@ export function parseSettings(raw: string | null): Settings {
         : [...DEFAULT_SETTINGS.selectedModes],
       hundrevennEnabled: parsed.hundrevennEnabled ?? true,
       sound: parsed.sound ?? true,
-      locale: parsed.locale === "en" ? "en" : "nb",
+      locale: parseLocale(parsed.locale),
       playStyle: parsePlayStyle(parsed.playStyle),
     });
   } catch {

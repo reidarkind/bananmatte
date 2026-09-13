@@ -1,11 +1,13 @@
 import { nextBananaValue } from "../math/banana-values";
 import { attackPeekBand } from "./attack";
 import { defendMaxThrowers, defendSpawnInterval, peekTime } from "./play-style";
-import { spawnRotten, type FallingKind } from "./rules";
+import type { FallingKind } from "./rules";
+
+export type DefendApe = "orangutan" | "gorilla" | "chimpanzee";
 
 export interface DefendThrower {
   id: number;
-  kind: "orangutan" | "gorilla";
+  kind: DefendApe;
   value: number;
   x: number;
   y: number;
@@ -33,8 +35,18 @@ export interface DefendThrow {
 
 let nextId = 1;
 
-export function bananaKindForThrower(kind: "orangutan" | "gorilla"): FallingKind {
-  return kind === "gorilla" ? "banana" : "rotten";
+export function bananaKindForThrower(kind: DefendApe): FallingKind {
+  if (kind === "gorilla") return "banana";
+  if (kind === "chimpanzee") return "trick";
+  return "rotten";
+}
+
+export function pickDefendThrower(level: number, rng: () => number): DefendApe {
+  if (level < 2) return "orangutan";
+  const roll = rng();
+  if (roll < 0.16) return "chimpanzee";
+  if (roll < 0.16 + Math.min(0.18 + (level - 2) * 0.05, 0.36)) return "gorilla";
+  return "orangutan";
 }
 
 export function createDefendWorld(): DefendWorld {
@@ -59,7 +71,7 @@ export function spawnDefendThrower(
   height: number,
   existing: DefendThrower[] = [],
 ): DefendThrower {
-  const gorilla = spawnRotten(level, rng);
+  const kind = pickDefendThrower(level, rng);
   const value = nextBananaValue(maxN, remaining, rng);
   const life = peekTime(level);
   const band = attackPeekBand(height);
@@ -68,7 +80,7 @@ export function spawnDefendThrower(
   const span = Math.max(8, band.maxY - band.minY - h);
   return {
     id: nextId++,
-    kind: gorilla ? "gorilla" : "orangutan",
+    kind,
     value,
     x: placeThrowerX(width, w, existing, rng),
     y: band.minY + rng() * span,

@@ -1,6 +1,6 @@
 import { applyScore, catchPoints, SCORE_MISS, SCORE_ROTTEN } from "../math/scoring";
 
-export type FallingKind = "banana" | "rotten";
+export type FallingKind = "banana" | "rotten" | "trick";
 
 export type CatchEvent =
   | { type: "caught"; kind: FallingKind; value: number }

@@ -131,7 +131,9 @@ export function createPlaySession(opts: {
       maybeSpawnThrower(defend, width, Math.max(1, state.target - state.collected), opts.settings.maxN, level, dt, opts.rng, height);
       const { throws } = stepThrowers(defend, dt);
       for (const tossed of throws) {
-        items.push(spawnFallingAt(tossed.kind, tossed.value, tossed.x, tossed.y, speed * tossed.fallMul, opts.rng));
+        const item = spawnFallingAt(tossed.kind, tossed.value, tossed.x, tossed.y, speed * tossed.fallMul, opts.rng);
+        if (item.kind === "trick") item.trickAt = height * (0.4 + opts.rng() * 0.3);
+        items.push(item);
       }
     } else if (spawnAcc >= interval && items.length < 5) {
       spawnAcc = 0;

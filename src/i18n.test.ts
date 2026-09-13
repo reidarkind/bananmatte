@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { overCopy, t } from "./i18n";
 
+describe("extra languages", () => {
+  it("has Spanish play label", () => {
+    expect(t("es", "menu.play")).toBe("Jugar");
+    expect(t("de", "over.gotIt")).toBe("Verstanden");
+    expect(t("sv", "settings.language")).toBe("Språk");
+  });
+});
+
 describe("menu lead", () => {
   it("talks about ape tricks, not only catching bananas", () => {
     expect(t("nb", "menu.lead")).toBe("Gjør apestreker. Regn etterpå.");

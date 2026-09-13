@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS, type ModeId, type Settings } from "../types";
 import { createRng } from "./rng";
-import { planMode, planRound } from "./questions";
+import { friendCatchMax, planMode, planRound } from "./questions";
 import { compareOf, nFriend, roundTo } from "./explanations";
 
 const base: Settings = { ...DEFAULT_SETTINGS, selectedModes: [...DEFAULT_SETTINGS.selectedModes] };
@@ -66,6 +66,27 @@ describe("planMode", () => {
     const plan = planMode("partall-oddetall", 10, () => 0);
     expect(plan.kind).toBe("parity");
     expect(["partall", "oddetall"]).toContain(plan.answer);
+  });
+
+  it("keeps friend-mode banana piles below the friend number", () => {
+    expect(friendCatchMax(5, 10)).toBe(4);
+    expect(friendCatchMax(6, 10)).toBe(5);
+    expect(friendCatchMax(10, 10)).toBe(9);
+    const rng = createRng(3);
+    for (const [mode, base] of [
+      ["femmervenn", 5],
+      ["sekservenn", 6],
+      ["syvervenn", 7],
+      ["attervenn", 8],
+      ["niervenn", 9],
+      ["tiervenn", 10],
+    ] as const) {
+      for (let i = 0; i < 20; i += 1) {
+        const plan = planMode(mode, 10, rng);
+        expect(plan.catchTarget).toBeGreaterThan(0);
+        expect(plan.catchTarget).toBeLessThan(base);
+      }
+    }
   });
 
   it("makes a fives friend", () => {

@@ -175,12 +175,13 @@ export function drawBanana(ctx: CanvasRenderingContext2D, item: FallingItem): vo
   ctx.translate(item.x + item.w / 2, item.y + item.h / 2);
   ctx.rotate(item.rot);
   ctx.scale(item.w / 40, item.h / 40);
+  const rottenLook = item.kind === "rotten" || (item.kind === "trick" && item.y >= (item.trickAt ?? Number.POSITIVE_INFINITY));
   const bunch = item.value > 1 ? 3 : 1;
   for (let i = bunch - 1; i >= 0; i -= 1) {
     ctx.save();
     ctx.translate(i * 3.2 - (bunch - 1) * 1.4, i * 2.6);
     ctx.rotate(i * 0.22);
-    drawOneBanana(ctx, item.kind === "rotten");
+    drawOneBanana(ctx, rottenLook);
     ctx.restore();
   }
   if (item.value > 1) {
@@ -199,6 +200,8 @@ export const APE_FUR = {
   orangutan: "#c4541a",
   orangutanDark: "#8a3010",
   orangutanLight: "#d97a32",
+  chimp: "#5a3d28",
+  chimpLight: "#7a5640",
 } as const;
 
 export const APE_BODY = { cx: 0, cy: 26, rx: 22, ry: 18 };
@@ -614,23 +617,69 @@ function drawHeldBanana(ctx: CanvasRenderingContext2D, rotten: boolean): void {
   ctx.restore();
 }
 
+function drawChimpHead(ctx: CanvasRenderingContext2D): void {
+  const { cx, cy, r } = GORILLA.head;
+  const fur = APE_FUR.chimp;
+  ctx.fillStyle = fur;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r - 1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(cx - 16, cy - 1, 7.5, 9, -0.2, 0, Math.PI * 2);
+  ctx.ellipse(cx + 16, cy - 1, 7.5, 9, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#d4a07a";
+  ctx.beginPath();
+  ctx.ellipse(cx - 16, cy - 1, 4.2, 5.5, -0.2, 0, Math.PI * 2);
+  ctx.ellipse(cx + 16, cy - 1, 4.2, 5.5, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#e8c4a0";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 3, 11, 12, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  ctx.ellipse(cx - 4.6, cy - 2, 3.2, 3.6, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + 4.6, cy - 2, 3.2, 3.6, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#1a120c";
+  ctx.beginPath();
+  ctx.arc(cx - 4.4, cy - 1.6, 1.6, 0, Math.PI * 2);
+  ctx.arc(cx + 4.4, cy - 1.6, 1.6, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#4a2818";
+  ctx.beginPath();
+  ctx.ellipse(cx, cy + 8, 5.5, 4.2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = "#1a120c";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(cx - 3.4, cy + 11);
+  ctx.quadraticCurveTo(cx, cy + 13.5, cx + 3.4, cy + 11);
+  ctx.stroke();
+}
+
 export function drawApe(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   facing: number,
-  kind: "gorilla" | "orangutan",
+  kind: "gorilla" | "orangutan" | "chimpanzee",
   scale = 1,
-  held?: "banana" | "rotten",
+  held?: "banana" | "rotten" | "trick",
 ): void {
-  const fur = kind === "orangutan" ? APE_FUR.orangutanDark : APE_FUR.gorilla;
-  const light = kind === "orangutan" ? APE_FUR.orangutanLight : APE_FUR.gorillaLight;
+  const fur = kind === "orangutan" ? APE_FUR.orangutanDark : kind === "chimpanzee" ? APE_FUR.chimp : APE_FUR.gorilla;
+  const light = kind === "orangutan" ? APE_FUR.orangutanLight : kind === "chimpanzee" ? APE_FUR.chimpLight : APE_FUR.gorillaLight;
   ctx.save();
   ctx.translate(x, y);
   ctx.scale((facing < 0 ? -1 : 1) * scale, scale);
   if (kind === "orangutan") {
     drawOrangutanTorso(ctx);
     drawOrangutanHead(ctx);
+    drawApeHands(ctx, fur, true);
+  } else if (kind === "chimpanzee") {
+    drawApeTorso(ctx, fur, light);
+    drawChimpHead(ctx);
     drawApeHands(ctx, fur, true);
   } else {
     drawApeTorso(ctx, fur, light);

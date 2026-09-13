@@ -11,6 +11,7 @@ export interface FallingItem {
   vy: number;
   rot: number;
   spin: number;
+  trickAt?: number;
 }
 
 let nextId = 1;

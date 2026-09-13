@@ -31,4 +31,10 @@ describe("settings storage", () => {
     saveSettings({ ...DEFAULT_SETTINGS, locale: "en" }, store);
     expect(loadSettings(store).locale).toBe("en");
   });
+
+  it("roundtrips Spanish locale", () => {
+    const store = memoryStore();
+    saveSettings({ ...DEFAULT_SETTINGS, locale: "es" }, store);
+    expect(loadSettings(store).locale).toBe("es");
+  });
 });

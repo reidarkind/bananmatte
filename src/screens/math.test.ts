@@ -12,7 +12,8 @@ describe("math overlay", () => {
     const plan: RoundPlan = {
       mode: "ulikhet-tegn",
       catchTarget: 4,
-      prompt: "Hvilket tegn passer? 4 □ 2",
+      prompt: "Hvilket tegn passer?",
+      expression: "4 □ 2",
       kind: "compare",
       answer: "gt",
       explanation: "4 er større enn 2",
@@ -22,6 +23,8 @@ describe("math overlay", () => {
       given = String(value);
     });
     expect(root.textContent).toContain(">");
+    expect(root.querySelector(".math-expr")?.textContent).toBe("4 □ 2");
+    expect(root.querySelector(".btn.primary")).toBeNull();
     root.querySelector<HTMLButtonElement>('[data-c="gt"]')!.click();
     expect(given).toBe("gt");
     root.remove();

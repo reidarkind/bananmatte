@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { memoryStore } from "./adapter";
-import { clearHighscores, emptyBoard, loadHighscores, normalizePlayerName, qualifies, saveHighscores, submitHighscore } from "./highscores";
+import { clearHighscores, emptyBoard, isBlankPlayerName, loadHighscores, normalizePlayerName, qualifies, saveHighscores, submitHighscore } from "./highscores";
 
 describe("highscores", () => {
   it("keeps a full typed name, trimmed to 20 characters", () => {
@@ -12,6 +12,11 @@ describe("highscores", () => {
   it("uses Anonym when the name is empty", () => {
     expect(normalizePlayerName("   ")).toBe("Anonym");
     expect(normalizePlayerName("")).toBe("Anonym");
+  });
+
+  it("knows a blank typed name before save", () => {
+    expect(isBlankPlayerName("   ")).toBe(true);
+    expect(isBlankPlayerName("Kari")).toBe(false);
   });
 
   it("stores the typed name on submit", () => {

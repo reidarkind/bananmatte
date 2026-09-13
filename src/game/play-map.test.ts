@@ -37,6 +37,14 @@ describe("bananforsvar mapping", () => {
     expect(next.collected).toBe(0);
   });
 
+  it("treats a trick banana like a rotten one", () => {
+    const hit = applyCatchEvent(createPlayState(8), defendHitEvent("trick", 10));
+    expect(hit.lives).toBe(1);
+    expect(hit.collected).toBe(0);
+    const dodged = applyCatchEvent(createPlayState(8), defendEscapeEvent("trick", 10));
+    expect(dodged.collected).toBe(10);
+  });
+
   it("counts a caught ripe banana as a catch and a missed ripe as rotten", () => {
     const caught = applyCatchEvent(createPlayState(8), defendHitEvent("banana", 1));
     expect(caught.collected).toBe(1);

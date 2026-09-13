@@ -73,6 +73,53 @@ describe("game over name", () => {
     root.remove();
   });
 
+  it("asks before saving a blank name as Anonym", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    let submitted = "";
+    let afterSave = false;
+    renderGameOver(
+      root,
+      { title: "Slutt", detail: "Bra jobba", score: 40, level: 3, askName: true },
+      {
+        submit: (name) => {
+          submitted = name;
+        },
+        afterSave: () => {
+          afterSave = true;
+        },
+        cancel: () => {},
+        again: () => {},
+        menu: () => {},
+      },
+    );
+    root.querySelector<HTMLButtonElement>("[data-save]")!.click();
+    expect(submitted).toBe("");
+    expect(afterSave).toBe(false);
+    expect(root.textContent).toContain("Anonym");
+    root.querySelector<HTMLButtonElement>("[data-anon-back]")!.click();
+    expect(root.querySelector("[data-name]")).not.toBeNull();
+    root.querySelector<HTMLButtonElement>("[data-save]")!.click();
+    root.querySelector<HTMLButtonElement>("[data-anon-yes]")!.click();
+    expect(afterSave).toBe(true);
+    root.remove();
+  });
+
+  it("shows the answer key before the name field", () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    renderGameOver(
+      root,
+      { title: "Feil svar", detail: "3 + 2 = 5", score: 10, level: 2, askName: true, ackFasit: true },
+      { submit: () => {}, afterSave: () => {}, cancel: () => {}, again: () => {}, menu: () => {} },
+    );
+    expect(root.querySelector("[data-name]")).toBeNull();
+    expect(root.querySelector(".fasit")?.textContent).toContain("3 + 2 = 5");
+    root.querySelector<HTMLButtonElement>("[data-gotit]")!.click();
+    expect(root.querySelector("[data-name]")).not.toBeNull();
+    root.remove();
+  });
+
   it("uses English save label when locale is en", () => {
     const root = document.createElement("div");
     document.body.append(root);

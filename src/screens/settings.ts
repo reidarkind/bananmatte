@@ -1,6 +1,6 @@
 import { modeLabel, t } from "../i18n";
 import { availableModes, isHundrevennAvailable, sanitizeSettings } from "../math/modes";
-import type { Locale, MaxN, ModeId, PlaySelection, PlayStyleChoice, Settings } from "../types";
+import { LOCALES, LOCALE_NAMES, type Locale, type MaxN, type ModeId, type PlaySelection, type PlayStyleChoice, type Settings } from "../types";
 import { html, onClick } from "./dom";
 
 const MAX_OPTIONS: MaxN[] = [10, 50, 100, 1000];
@@ -31,10 +31,9 @@ export function renderSettings(
         <button class="back" data-back type="button">${t(locale, "back")}</button>
         <h1>${t(locale, "settings.title")}</h1>
         <label>${t(locale, "settings.language")}
-          <div class="tabs">
-            <button class="tab ${next.locale === "nb" ? "on" : ""}" data-lang="nb">${t(locale, "settings.nb")}</button>
-            <button class="tab ${next.locale === "en" ? "on" : ""}" data-lang="en">${t(locale, "settings.en")}</button>
-          </div>
+          <select data-lang>
+            ${LOCALES.map((id) => `<option value="${id}" ${next.locale === id ? "selected" : ""}>${LOCALE_NAMES[id]}</option>`).join("")}
+          </select>
         </label>
         <label>${t(locale, "settings.play")}
           <div class="tabs">
@@ -81,8 +80,8 @@ export function renderSettings(
       actions.save(sanitizeSettings(next));
       actions.back();
     });
-    onClick(root, "[data-lang]", (button) => {
-      next.locale = button.dataset.lang as Locale;
+    root.querySelector<HTMLSelectElement>("[data-lang]")?.addEventListener("change", (event) => {
+      next.locale = (event.target as HTMLSelectElement).value as Locale;
       paint();
     });
     onClick(root, "[data-play]", (button) => {

@@ -3,6 +3,7 @@ import {
   bananaKindForThrower,
   createDefendWorld,
   maybeSpawnThrower,
+  pickDefendThrower,
   spawnDefendThrower,
   stepThrowers,
   type DefendThrower,
@@ -28,6 +29,12 @@ describe("defend throwers", () => {
   it("lets orangutans throw rotten bananas and gorillas throw ripe ones", () => {
     expect(bananaKindForThrower("orangutan")).toBe("rotten");
     expect(bananaKindForThrower("gorilla")).toBe("banana");
+    expect(bananaKindForThrower("chimpanzee")).toBe("trick");
+  });
+
+  it("keeps chimpanzees off level 1 and lets them appear later", () => {
+    expect(pickDefendThrower(1, () => 0.01)).toBe("orangutan");
+    expect(pickDefendThrower(3, () => 0.01)).toBe("chimpanzee");
   });
 
   it("throws from the ape after a short wind-up", () => {

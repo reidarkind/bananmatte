@@ -15,10 +15,10 @@ import { renderMenu } from "./screens/menu";
 import { renderSettings } from "./screens/settings";
 import { clearHighscores, loadHighscores, qualifies, saveHighscores, submitHighscore } from "./storage/highscores";
 import { loadSettings, saveSettings } from "./storage/settings";
-import type { Locale, MaxN, PlayStyle, RoundPlan, Settings } from "./types";
+import { LOCALE_HTML, type Locale, type MaxN, type PlayStyle, type RoundPlan, type Settings } from "./types";
 
 function applyDocumentLocale(locale: Locale): void {
-  document.documentElement.lang = locale === "en" ? "en" : "no";
+  document.documentElement.lang = LOCALE_HTML[locale];
 }
 
 export function startApp(root: HTMLElement): void {
@@ -146,7 +146,7 @@ export function startApp(root: HTMLElement): void {
             });
           } else {
             sfx.fail(settings.sound);
-            endGame(t(settings.locale, "over.wrong"), plan!.explanation, score, level);
+            endGame(t(settings.locale, "over.wrong"), plan!.explanation, score, level, true);
           }
         }, settings.locale);
       },
@@ -167,14 +167,14 @@ export function startApp(root: HTMLElement): void {
     });
   };
 
-  const endGame = (title: string, detail: string, finalScore: number, finalLevel: number) => {
+  const endGame = (title: string, detail: string, finalScore: number, finalLevel: number, ackFasit = false) => {
     session?.stop();
     session = null;
     const board = loadHighscores();
     const showOver = (askName: boolean) => {
       renderGameOver(
         root,
-        { title, detail, score: finalScore, level: finalLevel, askName, locale: settings.locale },
+        { title, detail, score: finalScore, level: finalLevel, askName, ackFasit, locale: settings.locale },
         {
           submit: (name) => {
             const date = new Date().toISOString();

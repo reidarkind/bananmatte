@@ -1,4 +1,5 @@
 import type { Locale, ModeId, PlaySelection, PlayStyle, PlayStyleChoice } from "./types";
+import { EXTRA_LOCALES } from "./i18n-extra";
 
 const NB: Record<string, string> = {
   "menu.lead": "Gjør apestreker. Regn etterpå.",
@@ -38,7 +39,7 @@ const NB: Record<string, string> = {
   "scores.new": "Ny",
   "about.title": "Om appen",
   "about.p1": "Bananmatte er et matte- og fangstspill for 1. og 2. klasse.",
-  "about.p2": "Tre spill: Banansanking (fang gule, la brune falle), Bananangrep (kast på orangutanger, ikke på gorillaer) og Bananforsvar (orangutanger kaster brune, gorillaer kaster gule).",
+  "about.p2": "Tre spill: Banansanking (fang gule, la brune falle), Bananangrep (kast på orangutanger, ikke på gorillaer) og Bananforsvar (orangutanger kaster brune, gorillaer kaster gule, sjimpanser kaster lurebananer).",
   "about.p3": "Mister du to gule i sanking, eller gjør to tilsvarende feil i de andre spillene, er det slutt. Mer enn tre råtne-feil er også slutt. Feil svar viser fasit, og du starter på nytt.",
   "about.privacy": "Personvern",
   "about.privacyBody": "Poeng og navn lagres bare på denne telefonen. Ingenting sendes på nett.",
@@ -55,6 +56,16 @@ const NB: Record<string, string> = {
   "hud.rottenCount.angrep": "Gorillaer {n} av {max}",
   "hud.rottenCount.forsvar": "Mistede gule {n} av {max}",
   "math.bananas": "{n} bananer",
+  "math.ask": "Hva er",
+  "math.friendAsk": "Hva er {name}en til",
+  "math.askParity": "Partall eller oddetall?",
+  "math.askSign": "Hvilket tegn passer?",
+  "math.askWord": "Hvilket ord passer?",
+  "math.roundUp": "Rund opp til nærmeste {unit}",
+  "math.roundDown": "Rund ned til nærmeste {unit}",
+  "math.roundNear": "Rund av til nærmeste {unit}",
+  "math.unitTen": "tier",
+  "math.unitHundred": "hundre",
   "math.even": "Partall",
   "math.odd": "Oddetall",
   "math.delete": "slett",
@@ -88,6 +99,10 @@ const NB: Record<string, string> = {
   "over.cancel": "Avbryt",
   "over.again": "Prøv igjen",
   "over.menu": "Meny",
+  "over.gotIt": "Forstått",
+  "over.anonymousAsk": "Du skrev ikke navn. Rekorden blir lagt inn som Anonym.",
+  "over.anonymousYes": "Lagre som Anonym",
+  "over.anonymousBack": "Skriv navn",
   "mode.mix": "Mix",
   "mode.selected": "Utvalg",
   "mode.tiervenn": "Tiervenn",
@@ -155,7 +170,7 @@ const EN: Record<string, string> = {
   "scores.new": "New",
   "about.title": "About",
   "about.p1": "Bananmatte is a math and catch game for grades 1 and 2.",
-  "about.p2": "Three games: Banana harvest (catch yellow, let brown fall), Banana attack (throw at orangutans, not gorillas) and Banana defense (orangutans throw brown, gorillas throw yellow).",
+  "about.p2": "Three games: Banana harvest (catch yellow, let brown fall), Banana attack (throw at orangutans, not gorillas) and Banana defense (orangutans throw brown, gorillas throw yellow, chimpanzees throw trick bananas).",
   "about.p3": "Miss two yellow bananas in harvest, or make two matching mistakes in the other games, and it ends. More than three rotten mistakes also ends it. A wrong answer shows the solution, and you start over.",
   "about.privacy": "Privacy",
   "about.privacyBody": "Scores and names stay on this phone. Nothing is sent online.",
@@ -172,6 +187,16 @@ const EN: Record<string, string> = {
   "hud.rottenCount.angrep": "Gorillas {n} of {max}",
   "hud.rottenCount.forsvar": "Missed ripe bananas {n} of {max}",
   "math.bananas": "{n} bananas",
+  "math.ask": "What is",
+  "math.friendAsk": "What is the {name} of",
+  "math.askParity": "Even or odd?",
+  "math.askSign": "Which sign fits?",
+  "math.askWord": "Which word fits?",
+  "math.roundUp": "Round up to the nearest {unit}",
+  "math.roundDown": "Round down to the nearest {unit}",
+  "math.roundNear": "Round to the nearest {unit}",
+  "math.unitTen": "ten",
+  "math.unitHundred": "hundred",
   "math.even": "Even",
   "math.odd": "Odd",
   "math.delete": "delete",
@@ -205,6 +230,10 @@ const EN: Record<string, string> = {
   "over.cancel": "Cancel",
   "over.again": "Play again",
   "over.menu": "Menu",
+  "over.gotIt": "Got it",
+  "over.anonymousAsk": "You did not type a name. The score will be saved as Anonym.",
+  "over.anonymousYes": "Save as Anonym",
+  "over.anonymousBack": "Type a name",
   "mode.mix": "Mix",
   "mode.selected": "Selection",
   "mode.tiervenn": "Tens friend",
@@ -234,7 +263,7 @@ const EN: Record<string, string> = {
   "mode.ulikhet-ord": "Inequality words",
 };
 
-const TABLES: Record<Locale, Record<string, string>> = { nb: NB, en: EN };
+const TABLES: Record<Locale, Record<string, string>> = { nb: NB, en: EN, ...EXTRA_LOCALES };
 
 export function t(locale: Locale, key: string, vars: Record<string, string | number> = {}): string {
   let text = TABLES[locale][key] ?? TABLES.nb[key] ?? key;

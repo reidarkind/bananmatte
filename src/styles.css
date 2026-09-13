@@ -285,7 +285,26 @@ select {
   text-align: center;
 }
 .overlay h2 { font-size: 1.6rem; }
+.overlay h2.math-q { margin-bottom: 0.35rem; }
 .overlay p { max-width: 22rem; overflow-wrap: break-word; }
+.math-expr {
+  margin: 0 0 0.8rem;
+  max-width: 100%;
+  font-size: 2rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+.fasit {
+  background: var(--cream);
+  color: var(--leaf-dark);
+  border-radius: 18px;
+  padding: 0.9rem 1.1rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  max-width: 22rem;
+}
 .mode-pill {
   background: var(--banana);
   color: var(--leaf-dark);

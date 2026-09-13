@@ -1,4 +1,4 @@
-import { modeLabel } from "../i18n";
+import { modeLabel, t } from "../i18n";
 import { FRIEND_BASE, type CompareAnswer, type Locale, type ModeId, type Parity, type Rng, type RoundPlan, type Settings } from "../types";
 import {
   compareOf,
@@ -26,14 +26,19 @@ function randomX(maxN: number, rng: Rng, min = 1, max = maxN): number {
   return randomInt(Math.max(1, min), Math.max(Math.max(1, min), Math.min(maxN, max)), rng);
 }
 
+export function friendCatchMax(base: number, maxN: number): number {
+  return Math.max(1, Math.min(maxN, base) - 1);
+}
+
 function planFriend(mode: ModeId, base: number, maxN: number, rng: Rng, locale: Locale): RoundPlan {
-  const x = randomX(maxN, rng);
+  const x = randomX(friendCatchMax(base, maxN), rng);
   const answer = nFriend(x, base);
   const name = modeLabel(locale, mode);
   return {
     mode,
     catchTarget: x,
-    prompt: locale === "en" ? `What is the ${name.toLowerCase()} of ${x}?` : `Hva er ${name.toLowerCase()}en til ${x}?`,
+    prompt: t(locale, "math.friendAsk", { name: name.toLowerCase() }),
+    expression: String(x),
     kind: "number",
     answer,
     explanation: explainFriend(name, x, answer, base, locale),
@@ -50,7 +55,8 @@ function planAddisjon(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   return {
     mode: "addisjon",
     catchTarget: x,
-    prompt: locale === "en" ? `What is ${x} + ${y}?` : `Hva er ${x} + ${y}?`,
+    prompt: t(locale, "math.ask"),
+    expression: `${x} + ${y}`,
     kind: "number",
     answer: x + y,
     operand: y,
@@ -64,7 +70,8 @@ function planSubtraksjonPositiv(maxN: number, rng: Rng, locale: Locale): RoundPl
   return {
     mode: "subtraksjon-positiv",
     catchTarget: x,
-    prompt: locale === "en" ? `What is ${x} − ${y}?` : `Hva er ${x} − ${y}?`,
+    prompt: t(locale, "math.ask"),
+    expression: `${x} − ${y}`,
     kind: "number",
     answer: x - y,
     operand: y,
@@ -78,7 +85,8 @@ function planSubtraksjonNegativ(maxN: number, rng: Rng, locale: Locale): RoundPl
   return {
     mode: "subtraksjon-negativ",
     catchTarget: x,
-    prompt: locale === "en" ? `What is ${x} − ${y}?` : `Hva er ${x} − ${y}?`,
+    prompt: t(locale, "math.ask"),
+    expression: `${x} − ${y}`,
     kind: "number",
     answer: x - y,
     operand: y,
@@ -93,7 +101,8 @@ function planMultiplikasjon(mode: "multiplikasjon-mini" | "multiplikasjon-liten"
   return {
     mode,
     catchTarget: x,
-    prompt: locale === "en" ? `What is ${x} · ${k}?` : `Hva er ${x} · ${k}?`,
+    prompt: t(locale, "math.ask"),
+    expression: `${x} · ${k}`,
     kind: "number",
     answer: x * k,
     operand: k,
@@ -114,7 +123,8 @@ function planDivisjonMini(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   return {
     mode: "divisjon-mini",
     catchTarget: x,
-    prompt: locale === "en" ? `What is ${x} : ${d}?` : `Hva er ${x} : ${d}?`,
+    prompt: t(locale, "math.ask"),
+    expression: `${x} : ${d}`,
     kind: "number",
     answer: x / d,
     operand: d,
@@ -129,7 +139,8 @@ function planDivisjonLiten(maxN: number, rng: Rng, locale: Locale): RoundPlan {
     return {
       mode: "divisjon-liten",
       catchTarget: x,
-      prompt: locale === "en" ? `What is ${x} : ${d}?` : `Hva er ${x} : ${d}?`,
+      prompt: t(locale, "math.ask"),
+      expression: `${x} : ${d}`,
       kind: "number",
       answer: x / d,
       operand: d,
@@ -143,7 +154,8 @@ function planDivisjonLiten(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   return {
     mode: "divisjon-liten",
     catchTarget: x,
-    prompt: locale === "en" ? `What is ${numerator} : ${x}?` : `Hva er ${numerator} : ${x}?`,
+    prompt: t(locale, "math.ask"),
+    expression: `${numerator} : ${x}`,
     kind: "number",
     answer: quotient,
     operand: numerator,
@@ -156,7 +168,8 @@ function planParity(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   return {
     mode: "partall-oddetall",
     catchTarget: x,
-    prompt: locale === "en" ? `Is ${x} even or odd?` : `Er ${x} partall eller oddetall?`,
+    prompt: t(locale, "math.askParity"),
+    expression: String(x),
     kind: "parity",
     answer: parityOf(x),
     explanation: explainParity(x, locale),
@@ -170,7 +183,8 @@ function planParityAdd(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   return {
     mode: "partall-oddetall-addisjon",
     catchTarget: x,
-    prompt: locale === "en" ? `Is ${x} + ${y} even or odd?` : `Er ${x} + ${y} partall eller oddetall?`,
+    prompt: t(locale, "math.askParity"),
+    expression: `${x} + ${y}`,
     kind: "parity",
     answer: parityOf(sum),
     operand: y,
@@ -185,7 +199,8 @@ function planParitySub(maxN: number, rng: Rng, locale: Locale): RoundPlan {
   return {
     mode: "partall-oddetall-subtraksjon",
     catchTarget: x,
-    prompt: locale === "en" ? `Is ${x} − ${y} even or odd?` : `Er ${x} − ${y} partall eller oddetall?`,
+    prompt: t(locale, "math.askParity"),
+    expression: `${x} − ${y}`,
     kind: "parity",
     answer: parityOf(diff),
     operand: y,
@@ -203,21 +218,13 @@ function planRoundMode(
 ): RoundPlan {
   const x = randomX(maxN, rng);
   const answer = roundTo(x, base, dir);
-  const unit = base === 100
-    ? locale === "en" ? "hundred" : "hundre"
-    : locale === "en" ? "ten" : "tier";
-  let prompt: string;
-  if (dir === "up") {
-    prompt = locale === "en" ? `Round ${x} up to the nearest ${unit}.` : `Rund ${x} opp til nærmeste ${unit}.`;
-  } else if (dir === "down") {
-    prompt = locale === "en" ? `Round ${x} down to the nearest ${unit}.` : `Rund ${x} ned til nærmeste ${unit}.`;
-  } else {
-    prompt = locale === "en" ? `Round ${x} to the nearest ${unit}.` : `Rund av ${x} til nærmeste ${unit}.`;
-  }
+  const unit = t(locale, base === 100 ? "math.unitHundred" : "math.unitTen");
+  const key = dir === "up" ? "math.roundUp" : dir === "down" ? "math.roundDown" : "math.roundNear";
   return {
     mode,
     catchTarget: x,
-    prompt,
+    prompt: t(locale, key, { unit }),
+    expression: String(x),
     kind: "number",
     answer,
     explanation: explainRound(x, answer, base, dir, locale),
@@ -229,13 +236,11 @@ function planCompare(mode: "ulikhet-tegn" | "ulikhet-ord", maxN: number, rng: Rn
   let y = randomX(maxN, rng);
   if (rng() < 0.22) y = x;
   const answer = compareOf(x, y);
-  const prompt = mode === "ulikhet-tegn"
-    ? (locale === "en" ? `Which sign fits? ${x} □ ${y}` : `Hvilket tegn passer? ${x} □ ${y}`)
-    : (locale === "en" ? `${x} is ___ ${y}` : `${x} er ___ ${y}`);
   return {
     mode,
     catchTarget: x,
-    prompt,
+    prompt: t(locale, mode === "ulikhet-tegn" ? "math.askSign" : "math.askWord"),
+    expression: mode === "ulikhet-tegn" ? `${x} □ ${y}` : `${x}  ___  ${y}`,
     kind: "compare",
     answer,
     operand: y,
