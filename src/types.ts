@@ -105,12 +105,12 @@ export interface Rect {
 }
 
 export const ALL_MODES: ModeId[] = [
-  "tiervenn",
   "femmervenn",
   "sekservenn",
   "syvervenn",
   "attervenn",
   "niervenn",
+  "tiervenn",
   "hundrevenn",
   "addisjon",
   "subtraksjon-positiv",

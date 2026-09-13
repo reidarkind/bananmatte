@@ -19,6 +19,13 @@ describe("availableModes", () => {
     }
   });
 
+  it("lists friends from five up to ten", () => {
+    const friends = availableModes({ ...DEFAULT_SETTINGS, maxN: 10 }).filter((mode) =>
+      ["femmervenn", "sekservenn", "syvervenn", "attervenn", "niervenn", "tiervenn"].includes(mode),
+    );
+    expect(friends).toEqual(["femmervenn", "sekservenn", "syvervenn", "attervenn", "niervenn", "tiervenn"]);
+  });
+
   it("does not offer rounding down under 10", () => {
     expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 50 }).join(" ")).not.toMatch(/ned-sma/);
     expect(availableModes({ ...DEFAULT_SETTINGS, maxN: 10 }).join(" ")).not.toMatch(/ned-sma/);
