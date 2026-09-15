@@ -19,7 +19,7 @@ import { playBonusRide } from "./session";
 
 function stubCanvas(): void {
   const gradient = { addColorStop: () => {} };
-  HTMLCanvasElement.prototype.getContext = () => new Proxy({}, {
+  const fake2d = new Proxy({}, {
     get(_target, prop) {
       if (prop === "createLinearGradient" || prop === "createRadialGradient") return () => gradient;
       if (prop === "measureText") return () => ({ width: 12 });
@@ -29,6 +29,9 @@ function stubCanvas(): void {
       return true;
     },
   }) as CanvasRenderingContext2D;
+  HTMLCanvasElement.prototype.getContext = ((id: string) => (
+    id === "2d" ? fake2d : null
+  )) as typeof HTMLCanvasElement.prototype.getContext;
   Object.defineProperty(HTMLCanvasElement.prototype, "clientWidth", { configurable: true, get: () => 400 });
   Object.defineProperty(HTMLCanvasElement.prototype, "clientHeight", { configurable: true, get: () => 700 });
 }
