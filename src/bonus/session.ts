@@ -6,7 +6,7 @@ import { renderMath } from "../screens/math";
 import type { Locale, Rng, Settings } from "../types";
 import { drawBonusRide } from "./draw";
 import { bonusVehicle, isJourneyEnd, worldTheme } from "./milestones";
-import { createRide, resolveBook, skipRide, startRide, stepRide, type RideState } from "./ride";
+import { createRide, laneFromPointer, resolveBook, skipRide, startRide, stepRide, type RideState } from "./ride";
 
 export function playBonusRide(
   host: HTMLElement,
@@ -156,7 +156,7 @@ export function playBonusRide(
   const pointerOff = attachPointer(canvas, (x) => {
     if (ride.phase !== "drive") return;
     const rect = canvas.getBoundingClientRect();
-    ride = { ...ride, x: Math.max(-1, Math.min(1, ((x / rect.width) * 2 - 1))) };
+    ride = { ...ride, x: laneFromPointer(x, rect.width) };
   });
   const keysOff = attachKeys((dir) => {
     steer = dir;

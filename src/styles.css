@@ -299,6 +299,7 @@ select {
   height: 100%;
   display: block;
   touch-action: none;
+  z-index: 0;
 }
 .bonus-bar {
   position: absolute;

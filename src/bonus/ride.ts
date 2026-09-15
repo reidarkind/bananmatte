@@ -24,8 +24,9 @@ export interface RideState {
   hitId?: number;
 }
 
-const HIT_X = 0.4;
+const HIT_X = 0.55;
 const HIT_S = 1.15;
+const LANE_SPAN = 0.3;
 const HOLD_CRASH = 1.5;
 const HOLD_BANK = 2.9;
 const COUNTDOWN = 4;
@@ -57,6 +58,20 @@ export function countdownMark(hold: number): 3 | 2 | 1 | "go" | null {
   if (hold < 3) return 1;
   if (hold < COUNTDOWN) return "go";
   return null;
+}
+
+export function laneToPixel(worldX: number, width: number): number {
+  return width / 2 + worldX * width * LANE_SPAN;
+}
+
+export function laneFromPointer(pixelX: number, width: number): number {
+  if (width <= 0) return 0;
+  return Math.max(-1, Math.min(1, (pixelX - width / 2) / (width * LANE_SPAN)));
+}
+
+function hitsObstacle(playerX: number, playerS: number, obs: RideObstacle): boolean {
+  const dist = obs.s - playerS;
+  return dist > 0 && dist <= HIT_S && Math.abs(playerX - obs.x) < HIT_X;
 }
 
 export function emptyRide(overrides: Partial<RideState> = {}): RideState {
@@ -139,7 +154,7 @@ export function stepRide(state: RideState, dt: number, steer: number): RideState
 
   for (const obs of obstacles) {
     if (obs.resolved) continue;
-    if (s < obs.s || s >= obs.s + HIT_S || Math.abs(x - obs.x) >= HIT_X) continue;
+    if (!hitsObstacle(x, s, obs)) continue;
     if (obs.kind === "banana") {
       obs.resolved = true;
       const dir = obs.x >= x ? 1 : -1;

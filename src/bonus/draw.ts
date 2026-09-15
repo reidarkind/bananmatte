@@ -1,7 +1,7 @@
 import { APE_FUR, apeFaceFill, drawBanana } from "../game/draw";
 import type { FallingItem } from "../game/entities";
 import { worldTheme, type BonusVehicle } from "./milestones";
-import { countdownMark, depositCoinT, depositShown, type RideObstacle, type RideState } from "./ride";
+import { countdownMark, depositCoinT, depositShown, laneToPixel, type RideObstacle, type RideState } from "./ride";
 
 interface Scene {
   sky: [string, string];
@@ -592,10 +592,10 @@ function drawObstacle(
   theme: ReturnType<typeof worldTheme>,
 ): void {
   const dist = obs.s - playerS;
-  if (dist < 0.28 || dist > 28 || obs.resolved) return;
+  if (dist < -0.15 || dist > 28 || obs.resolved) return;
   const p = project(w, h, obs.x, dist);
   ctx.save();
-  ctx.translate(p.x, p.y);
+  ctx.translate(laneToPixel(obs.x, w), p.y);
   const size = Math.min(150, Math.max(18, p.scale * 0.2));
   if (obs.kind === "banana") {
     if (theme === "water") drawSeaBanana(ctx, size);
@@ -1794,7 +1794,7 @@ export function drawBonusRide(
   const path = pathStyle(vehicle);
   const arrived = ride.phase === "bank";
   const glow = arrived ? Math.min(1, ride.hold / 1.4) : 0;
-  const apeX = w / 2 + ride.x * w * 0.3;
+  const apeX = laneToPixel(ride.x, w);
   const apeY = h - 96;
   drawSky(ctx, w, h, ride.s, colors);
   drawHills(ctx, w, h, colors, path);

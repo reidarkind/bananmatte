@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { countdownMark, createRide, depositShown, emptyRide, resolveBook, rideSpeed, skipRide, startRide, stepRide } from "./ride";
+import { countdownMark, createRide, depositShown, emptyRide, laneFromPointer, laneToPixel, resolveBook, rideSpeed, skipRide, startRide, stepRide } from "./ride";
 
 describe("bonus ride", () => {
   it("splats a banana, keeps driving, and starts a spin", () => {
     const next = stepRide(
-      emptyRide({ s: 9.6, obstacles: [{ id: 1, kind: "banana", x: 0.2, s: 10 }] }),
+      emptyRide({ s: 8.9, obstacles: [{ id: 1, kind: "banana", x: 0.2, s: 10 }] }),
       0.2,
       0,
     );
@@ -30,7 +30,7 @@ describe("bonus ride", () => {
 
   it("ends the tour on a crate", () => {
     const next = stepRide(
-      emptyRide({ s: 9.6, obstacles: [{ id: 1, kind: "crate", x: 0, s: 10 }] }),
+      emptyRide({ s: 8.9, obstacles: [{ id: 1, kind: "crate", x: 0, s: 10 }] }),
       0.2,
       0,
     );
@@ -39,13 +39,56 @@ describe("bonus ride", () => {
 
   it("stops for a book, continues when right, ends when wrong", () => {
     const hit = stepRide(
-      emptyRide({ s: 9.6, obstacles: [{ id: 1, kind: "book", x: 0, s: 10 }] }),
+      emptyRide({ s: 8.9, obstacles: [{ id: 1, kind: "book", x: 0, s: 10 }] }),
       0.2,
       0,
     );
     expect(hit.phase).toBe("math");
     expect(resolveBook(hit, true).phase).toBe("drive");
     expect(resolveBook(hit, false).phase).toBe("done");
+  });
+
+  it("pauses for a math book while it is still in front of the vehicle", () => {
+    const hit = stepRide(
+      emptyRide({ s: 8.9, obstacles: [{ id: 1, kind: "book", x: 0, s: 10 }] }),
+      0.2,
+      0,
+    );
+    expect(hit.s).toBeLessThan(10);
+    expect(hit.phase).toBe("math");
+  });
+
+  it("counts a math book that overlaps the vehicle in the same lane", () => {
+    const hit = stepRide(
+      emptyRide({ s: 8.9, obstacles: [{ id: 1, kind: "book", x: 0.48, s: 10 }] }),
+      0.2,
+      0,
+    );
+    expect(hit.phase).toBe("math");
+  });
+
+  it("lets a math book in the far lane go by", () => {
+    const next = stepRide(
+      emptyRide({ s: 8.9, obstacles: [{ id: 1, kind: "book", x: 0.9, s: 10 }] }),
+      0.2,
+      0,
+    );
+    expect(next.phase).toBe("drive");
+  });
+
+  it("does not start math after the book has already gone past", () => {
+    const next = stepRide(
+      emptyRide({ s: 10.4, obstacles: [{ id: 1, kind: "book", x: 0, s: 10 }] }),
+      0.2,
+      0,
+    );
+    expect(next.phase).toBe("drive");
+  });
+
+  it("maps a finger on a lane to the same world x the vehicle uses", () => {
+    expect(laneToPixel(0, 400)).toBe(200);
+    expect(laneFromPointer(200, 400)).toBe(0);
+    expect(laneFromPointer(laneToPixel(0.5, 400), 400)).toBeCloseTo(0.5);
   });
 
   it("starts slower than it finishes", () => {
