@@ -6,6 +6,7 @@ describe("extra languages", () => {
     expect(t("es", "menu.play")).toBe("Jugar");
     expect(t("de", "over.gotIt")).toBe("Verstanden");
     expect(t("sv", "settings.language")).toBe("Språk");
+    expect(t("fr", "menu.play")).toBe("Jouer");
   });
 });
 

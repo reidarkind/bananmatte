@@ -10,9 +10,9 @@ export function parseModeFilter(value: unknown): ModeFilter {
   return MODE_FILTERS.includes(value as ModeFilter) ? (value as ModeFilter) : "alle";
 }
 
-export type Locale = "nb" | "en" | "es" | "de" | "pt" | "sv" | "da";
+export type Locale = "nb" | "en" | "es" | "de" | "pt" | "sv" | "da" | "fr";
 
-export const LOCALES: Locale[] = ["nb", "en", "es", "de", "pt", "sv", "da"];
+export const LOCALES: Locale[] = ["nb", "en", "es", "de", "pt", "sv", "da", "fr"];
 
 export const LOCALE_NAMES: Record<Locale, string> = {
   nb: "Norsk",
@@ -22,6 +22,7 @@ export const LOCALE_NAMES: Record<Locale, string> = {
   pt: "Português",
   sv: "Svenska",
   da: "Dansk",
+  fr: "Français",
 };
 
 export const LOCALE_HTML: Record<Locale, string> = {
@@ -32,6 +33,7 @@ export const LOCALE_HTML: Record<Locale, string> = {
   pt: "pt",
   sv: "sv",
   da: "da",
+  fr: "fr",
 };
 
 export function tryParseLocale(value: unknown): Locale | null {

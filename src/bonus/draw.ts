@@ -1,4 +1,4 @@
-import { drawBanana, drawGorilla } from "../game/draw";
+import { APE_FUR, apeFaceFill, drawBanana } from "../game/draw";
 import type { FallingItem } from "../game/entities";
 import { worldTheme, type BonusVehicle } from "./milestones";
 import { countdownMark, depositCoinT, depositShown, type RideObstacle, type RideState } from "./ride";
@@ -462,189 +462,435 @@ function drawObstacle(
   ctx.restore();
 }
 
-function drawWheel(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
+function drawWheel(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, hub = "#adb5bd"): void {
   ctx.fillStyle = "#212529";
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
   ctx.fill();
-  ctx.fillStyle = "#adb5bd";
+  ctx.fillStyle = hub;
   ctx.beginPath();
   ctx.arc(x, y, r * 0.42, 0, Math.PI * 2);
   ctx.fill();
+  ctx.strokeStyle = "#868e96";
+  ctx.lineWidth = 1.4;
+  ctx.beginPath();
+  ctx.arc(x, y, r * 0.72, 0, Math.PI * 2);
+  ctx.stroke();
 }
 
-function drawVehicle(ctx: CanvasRenderingContext2D, vehicle: BonusVehicle, s: number): void {
-  if (vehicle === "vannscooter") {
-    ctx.fillStyle = "rgba(255,255,255,0.35)";
-    ctx.beginPath();
-    ctx.ellipse(8, 34, 58, 8, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#e63946";
-    ctx.beginPath();
-    ctx.moveTo(-46, 10);
-    ctx.lineTo(52, 6);
-    ctx.lineTo(44, 26);
-    ctx.lineTo(-38, 26);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#1d3557";
-    roundRect(ctx, -8, -8, 22, 20, 5);
-    ctx.fill();
-    ctx.strokeStyle = "#212529";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(4, -8);
-    ctx.lineTo(-10, -22);
-    ctx.lineTo(18, -22);
+export function bonusApePose(spin: number, spinLeft = 0): "rear" | "face" {
+  return Math.abs(spin) > 0.5 || Math.abs(spinLeft) > 0.15 ? "face" : "rear";
+}
+
+export function chaseLayout(vehicle: BonusVehicle): { rearW: number; frontW: number; depth: number } {
+  if (vehicle === "olabil") return { rearW: 96, frontW: 50, depth: 56 };
+  if (vehicle === "bil") return { rearW: 90, frontW: 54, depth: 60 };
+  if (vehicle === "vannscooter") return { rearW: 72, frontW: 34, depth: 66 };
+  if (vehicle === "baat") return { rearW: 100, frontW: 40, depth: 72 };
+  if (vehicle === "helikopter") return { rearW: 62, frontW: 46, depth: 68 };
+  if (vehicle === "propellfly") return { rearW: 42, frontW: 26, depth: 80 };
+  return { rearW: 48, frontW: 20, depth: 88 };
+}
+
+function chaseHull(
+  ctx: CanvasRenderingContext2D,
+  rearW: number,
+  frontW: number,
+  depth: number,
+  yRear: number,
+  fill: string,
+  stroke?: string,
+): void {
+  ctx.beginPath();
+  ctx.moveTo(-rearW / 2, yRear);
+  ctx.lineTo(rearW / 2, yRear);
+  ctx.lineTo(frontW / 2, yRear - depth);
+  ctx.lineTo(-frontW / 2, yRear - depth);
+  ctx.closePath();
+  ctx.fillStyle = fill;
+  ctx.fill();
+  if (stroke) {
+    ctx.strokeStyle = stroke;
+    ctx.lineWidth = 3;
     ctx.stroke();
+  }
+}
+
+function drawRidingGorilla(ctx: CanvasRenderingContext2D, pose: "rear" | "face"): void {
+  const fur = APE_FUR.gorilla;
+  const light = APE_FUR.gorillaLight;
+  const face = apeFaceFill("gorilla");
+  ctx.fillStyle = fur;
+  ctx.beginPath();
+  ctx.ellipse(0, 16, 21, 16, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = light;
+  ctx.beginPath();
+  ctx.ellipse(0, 14, 11, 9, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = fur;
+  ctx.beginPath();
+  ctx.ellipse(-19, 5, 7, 14, 0.4, 0, Math.PI * 2);
+  ctx.ellipse(19, 5, 7, 14, -0.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(-23, -8, 6.2, 0, Math.PI * 2);
+  ctx.arc(23, -8, 6.2, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = fur;
+  ctx.beginPath();
+  ctx.arc(0, -10, 16.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.ellipse(0, -22, 7, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(-15, -11, 5.6, 0, Math.PI * 2);
+  ctx.arc(15, -11, 5.6, 0, Math.PI * 2);
+  ctx.fill();
+
+  if (pose === "face") {
+    ctx.fillStyle = face;
+    ctx.beginPath();
+    ctx.ellipse(0, -7, 11, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.ellipse(-5, -10, 3.8, 4.4, 0, 0, Math.PI * 2);
+    ctx.ellipse(5, -10, 3.8, 4.4, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#1a120c";
+    ctx.beginPath();
+    ctx.arc(-4.6, -9.4, 2, 0, Math.PI * 2);
+    ctx.arc(5.4, -9.4, 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#4a2818";
+    ctx.beginPath();
+    ctx.arc(0, -2, 5.5, 0.2, Math.PI - 0.2);
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(-3.8, -3.4, 7.6, 2.1);
+    return;
+  }
+
+  ctx.fillStyle = light;
+  ctx.beginPath();
+  ctx.ellipse(0, -8, 8, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawOlabil(ctx: CanvasRenderingContext2D, pose: "rear" | "face"): void {
+  const { rearW, frontW, depth } = chaseLayout("olabil");
+  const y = 36;
+  ctx.fillStyle = "rgba(27, 20, 12, 0.22)";
+  ctx.beginPath();
+  ctx.ellipse(0, y + 10, 48, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  drawWheel(ctx, -28, y + 4, 9, "#ced4da");
+  drawWheel(ctx, 28, y + 4, 9, "#ced4da");
+  chaseHull(ctx, rearW, frontW, depth, y, "#c9782a", "#6b3f12");
+  ctx.fillStyle = "rgba(107, 63, 18, 0.28)";
+  ctx.fillRect(-rearW / 2 + 8, y - 18, rearW - 16, 5);
+  ctx.fillRect(-rearW / 2 + 10, y - 32, rearW - 22, 4);
+  ctx.fillStyle = "#fff3b0";
+  ctx.beginPath();
+  ctx.moveTo(-18, y - 6);
+  ctx.lineTo(18, y - 6);
+  ctx.lineTo(12, y - 16);
+  ctx.lineTo(-12, y - 16);
+  ctx.closePath();
+  ctx.fill();
+  drawWheel(ctx, -34, y + 8, 13);
+  drawWheel(ctx, 34, y + 8, 13);
+  ctx.strokeStyle = "#6b4226";
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-22, y - 8);
+  ctx.lineTo(-16, y - 38);
+  ctx.lineTo(16, y - 38);
+  ctx.lineTo(22, y - 8);
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(0, y - 22);
+  ctx.scale(0.92, 0.92);
+  drawRidingGorilla(ctx, pose);
+  ctx.restore();
+}
+
+function drawBil(ctx: CanvasRenderingContext2D, pose: "rear" | "face"): void {
+  const { rearW, frontW, depth } = chaseLayout("bil");
+  const y = 38;
+  ctx.fillStyle = "rgba(27, 20, 12, 0.22)";
+  ctx.beginPath();
+  ctx.ellipse(0, y + 12, 50, 8, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#adb5bd";
+  chaseHull(ctx, frontW + 18, frontW - 4, 16, y - depth + 8, "#adb5bd");
+  chaseHull(ctx, rearW, frontW, depth, y, "#e63946", "#9d0208");
+  ctx.fillStyle = "#1d3557";
+  ctx.beginPath();
+  ctx.moveTo(-30, y - 8);
+  ctx.lineTo(30, y - 8);
+  ctx.lineTo(20, y - 34);
+  ctx.lineTo(-20, y - 34);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#90e0ef";
+  ctx.beginPath();
+  ctx.moveTo(-24, y - 12);
+  ctx.lineTo(24, y - 12);
+  ctx.lineTo(16, y - 30);
+  ctx.lineTo(-16, y - 30);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#6c757d";
+  roundRect(ctx, -36, y - 4, rearW - 18, 10, 3);
+  ctx.fill();
+  ctx.fillStyle = "#c1121f";
+  roundRect(ctx, -40, y - 2, 14, 8, 2);
+  ctx.fill();
+  roundRect(ctx, 26, y - 2, 14, 8, 2);
+  ctx.fill();
+  ctx.fillStyle = "#fff3b0";
+  ctx.fillRect(-8, y + 2, 6, 4);
+  ctx.fillRect(2, y + 2, 6, 4);
+  drawWheel(ctx, -32, y + 10, 12);
+  drawWheel(ctx, 32, y + 10, 12);
+  ctx.save();
+  ctx.translate(0, y - 20);
+  ctx.scale(0.86, 0.86);
+  drawRidingGorilla(ctx, pose);
+  ctx.restore();
+}
+
+function drawVannscooter(ctx: CanvasRenderingContext2D, pose: "rear" | "face"): void {
+  const { rearW, frontW, depth } = chaseLayout("vannscooter");
+  const y = 40;
+  ctx.fillStyle = "rgba(255,255,255,0.4)";
+  ctx.beginPath();
+  ctx.ellipse(0, y + 14, 54, 10, 0, 0, Math.PI * 2);
+  ctx.fill();
+  chaseHull(ctx, rearW, frontW, depth, y, "#e63946", "#9d0208");
+  ctx.fillStyle = "#fff8e7";
+  ctx.beginPath();
+  ctx.moveTo(-16, y - 4);
+  ctx.lineTo(16, y - 4);
+  ctx.lineTo(10, y - 28);
+  ctx.lineTo(-10, y - 28);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#1d3557";
+  roundRect(ctx, -14, y - 18, 28, 16, 6);
+  ctx.fill();
+  ctx.strokeStyle = "#212529";
+  ctx.lineWidth = 4;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(-18, y - 22);
+  ctx.lineTo(-8, y - 40);
+  ctx.lineTo(8, y - 40);
+  ctx.lineTo(18, y - 22);
+  ctx.stroke();
+  ctx.fillStyle = "#495057";
+  ctx.beginPath();
+  ctx.ellipse(0, y + 6, 10, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.save();
+  ctx.translate(0, y - 18);
+  ctx.scale(0.9, 0.9);
+  drawRidingGorilla(ctx, pose);
+  ctx.restore();
+}
+
+function drawBaat(ctx: CanvasRenderingContext2D, pose: "rear" | "face"): void {
+  const { rearW, frontW, depth } = chaseLayout("baat");
+  const y = 42;
+  ctx.fillStyle = "rgba(255,255,255,0.4)";
+  ctx.beginPath();
+  ctx.ellipse(0, y + 16, 62, 11, 0, 0, Math.PI * 2);
+  ctx.fill();
+  chaseHull(ctx, rearW, frontW, depth, y, "#bc6c25", "#6b3f12");
+  ctx.fillStyle = "#fff3b0";
+  ctx.beginPath();
+  ctx.moveTo(-28, y - 8);
+  ctx.lineTo(28, y - 8);
+  ctx.lineTo(18, y - 36);
+  ctx.lineTo(-18, y - 36);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#90e0ef";
+  roundRect(ctx, -12, y - 30, 10, 12, 2);
+  ctx.fill();
+  roundRect(ctx, 2, y - 30, 10, 12, 2);
+  ctx.fill();
+  ctx.fillStyle = "#6b4226";
+  ctx.fillRect(-rearW / 2 + 6, y - 2, rearW - 12, 8);
+  ctx.fillStyle = "#e63946";
+  ctx.fillRect(22, y - 52, 4, 22);
+  ctx.beginPath();
+  ctx.moveTo(26, y - 52);
+  ctx.lineTo(42, y - 44);
+  ctx.lineTo(26, y - 38);
+  ctx.fill();
+  ctx.save();
+  ctx.translate(0, y - 18);
+  ctx.scale(0.88, 0.88);
+  drawRidingGorilla(ctx, pose);
+  ctx.restore();
+}
+
+function drawHelikopter(ctx: CanvasRenderingContext2D, s: number, pose: "rear" | "face"): void {
+  const { rearW, frontW, depth } = chaseLayout("helikopter");
+  const y = 36;
+  ctx.strokeStyle = "#495057";
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(0, y + 4);
+  ctx.lineTo(0, y + 28);
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(0, y + 28);
+  ctx.rotate(s * 10);
+  ctx.strokeStyle = "#6c757d";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-12, 0);
+  ctx.lineTo(12, 0);
+  ctx.stroke();
+  ctx.restore();
+  ctx.strokeStyle = "#343a40";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-22, y + 8);
+  ctx.lineTo(-30, y + 22);
+  ctx.moveTo(22, y + 8);
+  ctx.lineTo(30, y + 22);
+  ctx.stroke();
+  chaseHull(ctx, rearW, frontW, depth, y, "#ced4da", "#6c757d");
+  ctx.fillStyle = "#4cc9f0";
+  ctx.beginPath();
+  ctx.ellipse(0, y - 18, 18, 16, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.save();
+  ctx.translate(0, y - 28);
+  ctx.rotate(s * 8);
+  ctx.strokeStyle = "#495057";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(-56, 0);
+  ctx.lineTo(56, 0);
+  ctx.moveTo(0, -8);
+  ctx.lineTo(0, 8);
+  ctx.stroke();
+  ctx.restore();
+  ctx.fillStyle = "#adb5bd";
+  ctx.beginPath();
+  ctx.arc(0, y - 28, 5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.save();
+  ctx.translate(0, y - 16);
+  ctx.scale(0.84, 0.84);
+  drawRidingGorilla(ctx, pose);
+  ctx.restore();
+}
+
+function drawPropellfly(ctx: CanvasRenderingContext2D, s: number, pose: "rear" | "face"): void {
+  const { rearW, frontW, depth } = chaseLayout("propellfly");
+  const y = 40;
+  ctx.fillStyle = "#adb5bd";
+  ctx.beginPath();
+  ctx.moveTo(-70, y - 18);
+  ctx.lineTo(70, y - 18);
+  ctx.lineTo(58, y - 8);
+  ctx.lineTo(-58, y - 8);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = "#6c757d";
+  ctx.beginPath();
+  ctx.moveTo(-22, y + 2);
+  ctx.lineTo(22, y + 2);
+  ctx.lineTo(14, y + 14);
+  ctx.lineTo(-14, y + 14);
+  ctx.closePath();
+  ctx.fill();
+  chaseHull(ctx, rearW, frontW, depth, y, "#dee2e6", "#868e96");
+  ctx.fillStyle = "#4cc9f0";
+  roundRect(ctx, -8, y - 28, 16, 14, 4);
+  ctx.fill();
+  ctx.save();
+  ctx.translate(0, y - depth + 6);
+  ctx.rotate(s * 10);
+  ctx.fillStyle = "#495057";
+  ctx.fillRect(-3, -18, 6, 36);
+  ctx.restore();
+  ctx.save();
+  ctx.translate(0, y - 16);
+  ctx.scale(0.78, 0.78);
+  drawRidingGorilla(ctx, pose);
+  ctx.restore();
+}
+
+function drawJetfly(ctx: CanvasRenderingContext2D, pose: "rear" | "face"): void {
+  const { rearW, frontW, depth } = chaseLayout("jetfly");
+  const y = 42;
+  ctx.fillStyle = "#6c757d";
+  ctx.beginPath();
+  ctx.moveTo(-78, y - 22);
+  ctx.lineTo(78, y - 22);
+  ctx.lineTo(48, y - 8);
+  ctx.lineTo(-48, y - 8);
+  ctx.closePath();
+  ctx.fill();
+  chaseHull(ctx, rearW, frontW, depth, y, "#adb5bd", "#495057");
+  ctx.fillStyle = "#ff6b35";
+  ctx.beginPath();
+  ctx.ellipse(-10, y + 6, 7, 5, 0, 0, Math.PI * 2);
+  ctx.ellipse(10, y + 6, 7, 5, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#4cc9f0";
+  ctx.beginPath();
+  ctx.moveTo(-8, y - 20);
+  ctx.lineTo(8, y - 20);
+  ctx.lineTo(5, y - 40);
+  ctx.lineTo(-5, y - 40);
+  ctx.closePath();
+  ctx.fill();
+  ctx.save();
+  ctx.translate(0, y - 18);
+  ctx.scale(0.74, 0.74);
+  drawRidingGorilla(ctx, pose);
+  ctx.restore();
+}
+
+function drawVehicle(ctx: CanvasRenderingContext2D, vehicle: BonusVehicle, s: number, pose: "rear" | "face"): void {
+  if (vehicle === "vannscooter") {
+    drawVannscooter(ctx, pose);
     return;
   }
   if (vehicle === "baat") {
-    ctx.fillStyle = "rgba(255,255,255,0.35)";
-    ctx.beginPath();
-    ctx.ellipse(0, 36, 70, 10, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#bc6c25";
-    ctx.beginPath();
-    ctx.moveTo(-62, 8);
-    ctx.lineTo(68, 10);
-    ctx.lineTo(40, 34);
-    ctx.lineTo(-42, 34);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#fff3b0";
-    roundRect(ctx, -18, -10, 36, 22, 6);
-    ctx.fill();
-    ctx.fillStyle = "#e63946";
-    ctx.fillRect(48, -18, 4, 28);
-    ctx.beginPath();
-    ctx.moveTo(52, -18);
-    ctx.lineTo(72, -8);
-    ctx.lineTo(52, 0);
-    ctx.fill();
+    drawBaat(ctx, pose);
     return;
   }
   if (vehicle === "helikopter") {
-    ctx.strokeStyle = "#495057";
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(-8, -22);
-    ctx.lineTo(70, 8);
-    ctx.stroke();
-    ctx.save();
-    ctx.translate(-2, -26);
-    ctx.rotate(s * 8);
-    ctx.strokeStyle = "#6c757d";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(-54, 0);
-    ctx.lineTo(54, 0);
-    ctx.moveTo(0, -8);
-    ctx.lineTo(0, 8);
-    ctx.stroke();
-    ctx.restore();
-    ctx.fillStyle = "#ced4da";
-    roundRect(ctx, -36, -8, 64, 30, 12);
-    ctx.fill();
-    ctx.fillStyle = "#4cc9f0";
-    ctx.beginPath();
-    ctx.ellipse(-6, 2, 16, 12, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = "#343a40";
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.moveTo(-28, 22);
-    ctx.lineTo(-40, 34);
-    ctx.moveTo(16, 22);
-    ctx.lineTo(28, 34);
-    ctx.stroke();
+    drawHelikopter(ctx, s, pose);
     return;
   }
   if (vehicle === "jetfly") {
-    ctx.fillStyle = "#adb5bd";
-    ctx.beginPath();
-    ctx.moveTo(-70, 16);
-    ctx.lineTo(8, 4);
-    ctx.lineTo(78, 10);
-    ctx.lineTo(10, 20);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#ced4da";
-    ctx.beginPath();
-    ctx.moveTo(-36, 4);
-    ctx.lineTo(62, -2);
-    ctx.lineTo(68, 10);
-    ctx.lineTo(-28, 18);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#4cc9f0";
-    ctx.fillRect(18, -2, 16, 10);
-    ctx.fillStyle = "#6c757d";
-    ctx.fillRect(-8, 16, 16, 8);
-    ctx.fillRect(22, 16, 16, 8);
+    drawJetfly(ctx, pose);
     return;
   }
   if (vehicle === "propellfly") {
-    const span = 62;
-    ctx.fillStyle = "#adb5bd";
-    ctx.beginPath();
-    ctx.moveTo(-span, 12);
-    ctx.lineTo(span, 12);
-    ctx.lineTo(span - 10, 22);
-    ctx.lineTo(-span + 10, 22);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = "#dee2e6";
-    roundRect(ctx, -30, -10, 78, 28, 10);
-    ctx.fill();
-    ctx.fillStyle = "#4cc9f0";
-    ctx.fillRect(-8, -4, 14, 12);
-    ctx.fillRect(10, -4, 10, 12);
-    ctx.fillStyle = "#6c757d";
-    ctx.save();
-    ctx.translate(-32, 4);
-    ctx.rotate(s * 10);
-    ctx.fillRect(-3, -16, 6, 32);
-    ctx.restore();
+    drawPropellfly(ctx, s, pose);
     return;
   }
   if (vehicle === "bil") {
-    ctx.fillStyle = "#e63946";
-    roundRect(ctx, -52, -6, 104, 32, 10);
-    ctx.fill();
-    ctx.fillStyle = "#1d3557";
-    roundRect(ctx, -24, -26, 48, 24, 8);
-    ctx.fill();
-    ctx.fillStyle = "#90e0ef";
-    roundRect(ctx, -18, -20, 36, 14, 5);
-    ctx.fill();
-    ctx.fillStyle = "#fff3b0";
-    ctx.beginPath();
-    ctx.arc(-40, 2, 5, 0, Math.PI * 2);
-    ctx.arc(44, 2, 5, 0, Math.PI * 2);
-    ctx.fill();
-    drawWheel(ctx, -32, 26, 11);
-    drawWheel(ctx, 30, 26, 11);
+    drawBil(ctx, pose);
     return;
   }
-  ctx.fillStyle = "#c9782a";
-  roundRect(ctx, -46, 0, 92, 26, 6);
-  ctx.fill();
-  ctx.strokeStyle = "#6b3f12";
-  ctx.lineWidth = 3;
-  ctx.stroke();
-  ctx.fillStyle = "#fff3b0";
-  ctx.fillRect(-18, 6, 36, 8);
-  ctx.strokeStyle = "#6b4226";
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  ctx.moveTo(-20, 2);
-  ctx.lineTo(-8, -16);
-  ctx.lineTo(8, -16);
-  ctx.lineTo(20, 2);
-  ctx.stroke();
-  drawWheel(ctx, -28, 28, 10);
-  drawWheel(ctx, 28, 28, 10);
+  drawOlabil(ctx, pose);
 }
 
 function bankAnchor(w: number, h: number, dist: number, arrived: boolean): { x: number; y: number; scale: number } {
@@ -878,8 +1124,7 @@ export function drawBonusRide(
   ctx.rotate(tilt);
   ctx.scale(1.28, 1.28);
   ctx.translate(0, -14);
-  drawVehicle(ctx, vehicle, ride.s);
-  drawGorilla(ctx, 0, 0, 1, "back");
+  drawVehicle(ctx, vehicle, ride.s, bonusApePose(ride.spin, ride.spinLeft));
   ctx.restore();
   drawDeposit(ctx, w, h, ride, apeX, apeY, extras.score ?? 0, extras.depositLabel ?? "Poeng i banken");
   drawCountdown(ctx, w, h, ride, goLabel);

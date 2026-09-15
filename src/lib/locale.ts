@@ -10,6 +10,7 @@ const PHONE_TO_LOCALE: Record<string, Locale> = {
   pt: "pt",
   sv: "sv",
   da: "da",
+  fr: "fr",
 };
 
 export function localeFromNavigator(languages: readonly string[]): Locale {

@@ -1,4 +1,5 @@
 import type { Locale } from "./types";
+import { FR } from "./i18n-fr";
 
 const ES: Record<string, string> = {
   "menu.lead": "Haz travesuras de mono. Luego cuenta.",
@@ -1026,4 +1027,5 @@ export const EXTRA_LOCALES: Record<Exclude<Locale, "nb" | "en">, Record<string, 
   pt: PT,
   sv: SV,
   da: DA,
+  fr: FR,
 };

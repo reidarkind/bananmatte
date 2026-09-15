@@ -48,7 +48,7 @@ describe("settings storage", () => {
     const store = memoryStore();
     expect(hasChosenLocale(store)).toBe(false);
     expect(loadSettings(store, ["sv-SE"]).locale).toBe("sv");
-    expect(loadSettings(store, ["fr-FR"]).locale).toBe("en");
+    expect(loadSettings(store, ["it-IT"]).locale).toBe("en");
   });
 
   it("forgets the chosen language on reset and keeps other settings", () => {

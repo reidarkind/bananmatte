@@ -74,7 +74,7 @@ describe("settings highscores", () => {
       resetHighscores: () => {},
     });
     const lang = root.querySelector<HTMLSelectElement>("[data-lang]");
-    expect(lang?.querySelectorAll("option")).toHaveLength(7);
+    expect(lang?.querySelectorAll("option")).toHaveLength(8);
     lang!.value = "en";
     lang!.dispatchEvent(new Event("change"));
     expect(root.querySelector("h1")?.textContent).toBe("Settings");

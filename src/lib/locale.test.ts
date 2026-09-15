@@ -12,10 +12,11 @@ describe("localeFromNavigator", () => {
     expect(localeFromNavigator(["sv-SE"])).toBe("sv");
     expect(localeFromNavigator(["pt-BR", "en"])).toBe("pt");
     expect(localeFromNavigator(["de"])).toBe("de");
+    expect(localeFromNavigator(["fr-FR"])).toBe("fr");
   });
 
   it("falls back to English when the phone language is unknown", () => {
-    expect(localeFromNavigator(["fr-FR"])).toBe("en");
+    expect(localeFromNavigator(["it-IT"])).toBe("en");
     expect(localeFromNavigator([])).toBe("en");
   });
 });
