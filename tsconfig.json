@@ -16,5 +16,6 @@
     "noUncheckedSideEffectImports": true,
     "types": ["vitest/globals"]
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["src/sw.ts"]
 }

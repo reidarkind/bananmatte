@@ -1,22 +1,34 @@
 import { modeLabel, t } from "../i18n";
 import { isHundrevennAvailable, sanitizeSettings, visibleModes } from "../math/modes";
+import { applyAppUpdate, browserUpdateBridge, checkForAppUpdate, type UpdateCheckResult } from "../pwa/updates";
 import { ALL_MAX_N, LOCALES, LOCALE_NAMES, MODE_FILTERS, type Locale, type ModeFilter, type ModeId, type PlaySelection, type PlayStyleChoice, type Settings } from "../types";
 import { html, onClick } from "./dom";
 
 const MAX_OPTIONS = ALL_MAX_N;
 const PLAY_CHOICES: PlayStyleChoice[] = ["sank", "angrep", "forsvar", "mix"];
 
+export type SettingsActions = {
+  back: () => void;
+  save: (next: Settings) => void;
+  resetHighscores: () => void;
+  checkUpdate?: () => Promise<UpdateCheckResult>;
+  applyUpdate?: () => void | Promise<void>;
+};
+
 export function renderSettings(
   root: HTMLElement,
   settings: Settings,
-  actions: { back: () => void; save: (next: Settings) => void; resetHighscores: () => void },
+  actions: SettingsActions,
 ): void {
   const next: Settings = sanitizeSettings({
     ...settings,
     selectedModes: [...settings.selectedModes],
   });
   let resetStep: "idle" | "confirm" | "done" = "idle";
+  let updateStep: "idle" | "checking" | UpdateCheckResult = "idle";
   let needOne = false;
+  const checkUpdate = actions.checkUpdate ?? (() => checkForAppUpdate(browserUpdateBridge()));
+  const applyUpdate = actions.applyUpdate ?? (() => applyAppUpdate(browserUpdateBridge(), { reload: () => window.location.reload() }));
 
   const paint = () => {
     const locale = next.locale;
@@ -70,6 +82,13 @@ export function renderSettings(
           <input type="checkbox" data-sound ${next.sound ? "checked" : ""} />
           ${t(locale, "settings.sound")}
         </label>
+        <button class="btn" data-check-update type="button" ${updateStep === "checking" ? "disabled" : ""}>${t(locale, "settings.update")}</button>
+        ${updateStep === "checking" ? `<p class="muted">${t(locale, "settings.update.checking")}</p>` : ""}
+        ${updateStep === "current" ? `<p class="muted">${t(locale, "settings.update.current")}</p>` : ""}
+        ${updateStep === "offline" ? `<p class="muted">${t(locale, "settings.update.offline")}</p>` : ""}
+        ${updateStep === "available" ? `
+          <p class="muted">${t(locale, "settings.update.available")}</p>
+          <button class="btn primary" data-apply-update type="button">${t(locale, "settings.update.apply")}</button>` : ""}
         ${resetStep === "idle" ? `<button class="btn" data-reset-scores type="button">${t(locale, "settings.reset")}</button>` : ""}
         ${resetStep === "confirm" ? `
           <div class="reset-box">
@@ -116,6 +135,17 @@ export function renderSettings(
     });
     root.querySelector<HTMLInputElement>("[data-sound]")?.addEventListener("change", (event) => {
       next.sound = (event.target as HTMLInputElement).checked;
+    });
+    onClick(root, "[data-check-update]", () => {
+      updateStep = "checking";
+      paint();
+      void checkUpdate().then((result) => {
+        updateStep = result;
+        paint();
+      });
+    });
+    onClick(root, "[data-apply-update]", () => {
+      void applyUpdate();
     });
     root.querySelectorAll<HTMLInputElement>("[data-sel]").forEach((box) => {
       box.addEventListener("change", () => {

@@ -22,6 +22,16 @@ describe("bonus how-to", () => {
   });
 });
 
+describe("settings update copy", () => {
+  it("explains update check in short Bokmål", () => {
+    expect(t("nb", "settings.update")).toBe("Sjekk for oppdateringer");
+    expect(t("nb", "settings.update.current")).toBe("Du har nyeste versjon.");
+    expect(t("nb", "settings.update.available")).toBe("Ny versjon. Trykk for å laste inn.");
+    expect(t("nb", "settings.update.apply")).toBe("Last inn ny versjon");
+    expect(t("nb", "settings.update.offline")).toBe("Ingen nett. Prøv senere.");
+  });
+});
+
 describe("menu lead", () => {
   it("talks about ape tricks, not only catching bananas", () => {
     expect(t("nb", "menu.lead")).toBe("Gjør apestreker. Regn etterpå.");

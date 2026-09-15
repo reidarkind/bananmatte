@@ -18,6 +18,7 @@ Bananmatte is a Norwegian math game for grades 1-2. It is a Vite + TypeScript PW
 - src/game/ -- canvas loop, entities, collision, drawing, input, audio.
 - src/screens/ -- menu, play, math overlay, highscore, settings, about, game over.
 - src/app.ts -- screen state machine.
+- src/pwa/ -- update check. src/sw.ts precaches the whole Vite build for offline play.
 - Spec: docs/superpowers/specs/2026-09-12-bananmatte-design.md
 
 ## Rules

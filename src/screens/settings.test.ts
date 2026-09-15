@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { DEFAULT_SETTINGS } from "../types";
 import { renderSettings } from "./settings";
 
@@ -96,6 +96,47 @@ describe("settings highscores", () => {
     expect(options).toContain("manglende-tall");
     expect(options).not.toContain("subtraksjon-negativ");
     expect(options).not.toContain("likhet");
+    root.remove();
+  });
+
+  it("checks for an app update from settings", async () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    const check = vi.fn(async () => "current" as const);
+    renderSettings(root, { ...DEFAULT_SETTINGS, selectedModes: [...DEFAULT_SETTINGS.selectedModes] }, {
+      back: () => {},
+      save: () => {},
+      resetHighscores: () => {},
+      checkUpdate: check,
+      applyUpdate: () => {},
+    });
+    const button = root.querySelector<HTMLButtonElement>("[data-check-update]");
+    expect(button?.textContent).toBe("Sjekk for oppdateringer");
+    button!.click();
+    await vi.waitFor(() => {
+      expect(check).toHaveBeenCalledTimes(1);
+      expect(root.textContent).toContain("Du har nyeste versjon");
+    });
+    root.remove();
+  });
+
+  it("offers to load a waiting app update", async () => {
+    const root = document.createElement("div");
+    document.body.append(root);
+    const apply = vi.fn();
+    renderSettings(root, { ...DEFAULT_SETTINGS, selectedModes: [...DEFAULT_SETTINGS.selectedModes] }, {
+      back: () => {},
+      save: () => {},
+      resetHighscores: () => {},
+      checkUpdate: async () => "available",
+      applyUpdate: apply,
+    });
+    root.querySelector<HTMLButtonElement>("[data-check-update]")!.click();
+    await vi.waitFor(() => {
+      expect(root.textContent).toContain("Ny versjon. Trykk for å laste inn");
+    });
+    root.querySelector<HTMLButtonElement>("[data-apply-update]")!.click();
+    expect(apply).toHaveBeenCalledTimes(1);
     root.remove();
   });
 });
